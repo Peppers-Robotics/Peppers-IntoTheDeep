@@ -4,7 +4,11 @@ import android.graphics.Color;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchSimple;
+import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
+import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
@@ -19,7 +23,12 @@ class ColorRangeSensorPacket {
     }
 }
 
-public class FastColorRangeSensor extends RevColorSensorV3 {
+@I2cDeviceType
+@DeviceProperties(
+        xmlTag = "FastColorRangeSensor",
+        name = "Fast ColorRangeSensor - REV V3"
+)
+public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDevice {
     public enum Colors{
         RED,
         BLUE,
