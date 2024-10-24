@@ -1,37 +1,51 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.AsymetricMotionProfile;
+import org.firstinspires.ftc.teamcode.HelperClasses.DifferentialHelper;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 
 @Config
 public class Arm {
     public static double s1Offset = 0, s2Offset = 0;
     public static ServoPlus servo1, servo2;
-    public static AsymetricMotionProfile profile = new AsymetricMotionProfile(0, 0, 0);
+    private static AsymetricMotionProfile armProfile, pivotProfile;
+    private static final DifferentialHelper diffy;
 
-    synchronized public static void setAngle(double angle){
-        if(servo1.getAngle() == angle) return;
-        profile.startMotion(servo1.getAngle(), angle);
+    static {
+        armProfile = new AsymetricMotionProfile(0, 0, 0);
+        pivotProfile = new AsymetricMotionProfile(0, 0, 0);
+        diffy = new DifferentialHelper(1);
+    }
+
+
+    synchronized public static void setArmAngle(double angle){
+        armProfile.startMotion(armProfile.getPosition(), angle);
     }
 
     synchronized public static void update(){
-        profile.update();
-        servo1.setAngle(profile.getPosition() + s1Offset);
-        servo2.setAngle(profile.getPosition() + s2Offset);
+        armProfile.update();
+        pivotProfile.update();
+        diffy.setAngleToFirstJoint(armProfile.getPosition());
+        diffy.setAngleToSecondJoint(pivotProfile.getPosition());
+
+        servo1.setAngle(diffy.getRawAngles()[0]);
+        servo2.setAngle(diffy.getRawAngles()[1]);
     }
 
-    public synchronized static void setRotation(){
-
+    public synchronized static void setPivotAngle(double angle){
+        pivotProfile.startMotion(pivotProfile.getPosition(), angle);
     }
 
     public static boolean motionCompleted(){
-        return profile.motionEnded();
+        return pivotProfile.motionEnded() && armProfile.motionEnded();
+    }
+    public static double getCurrentPivotAngle(){
+        return pivotProfile.getPosition();
+    }
+    public static double getCurrentArmAngle(){
+        return armProfile.getPosition();
     }
 
-    public static double getPosition(){
-        return profile.getPosition();
-    }
 }

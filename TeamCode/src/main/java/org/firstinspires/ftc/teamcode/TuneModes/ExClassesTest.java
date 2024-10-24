@@ -18,7 +18,7 @@ public class ExClassesTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         ServoPlus s1 = hardwareMap.get(ServoPlus.class, "s1");
-        CachedMotor c1 = new CachedMotor( hardwareMap.get(DcMotor.class, "m1"));
+        CachedMotor c1 = new CachedMotor( hardwareMap.get(DcMotorEx.class, "m1"));
         s1.setAngle(0);
         c1.setPower(0);
 

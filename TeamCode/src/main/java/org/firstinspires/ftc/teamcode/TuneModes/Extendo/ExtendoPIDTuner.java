@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Initialization;
 
 @SuppressWarnings("unused")
-@TeleOp(group = "IntakeTuning")
+@TeleOp(group = "Intake")
 @Config
 public class ExtendoPIDTuner extends LinearOpMode {
     public static double TargetPosition = 0;

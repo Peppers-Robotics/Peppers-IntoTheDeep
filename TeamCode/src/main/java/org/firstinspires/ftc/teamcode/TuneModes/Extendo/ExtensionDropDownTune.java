@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 
-@TeleOp(group = "IntakeTuning")
+@TeleOp(group = "Intake")
 @Config
 public class ExtensionDropDownTune extends LinearOpMode {
 

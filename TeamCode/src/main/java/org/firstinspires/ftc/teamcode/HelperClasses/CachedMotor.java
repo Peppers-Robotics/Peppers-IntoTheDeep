@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorImpl;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
@@ -32,7 +31,7 @@ import java.util.Objects;
         orientation = Rotation.CCW
 )
 
-public class CachedMotor extends DcMotorImpl implements DcMotor, HardwareDevice {
+public class CachedMotor extends DcMotorImplEx implements DcMotorEx, HardwareDevice {
     private double lastSetPower = 69;
     private static double MAX_VELOCITY;
     public CachedMotor(DcMotorController controller, int portNumber) {
@@ -67,6 +66,7 @@ public class CachedMotor extends DcMotorImpl implements DcMotor, HardwareDevice 
     @Override
     public synchronized void setPower(double power){
         if(power != lastSetPower){
+            power = ((int)(power * 100)) / 100.f;
             lastSetPower = power;
             controller.setMotorPower(this.getPortNumber(), power);
         }
