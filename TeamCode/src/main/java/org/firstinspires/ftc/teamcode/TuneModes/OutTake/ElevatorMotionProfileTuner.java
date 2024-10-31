@@ -48,7 +48,7 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
         highBound = Elevator.motor.getCurrentPosition();
 
         telemetry.clear();
-        telemetry.addLine("Put the elevator down to its starting position (level 0)");
+        telemetry.addLine("Put the elevator down to its starting position (level 0) and press Y/▲ when done");
         telemetry.update();
 
         while (!gamepad1.y);
@@ -91,7 +91,7 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
         for(int i = 0; i < accelerations.size(); i++){
             mrv += maxVelocities.get(i);
             ar += accelerations.get(i);
-            dr += decelerations.get(i)
+            dr += decelerations.get(i);
         }
         mrv /= accelerations.size();
         ar /= accelerations.size();

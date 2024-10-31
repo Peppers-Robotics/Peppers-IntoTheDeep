@@ -53,9 +53,12 @@ public class PIDController {
         lastReturn = ret;
         return ret;
     }
-    public void setTargetPosition(double pos){
+    public void setTargetPosition(double pos, boolean resetIsum){
         targetPosition = pos;
-        Isum = 0;
+        if(resetIsum) Isum = 0;
+    }
+    public void setTargetPosition(double pos){
+        setTargetPosition(pos, true);
     }
     public void setMaxActuatorOutput(double mao){
         maxActuatorOutput = mao;
