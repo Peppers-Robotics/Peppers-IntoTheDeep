@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Intake;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
 import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 
@@ -49,6 +50,7 @@ public class Extendo {
             else motor.setPower(-1);
 
             if(motor.getVelocity() < 5){
+                motor.setPower(0);
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 HOME_RESET_ENCODERS = false;
@@ -58,7 +60,7 @@ public class Extendo {
         }
         double PIDPower = pidController.calculatePower(motor.getCurrentPosition());
 
-        motor.setPower(PIDPower);
+        motor.setPower(CutOffResolution.GetResolution(PIDPower, 2));
     }
 
 

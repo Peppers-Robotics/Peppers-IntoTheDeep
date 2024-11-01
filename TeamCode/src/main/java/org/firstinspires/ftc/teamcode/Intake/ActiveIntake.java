@@ -7,7 +7,6 @@ public class ActiveIntake {
 
     synchronized public static void powerOn(){
         motor.setPower(1);
-        if(Storage.hasAlliancePice()) Reverse();
     }
     synchronized public static void powerOff(){
         motor.setPower(0);

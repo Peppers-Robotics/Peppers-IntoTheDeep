@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.AsymetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
 import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
 
 @Config
@@ -36,17 +39,34 @@ public class Elevator {
     public static boolean PIDControllerInWork;
 
     public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
+    private static boolean elevatorReachedStopMotion, NEED_TO_RESET = false;
+    private static ElapsedTime time = new ElapsedTime();
 
     synchronized public static void update(){
-        if(!PIDControllerInWork) return;
+        if(targetPos <= 0 && NEED_TO_RESET) {
+            if(elevatorReachedStopMotion){
+                if(time.seconds() > 0.1){
+                    motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    NEED_TO_RESET = false;
+                }
+                motor.setPower(0);
+            }
+            else {
+                elevatorReachedStopMotion = motor.getVelocity() <= 5;
+                motor.setPower(-1);
+                if(elevatorReachedStopMotion) {
+                    time.reset();
+                    motor.setPower(0);
+                }
+            }
+            return;
+        }
+
         controller.setPidCoefficients(pidCoefficients);
         motionProfile.update();
         controller.setTargetPosition(motionProfile.getPosition(), false);
-        if(targetPos <= 0 && motor.getCurrentPosition() <= 5){ // disable PID and motor if elevator is already down
-            motor.setPower(0);
-        } else {
-            motor.setPower(controller.calculatePower(motor.getCurrentPosition()));
-        }
+        motor.setPower(CutOffResolution.GetResolution(controller.calculatePower(motor.getCurrentPosition()), 2));
     }
 
 }

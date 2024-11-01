@@ -6,28 +6,27 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.Initialization;
+import org.firstinspires.ftc.teamcode.OutTake.Arm;
+
 @Config
 @TeleOp
 public class Diffy extends LinearOpMode {
-    public Servo r, l;
-
-    public static double stage1Angle = 0, stage2Angle = 0;
-    private static double initPos1 = 180, initPos2 = 180;
-    public static double ratio = 40.0 / 24.f;
+    public static double ArmAngle = 180, PivotAngle = 180;
     @Override
     public void runOpMode() throws InterruptedException {
-        r = hardwareMap.get(Servo.class, "r");
-        l = hardwareMap.get(Servo.class, "l");
+        Arm.servo1 = hardwareMap.get(ServoPlus.class, "cS0");
+        Arm.servo2 = hardwareMap.get(ServoPlus.class, "cS1");
+        Arm.servo1.setAngle(180);
+        Arm.servo1.setAngle(180);
 
-        r.setPosition(initPos1 / 360 * ratio);
-        l.setPosition(initPos2 / 360 * ratio);
         waitForStart();
 
-        while (opModeIsActive()){
-            double lAngle = initPos1 + stage1Angle + stage2Angle;
-            double rAngle = initPos2 + stage2Angle - stage1Angle;
-            r.setPosition(rAngle / 360 * ratio);
-            l.setPosition(lAngle / 360 * ratio);
+        while (isStarted() && !isStopRequested()){
+            Arm.setArmAngle(ArmAngle);
+            Arm.setPivotAngle(PivotAngle);
+
+            Arm.update();
         }
     }
 }
