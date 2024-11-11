@@ -5,10 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
+import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
+import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogicStateMachine;
 
 @TeleOp(name = ".pipers \uD83C\uDF36", group = "mainOp")
@@ -19,6 +22,9 @@ public class MainOpMode extends LinearOpMode {
 	    Initialization.initializeRobot(hardwareMap);
         Controls.Initialize(gamepad1, gamepad2);
 
+        OutTakeController.Initialize(gamepad1, gamepad2);
+        IntakeController.Initialize(gamepad1, gamepad2);
+
         while (opModeInInit()){
             Elevator.update();
             Arm.update();
@@ -26,10 +32,12 @@ public class MainOpMode extends LinearOpMode {
 
         while (isStarted() && !isStopRequested()){
 
+            IntakeController.Update();
+            OutTakeController.Update();
+
+            Initialization.updateCacheing();
             Elevator.update();
             Arm.update();
         }
-
-
     }
 }

@@ -42,7 +42,7 @@ public class Elevator {
     private static boolean elevatorReachedStopMotion, NEED_TO_RESET = false;
     private static ElapsedTime time = new ElapsedTime();
 
-    synchronized public static void update(){
+    public static void update(){
         if(targetPos <= 0 && NEED_TO_RESET) {
             if(elevatorReachedStopMotion){
                 if(time.seconds() > 0.1){
