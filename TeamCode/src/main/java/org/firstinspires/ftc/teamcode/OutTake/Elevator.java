@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.AsymetricMotionProfile;
+import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
 import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
@@ -15,12 +15,12 @@ public class Elevator {
     public static CachedMotor motor;
     private static PIDController controller;
     public static PIDCoefficients pidCoefficients;
-    private static AsymetricMotionProfile motionProfile;
+    private static AsymmetricMotionProfile motionProfile;
 
     static {
         pidCoefficients = new PIDCoefficients(0, 0, 0);
         controller = new PIDController(pidCoefficients);
-        motionProfile = new AsymetricMotionProfile(0, 0, 0);
+        motionProfile = new AsymmetricMotionProfile(0, 0, 0);
         PIDControllerInWork = true;
     }
 

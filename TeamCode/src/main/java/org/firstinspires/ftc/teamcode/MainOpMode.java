@@ -19,19 +19,13 @@ public class MainOpMode extends LinearOpMode {
 	    Initialization.initializeRobot(hardwareMap);
         Controls.Initialize(gamepad1, gamepad2);
 
-        OutTakeLogicStateMachine.SetState(OutTakeLogicStateMachine.States.IDLE);
-
         while (opModeInInit()){
-            OutTakeLogicStateMachine.update();
             Elevator.update();
             Arm.update();
         }
 
         while (isStarted() && !isStopRequested()){
 
-
-
-            OutTakeLogicStateMachine.update();
             Elevator.update();
             Arm.update();
         }

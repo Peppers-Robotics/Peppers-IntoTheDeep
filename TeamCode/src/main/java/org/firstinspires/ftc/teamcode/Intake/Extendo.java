@@ -4,8 +4,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
+import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.OutTake.Claw;
 
 @SuppressWarnings("unused")
 public class Extendo {
@@ -50,6 +52,7 @@ public class Extendo {
             else motor.setPower(-1);
 
             if(motor.getVelocity() < 5){
+                if(Claw.HasElementInIt()) Claw.close(); // :) <- eu cand am scris asta
                 motor.setPower(0);
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

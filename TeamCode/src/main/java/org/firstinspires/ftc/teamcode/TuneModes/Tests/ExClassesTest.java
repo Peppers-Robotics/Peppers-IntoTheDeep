@@ -1,18 +1,13 @@
-package org.firstinspires.ftc.teamcode.TuneModes;
+package org.firstinspires.ftc.teamcode.TuneModes.Tests;
 
-import com.qualcomm.hardware.motors.GoBILDA5201Series;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
-import com.qualcomm.robotcore.hardware.configuration.UnspecifiedMotor;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 
-@TeleOp
+@TeleOp(group = "tests")
 public class ExClassesTest extends LinearOpMode {
 
     @Override

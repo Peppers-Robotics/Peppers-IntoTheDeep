@@ -33,12 +33,12 @@ public class OutTakeController extends GenericController {
                 OutTakeLogicStateMachine.ElevatorScoreSpecimen = OutTakeLogicStateMachine.ElevatorSpecimen2;
                 OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.EXTEND_TO_SCORE_SPECIMEN);
             } else {
-                OutTakeLogicStateMachine.ElevatorScoreSample = OutTakeLogicStateMachine.ElevatorSample1;
+                OutTakeLogicStateMachine.ElevatorScoreSample = OutTakeLogicStateMachine.ElevatorSample2;
                 OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.EXTEND_TO_SCORE_SAMPLE);
             }
             Controls.ScoreLevel2 = false;
         }
-        if(-gamepad2.right_stick_y <= -0.5 /*TODO: Do this only when we are scoring */) Arm.setArmAngle(OutTakeLogicStateMachine.ArmPushSpecimen);
+        if(-gamepad2.right_stick_y <= -0.5 && OutTakeLogicStateMachine.canDunk) OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.PUSH_SPECIMEN);
         else Arm.setArmAngle(OutTakeLogicStateMachine.ArmTakeSpecimen);
     }
 }

@@ -24,7 +24,7 @@ public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
     public ServoPlus(Servo s){
         super(s.getController(), s.getPortNumber(), s.getDirection());
     }
-    private volatile double MaxAngle = 360;
+    private volatile double MaxAngle = 355;
 
     synchronized public void setMaxAngle(double angle){
         MaxAngle = angle;
@@ -39,6 +39,8 @@ public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
     synchronized public void setPosition(double pos){
         if(pos != positionSetted){
             positionSetted = pos;
+            if(pos < 0) pos = 0;
+            if(pos > 1) pos = 1;
             this.controller.setServoPosition(portNumber, pos);
         }
     }

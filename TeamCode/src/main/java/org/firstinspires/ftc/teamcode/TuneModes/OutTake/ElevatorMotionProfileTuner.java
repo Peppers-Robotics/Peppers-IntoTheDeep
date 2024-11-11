@@ -25,8 +25,7 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
-        Initialization.initializeRobot(hardwareMap);
-        Initialization.UninitializeRobot();
+        Initialization.initializeElevator(hardwareMap);
 
         maxVelocities = new Vector<>();
         accelerations = new Vector<>();
@@ -57,12 +56,12 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
             telemetry.clear();
             telemetry.addLine("Wait for max velocity, acceleration, decceleration determination");
             telemetry.update();
-            Elevator.motor.setPower(1);
             double lastVelocity = 0;
             double acceleration = 0, deceleration = 0;
             ElapsedTime time = new ElapsedTime();
-            while(Elevator.motor.getCurrentPosition() < highBound - 10){
-                double currentAcceleration = (lastVelocity - Elevator.motor.getVelocity()) / time.seconds();
+            Elevator.motor.setPower(1);
+            while(Elevator.motor.getCurrentPosition() < highBound - 50){
+                double currentAcceleration = (lastVelocity - Elevator.motor.getVelocity()) / -time.seconds();
                 if(currentAcceleration > acceleration) acceleration = currentAcceleration;
                 if(currentAcceleration < deceleration) deceleration = currentAcceleration;
 
@@ -76,7 +75,7 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
             telemetry.clear();
             telemetry.addData("Max velocity", currentMaxVelocity);
             telemetry.addData("Acceleration", acceleration);
-            telemetry.addData("Deceleration", deceleration);
+            telemetry.addData("Deceleration (non accurate)", deceleration);
             telemetry.addLine("Put the elevator down to its starting position (level 0) and press Y/▲");
             telemetry.update();
             maxVelocities.add(currentMaxVelocity);
@@ -93,13 +92,16 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
             ar += accelerations.get(i);
             dr += decelerations.get(i);
         }
-        mrv /= accelerations.size();
+        mrv /= maxVelocities.size();
         ar /= accelerations.size();
-        dr /= accelerations.size();
+        dr /= decelerations.size();
+        telemetry.clear();
         telemetry.addData("Recommanded MaxVelocity", mrv);
         telemetry.addData("Recommanded Acceleration", ar);
-        telemetry.addData("Recommanded Deceleration", dr);
+        telemetry.addData("Recommanded Deceleration (recommandation: -acceleration)", dr);
+        telemetry.update();
 
         requestOpModeStop();
+        while (opModeIsActive());
     }
 }

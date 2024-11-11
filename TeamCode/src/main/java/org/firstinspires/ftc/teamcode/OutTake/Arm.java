@@ -2,40 +2,47 @@ package org.firstinspires.ftc.teamcode.OutTake;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.AsymetricMotionProfile;
+import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.DifferentialHelper;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 
 @Config
 public class Arm {
-    public static double s1Offset = 0, s2Offset = 0;
+    public static double s1Offset = 180, s2Offset = 180;
+    private static double armPrevPos = 0, pivotPrevPos = 0;
     public static ServoPlus servo1, servo2;
-    private static AsymetricMotionProfile armProfile, pivotProfile;
+    public static AsymmetricMotionProfile armProfile, pivotProfile;
     private static final DifferentialHelper diffy;
 
     static {
-        armProfile = new AsymetricMotionProfile(8e6, 8e6, 8e6);
-        pivotProfile = new AsymetricMotionProfile(8e6, 8e6, 8e6);
+        armProfile = new AsymmetricMotionProfile(4e3, 3e3, 1e4);
+        pivotProfile = new AsymmetricMotionProfile(6e3, 6e3, 5e4);
         diffy = new DifferentialHelper(3/4.f);
     }
 
 
-    synchronized public static void setArmAngle(double angle){
-        armProfile.startMotion(armProfile.getPosition(), angle);
+    public static void setArmAngle(double angle){
+        if(armProfile.getPosition() == angle) return;
+//        diffy.setAngleToSecondJoint(angle);
+        armProfile.startMotion(armPrevPos, angle);
+        armPrevPos = angle;
     }
 
-    synchronized public static void update(){
+    public static void update(){
         armProfile.update();
         pivotProfile.update();
-        diffy.setAngleToFirstJoint(armProfile.getPosition());
-        diffy.setAngleToSecondJoint(pivotProfile.getPosition());
+        diffy.setAngleToSecondJoint(armProfile.getPosition());
+        diffy.setAngleToFirstJoint(pivotProfile.getPosition());
 
-        servo1.setAngle(diffy.getRawAngles()[0]);
-        servo2.setAngle(diffy.getRawAngles()[1]);
+        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
+        servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
     }
 
-    public synchronized static void setPivotAngle(double angle){
-        pivotProfile.startMotion(pivotProfile.getPosition(), angle);
+    public static void setPivotAngle(double angle){
+        if(pivotProfile.getPosition() == angle) return;
+//        diffy.setAngleToFirstJoint(angle);
+        pivotProfile.startMotion(pivotPrevPos, angle);
+        pivotPrevPos = angle;
     }
 
     public static boolean motionCompleted(){
@@ -43,6 +50,9 @@ public class Arm {
     }
     public static double getCurrentPivotAngle(){
         return pivotProfile.getPosition();
+    }
+    public static double getPrecentOfArmMotionCompleted(){
+        return armProfile.getPrecentOfMotion();
     }
     public static double getCurrentArmAngle(){
         return armProfile.getPosition();

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.HelperClasses;
 
 public class DifferentialHelper {
     private double angleFirstJoint, angleSecondJoint;
-    private double gearRatio = 0;
+    private final double gearRatio;
     public DifferentialHelper(double gearRatio){
         angleFirstJoint = 0;
         angleSecondJoint = 0;

@@ -1,21 +1,23 @@
 package org.firstinspires.ftc.teamcode.HelperClasses;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
-public class AsymetricMotionProfile {
-    private double maxVelocity, acceleration;
+public class AsymmetricMotionProfile {
+    public double maxVelocity, acceleration, deceleration;
     private ElapsedTime time = new ElapsedTime();
     private double accelerationTime, deccelarationTime, constantTime,
             currentPosition, initialPosition, targetPosition, mvUsed,
-            velocity, sig, deceleration;
+            velocity, sig;
     private double t0 = 0, t1 = 0, t2 = 0;
-    public AsymetricMotionProfile(double maxVelocity, double acceleration, double deceleration){
+    public AsymmetricMotionProfile(double maxVelocity, double acceleration, double deceleration){
         this.maxVelocity = maxVelocity;
         this.acceleration = acceleration;
         this.deceleration = deceleration;
     }
     public void startMotion(double initialPos, double targetPos){
         if(initialPos == targetPos) return;
+        RobotLog.i("(stub! - handled) Asymmetric Motion can't make a profile for a distance of 0 units");
         double dist = Math.abs(targetPos - initialPos);
         sig = Math.signum(targetPos - initialPos);
         initialPosition = initialPos;
@@ -44,16 +46,19 @@ public class AsymetricMotionProfile {
         velocity = 0;
         time.reset();
     }
+    public double getPrecentOfMotion(){
+        return Math.abs(targetPosition - initialPosition) / Math.abs(targetPosition - currentPosition)  * 100;
+    }
     private double a(double t){
         if(t <= t0) return acceleration;
         if(t <= t1) return 0;
-        if(t <= t2) return -acceleration;
+        if(t <= t2) return deceleration;
         return 0;
     }
     private double v(double t){
         if(t <= t0) return t * acceleration;
         if(t <= t1) return maxVelocity;
-        if(t <= t2) return maxVelocity - acceleration * (t - t1);
+        if(t <= t2) return maxVelocity - deceleration * (t - t1);
         return 0;
     }
     private double p(double t){
