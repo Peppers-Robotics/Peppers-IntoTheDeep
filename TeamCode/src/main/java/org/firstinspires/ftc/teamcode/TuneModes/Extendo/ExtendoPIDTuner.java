@@ -18,19 +18,12 @@ public class ExtendoPIDTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Initialization.initializeRobot(hardwareMap);
+        Initialization.initializeExtendo(hardwareMap);
+        Initialization.initializeHubCacheing(hardwareMap);
         ElapsedTime time = new ElapsedTime();
-
-        Thread updater = new Thread(() -> {
-            while(opModeIsActive()) {
-                Initialization.updateCacheing();
-                Extendo.update();
-            }
-        });
 
         waitForStart();
         time.reset();
-        updater.start();
 
         while (opModeIsActive()){
             Extendo.DropDown(0);
@@ -40,8 +33,10 @@ public class ExtendoPIDTuner extends LinearOpMode {
             }
 
             Extendo.Extend((int) TargetPosition);
-
+            Initialization.updateCacheing();
+            Extendo.update();
+            Initialization.telemetry.update();
         }
-        Initialization.UninitializeRobot();
+//        Initialization.UninitializeRobot();
     }
 }

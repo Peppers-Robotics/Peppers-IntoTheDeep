@@ -1,15 +1,19 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
 import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 
 @SuppressWarnings("unused")
+@Config
 public class Extendo {
     public static CachedMotor motor;
     public static ServoPlus dropDownIntakeRight;
@@ -17,9 +21,15 @@ public class Extendo {
     public static PIDController pidController = new PIDController(0, 0, 0);
     public static double MaxExtension;
     private static volatile double targetPosition = 0;
-    public static final double tensionCoeff = 10;
+//    public static final double tensionCoeff = 10;
+    public static double off1 = 31, off2 = 30;
     public static final double A = 60, B = 90;
     public static boolean HOME_RESET_ENCODERS = true;
+    public static AsymmetricMotionProfile DropDownProfile;
+
+    static {
+        DropDownProfile = new AsymmetricMotionProfile(1000, 8000, 8000);
+    }
 
     private static double inverseKinematicsForDropdownLinkage(double lenght){
 
@@ -32,8 +42,10 @@ public class Extendo {
     }
 
     public synchronized static void DropDown(double distanceInMm){
-        dropDownIntakeRight.setAngle(inverseKinematicsForDropdownLinkage(distanceInMm) - tensionCoeff);
-        dropDownIntakeLeft.setAngle(inverseKinematicsForDropdownLinkage(distanceInMm) - tensionCoeff);
+        if(DropDownProfile.motionEnded()) DropDownProfile.startMotion(DropDownProfile.getPosition(), inverseKinematicsForDropdownLinkage(distanceInMm));
+        dropDownIntakeRight.setAngle(DropDownProfile.getPosition() + off1);
+        dropDownIntakeLeft.setAngle(DropDownProfile.getPosition() + off2);
+        Initialization.telemetry.addData("dropdown profile", DropDownProfile.getPosition());
     }
 
     public synchronized static void Extend(int position){
@@ -46,7 +58,7 @@ public class Extendo {
         pidController.setTargetPosition(position);
     }
     public synchronized static void update(){
-        if(HOME_RESET_ENCODERS){
+       /* if(HOME_RESET_ENCODERS){
 
             if(motor.getCurrentPosition() < 30) motor.setPower(-0.3);
             else motor.setPower(-1);
@@ -60,10 +72,13 @@ public class Extendo {
             }
 
             return;
-        }
+        }*/
         double PIDPower = pidController.calculatePower(motor.getCurrentPosition());
 
         motor.setPower(CutOffResolution.GetResolution(PIDPower, 2));
+        DropDownProfile.update();
+        Initialization.telemetry.addData("currentPosition", motor.getCurrentPosition());
+        Initialization.telemetry.addData("targetPos", targetPosition);
     }
 
 

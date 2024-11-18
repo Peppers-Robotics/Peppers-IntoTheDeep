@@ -18,13 +18,15 @@ public class ExtensionDropDownTune extends LinearOpMode {
     public static double Distance = 0;
     @Override
     public void runOpMode() throws InterruptedException {
-        Extendo.dropDownIntakeLeft = new ServoPlus(hardwareMap.get(Servo.class, "cS2"));
-        Extendo.dropDownIntakeRight = new ServoPlus(hardwareMap.get(Servo.class, "cS3"));
+        Initialization.initializeExtendo(hardwareMap);
 
         waitForStart();
 
         while (opModeIsActive()){
             Extendo.DropDown(Distance);
+//            Extendo.update();
+            Extendo.DropDownProfile.update();
+            Initialization.telemetry.update();
         }
     }
 }

@@ -1,18 +1,13 @@
 package org.firstinspires.ftc.teamcode.HelperClasses;
 
-import android.graphics.Color;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchSimple;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.vision.opencv.ColorRange;
-import org.firstinspires.ftc.vision.opencv.ColorSpace;
 
 class ColorRangeSensorPacket {
     public int R, G, B;
@@ -29,18 +24,9 @@ class ColorRangeSensorPacket {
         name = "Fast ColorRangeSensor - REV V3"
 )
 public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDevice {
-    public enum Colors{
-        RED,
-        BLUE,
-        GREEN,
-        WHITE,
-        YELLOW,
-        BLACK,
-        OTHER
-    }
     private long timeDistance = 0, timeRGB = 0;
     private double freq = 50;
-    ColorRangeSensorPacket p;
+    public ColorRangeSensorPacket p = new ColorRangeSensorPacket();
     public FastColorRangeSensor(I2cDeviceSynchSimple deviceClient, boolean deviceClientIsOwned) {
         super(deviceClient, deviceClientIsOwned);
         timeDistance = System.currentTimeMillis();
@@ -84,29 +70,14 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
         return x <= upperBound && x >= lowerBound;
     }
 
-    public Colors getColorSeenBySensor(){
+    public Colors.ColorType getColorSeenBySensor(){
         if(System.currentTimeMillis() - timeRGB > freq){
             p.G = this.green();
-            p.B = this.red();
-            p.R = this.blue();
+            p.R = this.red();
+            p.B = this.blue();
+            timeRGB = System.currentTimeMillis();
         }
-        double[] hsv = rgbToHSV(new int[]{p.R, p.G, p.B});
+        return Colors.getColorFromRGB(new Colors.Color(p.R, p.G, p.B));
 
-        if(isInRage(hsv[0], 50, 65) && isInRage(hsv[1], 75, 100) && isInRage(hsv[2], 50, 100)){
-            return Colors.YELLOW;
-        }
-
-        if(isInRage(hsv[0], 200, 255) && isInRage(hsv[1], 65, 100) && isInRage(hsv[2], 50, 100)){
-            return Colors.BLUE;
-        }
-
-        hsv = rgbToHSV(new int[]{p.B, p.G, p.R});
-
-        if(isInRage(hsv[0], 200, 255) && isInRage(hsv[1], 65, 100) && isInRage(hsv[2], 50, 100)){
-            return Colors.RED;
-        }
-
-
-        return Colors.OTHER;
     }
 }

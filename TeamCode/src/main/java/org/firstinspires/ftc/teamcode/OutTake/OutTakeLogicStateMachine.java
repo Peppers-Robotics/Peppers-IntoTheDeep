@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.OutTake;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class OutTakeLogicStateMachine {
-    public static double IdleArmAngle, IdlePivotAngle, IdleElevatorLevel = 0;
-    public static double ArmScoreSample, PivotScoreSample, ElevatorScoreSample;
-    public static double ArmScoreSpecimen, PivotScoreSpecimen, ElevatorScoreSpecimen, ArmPushSpecimen;
-    public static double ArmTakeSpecimen, PivotTakeSpecimen, ElevatorTakeSpecimen;
-    public static double ElevatorSpecimen1, ElevatorSpecimen2, ElevatorSample1, ElevatorSample2;
+    public static double IdleArmAngle = 0, IdlePivotAngle = 0, IdleElevatorLevel = 0;
+    public static double ArmScoreSample = 90, PivotScoreSample = 50, ElevatorScoreSample;
+    public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 100, ElevatorScoreSpecimen = 200, ArmPushSpecimen = 130;
+    public static double ArmTakeSpecimen = 270, PivotTakeSpecimen = 195, ElevatorTakeSpecimen = 50; // DONE
+    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 400, ElevatorSample1 = 100, ElevatorSample2 = 400;
     private static boolean DunkBoolean = false;
     public enum States{
         EXTEND_TO_SCORE_SPECIMEN,
@@ -29,13 +29,15 @@ public class OutTakeLogicStateMachine {
         if(CurrentState != States.IDLE) return;
         CurrentState = state;
     }
-
+    private static boolean sense = false;
 
     public static void Update(){
         switch (CurrentState){
             case IDLE:
-                if(OutTakeController.ScoreSpecimen && Claw.HasElementInIt())
+                if(sense && Claw.HasElementInIt()) {
                     Claw.close();
+                    sense = false;
+                }
                 break;
 
             case RETRACT:
@@ -78,6 +80,7 @@ public class OutTakeLogicStateMachine {
                 Arm.setPivotAngle(PivotTakeSpecimen);
                 Elevator.setTargetPosition(ElevatorTakeSpecimen);
                 if(Elevator.ReachedTargetPosition() && Arm.motionCompleted()) CurrentState = States.IDLE;
+                sense = true;
                 break;
             case EXTEND_TO_SCORE_SAMPLE:
                 Arm.setArmAngle(ArmScoreSample);

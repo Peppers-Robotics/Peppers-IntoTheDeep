@@ -5,10 +5,11 @@ import com.acmerobotics.dashboard.config.Config;
 import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.DifferentialHelper;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.Initialization;
 
 @Config
 public class Arm {
-    public static double s1Offset = 180, s2Offset = 180;
+    public static double s1Offset = 0, s2Offset = 0;
     private static double armPrevPos = 0, pivotPrevPos = 0;
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;
@@ -17,7 +18,7 @@ public class Arm {
     static {
         armProfile = new AsymmetricMotionProfile(4e3, 3e3, 1e4);
         pivotProfile = new AsymmetricMotionProfile(6e3, 6e3, 5e4);
-        diffy = new DifferentialHelper(3/4.f);
+        diffy = new DifferentialHelper(3.f/4);
     }
 
 
@@ -36,6 +37,10 @@ public class Arm {
 
         servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
         servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
+        Initialization.telemetry.addData("Arm angle", armProfile.getPosition());
+        Initialization.telemetry.addData("Pivot angle", pivotProfile.getPosition());
+        Initialization.telemetry.addData("deg1", diffy.getRawAngles()[1]);
+        Initialization.telemetry.addData("deg0", diffy.getRawAngles()[0]);
     }
 
     public static void setPivotAngle(double angle){

@@ -40,7 +40,8 @@ public class ServoTesterMode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         ServoController chubController = hardwareMap.get(Servo.class, "cS0").getController();
         ServoController ehubController = hardwareMap.get(Servo.class, "eS0").getController();
-
+//        chubController.pwmEnable();
+//        ehubController.pwmEnable();
         waitForStart();
 
         while (opModeIsActive()){

@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
 import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
+import org.firstinspires.ftc.teamcode.Initialization;
 
 @Config
 public class Elevator {
@@ -20,7 +21,7 @@ public class Elevator {
     static {
         pidCoefficients = new PIDCoefficients(0, 0, 0);
         controller = new PIDController(pidCoefficients);
-        motionProfile = new AsymmetricMotionProfile(0, 0, 0);
+        motionProfile = new AsymmetricMotionProfile(100, 40, 30);
         PIDControllerInWork = true;
     }
 
@@ -28,7 +29,7 @@ public class Elevator {
 
     synchronized public static void setTargetPosition(double pos){
         if(pos == targetPos) return;
-        motionProfile.startMotion(pos, targetPos);
+        motionProfile.startMotion(targetPos, pos);
         targetPos = pos;
         motionProfile.update();
         controller.setTargetPosition(motionProfile.getPosition());
@@ -38,12 +39,13 @@ public class Elevator {
     public static double getCurrentPosition(){ return motor.getCurrentPosition(); }
     public static boolean PIDControllerInWork;
 
-    public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
+//    public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
+    public static boolean ReachedTargetPosition(){ return motionProfile.motionEnded(); }
     private static boolean elevatorReachedStopMotion, NEED_TO_RESET = false;
     private static ElapsedTime time = new ElapsedTime();
 
     public static void update(){
-        if(targetPos <= 0 && NEED_TO_RESET) {
+       /* if(targetPos <= 0 && NEED_TO_RESET) {
             if(elevatorReachedStopMotion){
                 if(time.seconds() > 0.1){
                     motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -62,11 +64,14 @@ public class Elevator {
             }
             return;
         }
-
+*/
         controller.setPidCoefficients(pidCoefficients);
         motionProfile.update();
         controller.setTargetPosition(motionProfile.getPosition(), false);
         motor.setPower(CutOffResolution.GetResolution(controller.calculatePower(motor.getCurrentPosition()), 2));
+        Initialization.telemetry.addData("Elevator pose from profile", motionProfile.getPosition());
+        Initialization.telemetry.addData("Elevator current pose", motor.getCurrentPosition());
+        Initialization.telemetry.addData("Elevator targetPos", motor.getTargetPosition());
     }
 
 }

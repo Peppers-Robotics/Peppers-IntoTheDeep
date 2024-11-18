@@ -2,11 +2,15 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
@@ -27,33 +31,40 @@ public class Initialization {
         BLUE
     }
     public static AllianceColor Team;
+    public static Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     public static void initializeHubCacheing(@NonNull HardwareMap hm){
         hubs = hm.getAll(LynxModule.class);
-        hubs.get(0).setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        hubs.get(1).setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        for(LynxModule l : hubs){
+            l.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
     }
     public static void initializeExtendo(@NonNull HardwareMap hm){
-        Extendo.motor = (CachedMotor) hm.get(DcMotor.class, "cM0");
+        Extendo.motor = new CachedMotor(hm.get(DcMotor.class, "cM1"));
+//        Extendo.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        Extendo.dropDownIntakeLeft = (ServoPlus) hm.get(Servo.class, "cS0");
-        Extendo.dropDownIntakeRight = (ServoPlus) hm.get(Servo.class, "cS4");
+        Extendo.dropDownIntakeLeft = hm.get(ServoPlus.class, "eS4");
+        Extendo.dropDownIntakeRight = hm.get(ServoPlus.class, "eS2");
     }
+    // eS1 - hang1
+    // es0 - hang2
     public static void initializeStorage(@NonNull HardwareMap hm){
         Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
     }
     public static void initializeElevator(@NonNull HardwareMap hm){
-        Elevator.motor = (CachedMotor) hm.get(DcMotor.class, "cM1");
+        Elevator.motor = new CachedMotor (hm.get(DcMotor.class, "eM0"));
         Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void initializeOuttake(@NonNull HardwareMap hm){
-        Claw.clawServo = (ServoPlus) hm.get(Servo.class, "cS1");
-        Arm.servo1 = (ServoPlus) hm.get(Servo.class, "cS2");
-        Arm.servo2 = (ServoPlus) hm.get(Servo.class, "cS3");
+        Claw.clawServo = hm.get(ServoPlus.class, "cS2");
+        Arm.servo1 = hm.get(ServoPlus.class, "eS3");
+        Arm.servo2 = hm.get(ServoPlus.class, "eS5");
         Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");
     }
     public static void initializeIntake(@NonNull HardwareMap hm){
-        ActiveIntake.motor = (CachedMotor) hm.get(DcMotor.class, "cM2");
+        ActiveIntake.motor = new CachedMotor(hm.get(DcMotor.class, "eM3"));
         ActiveIntake.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        ServoPlus latch = hm.get(ServoPlus.class, "cS0");
+        // PTO - cS4
     }
     public static void initializeRobot(@NonNull HardwareMap hm){
         initializeIntake(hm);
@@ -93,5 +104,16 @@ public class Initialization {
         Extendo.dropDownIntakeLeft.getController().pwmDisable();
 
         Claw.clawServo.getController().pwmDisable();
+    }
+
+    public static void chassis(){
+        /*
+        * cM2 - stanga spate
+        * cM3 - stanga fata
+        * eM1 - drapta fata
+        * eM2 - drapta spate
+        *
+        *
+        * */
     }
 }

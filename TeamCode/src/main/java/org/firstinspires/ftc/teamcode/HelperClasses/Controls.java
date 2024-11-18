@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.HelperClasses;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+@Config
 public class Controls {
     public static AutoGamepad gamepad1, gamepad2;
 

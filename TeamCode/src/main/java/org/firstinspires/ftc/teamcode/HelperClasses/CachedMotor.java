@@ -64,7 +64,7 @@ public class CachedMotor extends DcMotorImplEx implements DcMotorEx, HardwareDev
     }
 
     @Override
-    public synchronized void setPower(double power){
+    public void setPower(double power){
         if(power != lastSetPower){
             power = ((int)(power * 100)) / 100.f;
             lastSetPower = power;

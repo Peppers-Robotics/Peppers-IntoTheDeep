@@ -2,15 +2,20 @@ package org.firstinspires.ftc.teamcode.OutTake;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
+import org.firstinspires.ftc.teamcode.Initialization;
+
+import java.util.concurrent.RecursiveTask;
 
 public class OutTakeController extends GenericController {
     public static boolean ScoreSpecimen = false;
     public static void Update(){
         if(Controls.Grab){
-            if(Claw.isClosed()) Claw.open();
+            if(Claw.isClosed()) {
+                Claw.open();
+                ScoreSpecimen = false;
+            }
             else Claw.close();
 
-            ScoreSpecimen = false;
             Controls.Grab = false;
         }
         if(Controls.GrabSpecimen){
@@ -37,8 +42,17 @@ public class OutTakeController extends GenericController {
                 OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.EXTEND_TO_SCORE_SAMPLE);
             }
             Controls.ScoreLevel2 = false;
+        } else if(Controls.Retract){
+            OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.RETRACT);
+
+            Controls.Retract = false;
+        } else if(Controls.DunkToScore){
+            OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.PUSH_SPECIMEN);
+
+            Controls.DunkToScore = false;
         }
-        if(-gamepad2.right_stick_y <= -0.5 && OutTakeLogicStateMachine.canDunk) OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.PUSH_SPECIMEN);
-        else Arm.setArmAngle(OutTakeLogicStateMachine.ArmTakeSpecimen);
+//        if(-gamepad2.right_stick_y <= -0.5 && OutTakeLogicStateMachine.canDunk) OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.PUSH_SPECIMEN);
+//        else Arm.setArmAngle(OutTakeLogicStateMachine.ArmTakeSpecimen);
+        OutTakeLogicStateMachine.Update();
     }
 }

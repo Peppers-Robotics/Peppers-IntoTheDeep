@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 
 @Config
@@ -17,9 +18,8 @@ public class Diffy extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Initialization.initializeOuttake(hardwareMap);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        Arm.servo1 = new ServoPlus(hardwareMap.get(Servo.class, "cS0"));
-        Arm.servo2 = new ServoPlus(hardwareMap.get(Servo.class, "cS1"));
         waitForStart();
 
         while (opModeIsActive()){
@@ -27,6 +27,7 @@ public class Diffy extends LinearOpMode {
             Arm.setPivotAngle(PivotAngle);
 
             Arm.update();
+            Initialization.telemetry.update();
         }
     }
 }

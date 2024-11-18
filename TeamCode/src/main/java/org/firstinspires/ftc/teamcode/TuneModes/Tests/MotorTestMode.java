@@ -11,7 +11,8 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 @Config
 @TeleOp(group = "tests")
 public class MotorTestMode extends LinearOpMode {
-    public static int port = 0, power = 0;
+    public static int port = 0;
+    public static double power = 0;
     public static ServoTesterMode.Hub hub = ServoTesterMode.Hub.CONTROL_HUB;
     @Override
     public void runOpMode() throws InterruptedException {
