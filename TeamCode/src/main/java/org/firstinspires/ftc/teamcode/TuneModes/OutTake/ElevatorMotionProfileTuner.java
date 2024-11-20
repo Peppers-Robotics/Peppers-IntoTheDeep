@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.HelperClasses.AutoGamepad;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.MainOpMode;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
@@ -24,33 +25,33 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
     private Vector<Double> maxVelocities, accelerations, decelerations;
     @Override
     public void runOpMode() throws InterruptedException {
+        AutoGamepad gamepad = new AutoGamepad(gamepad1);
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
         Initialization.initializeElevator(hardwareMap);
+        Initialization.initializeHubCacheing(hardwareMap);
 
         maxVelocities = new Vector<>();
         accelerations = new Vector<>();
         decelerations = new Vector<>();
 
-        Thread t = new Thread(() -> {
-            while (isStarted() && !isStopRequested()){
-                Initialization.updateCacheing();
-            }
-        });
-
         waitForStart();
-        t.start();
         telemetry.addLine("raise the elevator by hand to its maximum position");
         telemetry.addLine("press Y/▲ when the elevator is extended at its maximum");
         telemetry.update();
 
-        while(!gamepad1.y);
+        do {
+            gamepad.update();
+        } while (!gamepad.wasPressed.y);
+        Initialization.updateCacheing();
         highBound = Elevator.motor.getCurrentPosition();
 
         telemetry.clear();
         telemetry.addLine("Put the elevator down to its starting position (level 0) and press Y/▲ when done");
         telemetry.update();
 
-        while (!gamepad1.y);
+        do {
+            gamepad.update();
+        } while (!gamepad.wasPressed.y);
 
         while (repeatAMPtune -- > 0) {
             telemetry.clear();
@@ -59,8 +60,10 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
             double lastVelocity = 0;
             double acceleration = 0, deceleration = 0;
             ElapsedTime time = new ElapsedTime();
-            Elevator.motor.setPower(1);
+            Elevator.motor.setPower(-1);
             while(Elevator.motor.getCurrentPosition() < highBound - 50){
+                telemetry.addData("Elevator current position", Elevator.motor.getCurrentPosition());
+                Initialization.updateCacheing();
                 double currentAcceleration = (lastVelocity - Elevator.motor.getVelocity()) / -time.seconds();
                 if(currentAcceleration > acceleration) acceleration = currentAcceleration;
                 if(currentAcceleration < deceleration) deceleration = currentAcceleration;
@@ -69,6 +72,7 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
                 if(Elevator.motor.getVelocity() > currentMaxVelocity) currentMaxVelocity = Elevator.motor.getVelocity();
                 lastVelocity = Elevator.motor.getVelocity();
                 time.reset();
+                telemetry.update();
             }
             Elevator.motor.setPower(0);
 
@@ -83,7 +87,9 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
             decelerations.add(deceleration);
             currentMaxVelocity = 0;
 
-            while (!gamepad1.y);
+            do {
+                gamepad.update();
+            } while (!gamepad.wasPressed.y);
 
         }
         double mrv = 0, ar = 0, dr = 0;
@@ -101,7 +107,6 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
         telemetry.addData("Recommanded Deceleration (recommandation: -acceleration)", dr);
         telemetry.update();
 
-        requestOpModeStop();
         while (opModeIsActive());
     }
 }

@@ -18,11 +18,11 @@ public class Extendo {
     public static CachedMotor motor;
     public static ServoPlus dropDownIntakeRight;
     public static ServoPlus dropDownIntakeLeft;
-    public static PIDController pidController = new PIDController(0, 0, 0);
+    public static PIDController pidController = new PIDController(0.05, 0, 0.001);
     public static double MaxExtension;
     private static volatile double targetPosition = 0;
 //    public static final double tensionCoeff = 10;
-    public static double off1 = 31, off2 = 30;
+    public static double off1 = 10, off2 = 10, koeff = 0.11;
     public static final double A = 60, B = 90;
     public static boolean HOME_RESET_ENCODERS = true;
     public static AsymmetricMotionProfile DropDownProfile;
@@ -43,12 +43,15 @@ public class Extendo {
 
     public synchronized static void DropDown(double distanceInMm){
         if(DropDownProfile.motionEnded()) DropDownProfile.startMotion(DropDownProfile.getPosition(), inverseKinematicsForDropdownLinkage(distanceInMm));
-        dropDownIntakeRight.setAngle(DropDownProfile.getPosition() + off1);
-        dropDownIntakeLeft.setAngle(DropDownProfile.getPosition() + off2);
+
+        dropDownIntakeRight.setAngle(DropDownProfile.getPosition() + off1 + DropDownProfile.getPosition() * koeff);
+        dropDownIntakeLeft.setAngle(DropDownProfile.getPosition() + off2 + DropDownProfile.getPosition() * koeff);
+
         Initialization.telemetry.addData("dropdown profile", DropDownProfile.getPosition());
     }
 
     public synchronized static void Extend(int position){
+        position *= -1;
         if(position == targetPosition) return;
         if(position == 0){
             HOME_RESET_ENCODERS = true;

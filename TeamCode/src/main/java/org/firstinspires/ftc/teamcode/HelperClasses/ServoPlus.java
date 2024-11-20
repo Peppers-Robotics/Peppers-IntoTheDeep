@@ -20,9 +20,11 @@ public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
     }
     public ServoPlus(ServoController controller, int portNumber) {
         super(controller, portNumber);
+        positionSetted = 69;
     }
     public ServoPlus(Servo s){
         super(s.getController(), s.getPortNumber(), s.getDirection());
+        positionSetted = 69;
     }
     private volatile double MaxAngle = 355;
 

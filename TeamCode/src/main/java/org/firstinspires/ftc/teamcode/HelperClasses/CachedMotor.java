@@ -49,6 +49,7 @@ public class CachedMotor extends DcMotorImplEx implements DcMotorEx, HardwareDev
     }
     public CachedMotor(DcMotor motor){
         super(motor.getController(), motor.getPortNumber(), motor.getDirection(), motor.getMotorType());
+        lastSetPower = 69;
     }
     /**
      * MaxVelocity is measured in [outputDiameter]_(SI) / s, we recommend using m/s

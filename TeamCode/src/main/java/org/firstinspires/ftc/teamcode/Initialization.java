@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -73,6 +74,7 @@ public class Initialization {
         initializeOuttake(hm);
         initializeStorage(hm);
         initializeHubCacheing(hm);
+        InitializeChassis(hm);
     }
 
     public static void startDevices(){
@@ -105,8 +107,13 @@ public class Initialization {
 
         Claw.clawServo.getController().pwmDisable();
     }
+    public static void InitializeChassis(HardwareMap hm){
+        Chassis.BL = new CachedMotor(hm.get(DcMotorEx.class, "cM2"));
+        Chassis.BR = new CachedMotor(hm.get(DcMotorEx.class, "eM2"));
+        Chassis.FL = new CachedMotor(hm.get(DcMotorEx.class, "cM3"));
+        Chassis.FR = new CachedMotor(hm.get(DcMotorEx.class, "eM1"));
+    }
 
-    public static void chassis(){
         /*
         * cM2 - stanga spate
         * cM3 - stanga fata
@@ -115,5 +122,4 @@ public class Initialization {
         *
         *
         * */
-    }
 }

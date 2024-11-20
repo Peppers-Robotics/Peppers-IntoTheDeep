@@ -22,6 +22,7 @@ public class OutTakeController extends GenericController {
             ScoreSpecimen = true;
             OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.EXTEND_TO_TAKE_SPECIMEN);
             Controls.GrabSpecimen = false;
+            Claw.open();
         }
         if(Controls.ScoreLevel1){
             if(ScoreSpecimen){

@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 public class Claw {
     public static ServoPlus clawServo;
     public static FastColorRangeSensor clawSensor;
-    public static double OpenPosition = 10, ClosePosition = 0;
+    public static double OpenPosition = 200, ClosePosition = 355;
     public static void open(){
         clawServo.setAngle(OpenPosition);
     }

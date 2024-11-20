@@ -4,10 +4,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class OutTakeLogicStateMachine {
     public static double IdleArmAngle = 0, IdlePivotAngle = 0, IdleElevatorLevel = 0;
-    public static double ArmScoreSample = 90, PivotScoreSample = 50, ElevatorScoreSample;
-    public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 100, ElevatorScoreSpecimen = 200, ArmPushSpecimen = 130;
-    public static double ArmTakeSpecimen = 270, PivotTakeSpecimen = 195, ElevatorTakeSpecimen = 50; // DONE
-    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 400, ElevatorSample1 = 100, ElevatorSample2 = 400;
+    public static double ArmScoreSample = 225, PivotScoreSample = 180, ElevatorScoreSample;
+    public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 400, ArmPushSpecimen = 60;
+    public static double ArmTakeSpecimen = 270, PivotTakeSpecimen = 200, ElevatorTakeSpecimen = 10; // DONE
+    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 400, ElevatorSample1 = 500, ElevatorSample2 = 1100;
     private static boolean DunkBoolean = false;
     public enum States{
         EXTEND_TO_SCORE_SPECIMEN,
@@ -35,7 +35,7 @@ public class OutTakeLogicStateMachine {
         switch (CurrentState){
             case IDLE:
                 if(sense && Claw.HasElementInIt()) {
-                    Claw.close();
+//                    Claw.close();
                     sense = false;
                 }
                 break;
@@ -50,9 +50,11 @@ public class OutTakeLogicStateMachine {
                 if(Arm.motionCompleted() && Elevator.ReachedTargetPosition()) CurrentState = States.IDLE;
                 break;
             case EXTEND_TO_SCORE_SPECIMEN:
-                Arm.setArmAngle(ArmScoreSpecimen);
-                Arm.setPivotAngle(PivotScoreSpecimen);
                 Elevator.setTargetPosition(ElevatorScoreSpecimen);
+                if(Elevator.getCurrentPosition() >= 200){
+                    Arm.setArmAngle(ArmScoreSpecimen);
+                    Arm.setPivotAngle(PivotScoreSpecimen);
+                }
                 if(Elevator.ReachedTargetPosition() && Arm.motionCompleted()){
                     CurrentState = States.IDLE;
                     canDunk = true;
@@ -67,7 +69,7 @@ public class OutTakeLogicStateMachine {
                 } else {
                     if(time.seconds() >= 0.2){
                         Claw.open();
-                        Arm.setPivotAngle(ArmScoreSpecimen);
+                        Arm.setPivotAngle(180);
                         if(Arm.motionCompleted()) {
                             CurrentState = States.RETRACT;
                             DunkBoolean = false;
