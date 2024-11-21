@@ -20,6 +20,7 @@ public class Storage {
     }
 
     public static boolean hasAlliancePice(){
+        if(getStorageStatus() == SpecimenType.NONE) return false;
         switch (Initialization.Team){
             case RED:
                 return getStorageStatus() != SpecimenType.BLUE;

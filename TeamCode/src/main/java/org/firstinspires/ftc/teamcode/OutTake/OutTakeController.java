@@ -1,17 +1,23 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
+
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
 import org.firstinspires.ftc.teamcode.Initialization;
+import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.Intake.Storage;
 
 import java.util.concurrent.RecursiveTask;
 
 public class OutTakeController extends GenericController {
     public static boolean ScoreSpecimen = false;
     public static void Update(){
+        if(gamepad1.left_stick_x != 0 && OutTakeLogicStateMachine.isWaitingForSample()) Claw.open();
         if(Controls.Grab){
             if(Claw.isClosed()) {
                 Claw.open();
+                if(OutTakeLogicStateMachine.isScoringSample) OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.RETRACT, 0.2);
                 ScoreSpecimen = false;
             }
             else Claw.close();
@@ -48,6 +54,7 @@ public class OutTakeController extends GenericController {
 
             Controls.Retract = false;
         } else if(Controls.DunkToScore){
+            OutTakeLogicStateMachine.DunkBoolean = false;
             OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.PUSH_SPECIMEN);
 
             Controls.DunkToScore = false;

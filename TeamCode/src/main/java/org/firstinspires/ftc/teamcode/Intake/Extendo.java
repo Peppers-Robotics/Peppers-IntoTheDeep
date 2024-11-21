@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode.Intake;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
 import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
@@ -15,19 +17,27 @@ import org.firstinspires.ftc.teamcode.OutTake.Claw;
 @SuppressWarnings("unused")
 @Config
 public class Extendo {
+
+    public enum States {
+        RETRACT,
+        IDLE,
+        HOLD0
+    }
+    public static States CurrentState;
+
     public static CachedMotor motor;
     public static ServoPlus dropDownIntakeRight;
     public static ServoPlus dropDownIntakeLeft;
-    public static PIDController pidController = new PIDController(0.05, 0, 0.001);
-    public static double MaxExtension;
+    public static PIDController pidController = new PIDController(0.02, 0, 0.0007);
+    public static double MaxExtension = 120;
     private static volatile double targetPosition = 0;
 //    public static final double tensionCoeff = 10;
     public static double off1 = 10, off2 = 10, koeff = 0.11;
     public static final double A = 60, B = 90;
-    public static boolean HOME_RESET_ENCODERS = true;
     public static AsymmetricMotionProfile DropDownProfile;
 
     static {
+        CurrentState = States.RETRACT;
         DropDownProfile = new AsymmetricMotionProfile(1000, 8000, 8000);
     }
 
@@ -51,37 +61,47 @@ public class Extendo {
     }
 
     public synchronized static void Extend(int position){
+        pidEnable = true;
         position *= -1;
         if(position == targetPosition) return;
-        if(position == 0){
-            HOME_RESET_ENCODERS = true;
-        }
 
         targetPosition = position;
         pidController.setTargetPosition(position);
     }
-    public synchronized static void update(){
-       /* if(HOME_RESET_ENCODERS){
+    public static boolean pidEnable = false;
+    public static ElapsedTime retractTime = new ElapsedTime(), waitToCloseClaw = new ElapsedTime();
+    public static void update(){
 
-            if(motor.getCurrentPosition() < 30) motor.setPower(-0.3);
-            else motor.setPower(-1);
+        switch (CurrentState){
+            case RETRACT:
+                if(retractTime.seconds() >= 1 && motor.getVelocity() < 1){
+                    motor.setPower(0);
+                    motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    CurrentState = States.HOLD0;
+                    waitToCloseClaw.reset();
+                } else {
+                    motor.setPower(-1);
+                }
+                break;
+            case HOLD0:
+                if(waitToCloseClaw.seconds() >= 0.3){
+                    if(Storage.hasAlliancePice()) Claw.close();
+                    else Claw.open();
+                }
+                motor.setPower(12 / Initialization.Voltage * -0.2);
+                retractTime.reset();
+                break;
+            case IDLE:
+                retractTime.reset();
+                waitToCloseClaw.reset();
+                break;
+        }
 
-            if(motor.getVelocity() < 5){
-                if(Claw.HasElementInIt()) Claw.close(); // :) <- eu cand am scris asta
-                motor.setPower(0);
-                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                HOME_RESET_ENCODERS = false;
-            }
-
-            return;
-        }*/
-        double PIDPower = pidController.calculatePower(motor.getCurrentPosition());
-
-        motor.setPower(CutOffResolution.GetResolution(PIDPower, 2));
-        DropDownProfile.update();
-        Initialization.telemetry.addData("currentPosition", motor.getCurrentPosition());
-        Initialization.telemetry.addData("targetPos", targetPosition);
+       DropDownProfile.update();
+       DropDown(DropDownProfile.getTargetPosition());
+       Initialization.telemetry.addData("currentPosition", motor.getCurrentPosition());
+       Initialization.telemetry.addData("targetPos", targetPosition);
     }
 
 

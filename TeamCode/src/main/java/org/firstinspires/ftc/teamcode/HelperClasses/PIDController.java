@@ -24,11 +24,11 @@ public class PIDController {
         pidCoefficients = coeff;
     }
     public void setFreq(double f){freq = f;}
-    private long time = 0;
+    private ElapsedTime time = new ElapsedTime();
     private double lastReturn = 0;
     public double calculatePower(double currentPosition){
-        if(System.currentTimeMillis() - time < 1 / (freq * 1000)) return lastReturn;
-        time = System.currentTimeMillis();
+        if(time.seconds() < 1.0/freq) return lastReturn;
+        time.reset();
         error = targetPosition - currentPosition;
         double dtime = et.seconds();
 

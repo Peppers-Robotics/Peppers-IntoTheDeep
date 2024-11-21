@@ -1,14 +1,16 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Config
 public class OutTakeLogicStateMachine {
     public static double IdleArmAngle = 0, IdlePivotAngle = 0, IdleElevatorLevel = 0;
     public static double ArmScoreSample = 225, PivotScoreSample = 180, ElevatorScoreSample;
-    public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 400, ArmPushSpecimen = 60;
+    public static double ArmScoreSpecimen = 160, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 400, ArmPushSpecimen = 0;
     public static double ArmTakeSpecimen = 270, PivotTakeSpecimen = 200, ElevatorTakeSpecimen = 10; // DONE
-    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 400, ElevatorSample1 = 500, ElevatorSample2 = 1100;
-    private static boolean DunkBoolean = false;
+    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 260, ElevatorSample1 = 500, ElevatorSample2 = 1100;
+    public static boolean DunkBoolean = false;
     public enum States{
         EXTEND_TO_SCORE_SPECIMEN,
         EXTEND_TO_SCORE_SAMPLE,
@@ -25,33 +27,55 @@ public class OutTakeLogicStateMachine {
         CurrentState = States.IDLE;
         time = new ElapsedTime();
     }
-    public static void ChangeState(States state){
+    public static void ResetForTeleOp(){
+        sense = false;
+        isScoringSample = false;
+        Claw.open();
+        Arm.setArmAngle(IdleArmAngle);
+        Arm.setPivotAngle(IdlePivotAngle);
+        canDunk = false;
+    }
+    synchronized public static void ChangeState(States state){
         if(CurrentState != States.IDLE) return;
         CurrentState = state;
     }
+    public static void ChangeState(States state, double s){
+        new Thread(() -> {
+            long t = System.currentTimeMillis();
+            while(System.currentTimeMillis() - t < s / 1000.f);
+            ChangeState(state);
+        }).start();
+    }
     private static boolean sense = false;
+    public static boolean isScoringSample = false;
+
+    public static boolean isWaitingForSample(){
+        return CurrentState == States.IDLE && Arm.getCurrentArmAngle() == IdleArmAngle && Arm.getCurrentPivotAngle() == IdlePivotAngle;
+    }
 
     public static void Update(){
         switch (CurrentState){
             case IDLE:
                 if(sense && Claw.HasElementInIt()) {
-//                    Claw.close();
+                    Claw.close();
                     sense = false;
                 }
                 break;
 
             case RETRACT:
+                Claw.open();
                 Arm.setArmAngle(IdleArmAngle);
                 Arm.setPivotAngle(IdlePivotAngle);
-                if(Arm.getPrecentOfArmMotionCompleted() >= 40) {
+                if(Arm.armProfile.motionEnded()) {
                     Elevator.setTargetPosition(IdleElevatorLevel);
                 }
                 OutTakeController.ScoreSpecimen = false;
                 if(Arm.motionCompleted() && Elevator.ReachedTargetPosition()) CurrentState = States.IDLE;
                 break;
             case EXTEND_TO_SCORE_SPECIMEN:
+                sense = false;
                 Elevator.setTargetPosition(ElevatorScoreSpecimen);
-                if(Elevator.getCurrentPosition() >= 200){
+                if(Elevator.getCurrentPosition() >= 50){
                     Arm.setArmAngle(ArmScoreSpecimen);
                     Arm.setPivotAngle(PivotScoreSpecimen);
                 }
@@ -62,18 +86,19 @@ public class OutTakeLogicStateMachine {
                 break;
             case PUSH_SPECIMEN:
                 canDunk = false;
-                if(!DunkBoolean) {
+                sense = false;
+                if(Arm.getCurrentArmAngle() != ArmPushSpecimen) {
                     Arm.setArmAngle(ArmPushSpecimen);
+                    Elevator.setTargetPosition(ElevatorScoreSpecimen - 30);
                     Arm.update();
-                    if(Arm.motionCompleted()){ DunkBoolean = true; time.reset();}
+                    time.reset();
                 } else {
-                    if(time.seconds() >= 0.2){
+                    if(time.seconds() >= 0.4 && Claw.isClosed()) {
                         Claw.open();
-                        Arm.setPivotAngle(180);
-                        if(Arm.motionCompleted()) {
-                            CurrentState = States.RETRACT;
-                            DunkBoolean = false;
-                        }
+                        time.reset();
+                    }
+                    else if(time.seconds() >= 0.2 && !Claw.isClosed()){
+                        CurrentState = States.RETRACT;
                     }
                 }
                 break;
@@ -85,6 +110,8 @@ public class OutTakeLogicStateMachine {
                 sense = true;
                 break;
             case EXTEND_TO_SCORE_SAMPLE:
+                sense = false;
+                isScoringSample = true;
                 Arm.setArmAngle(ArmScoreSample);
                 Arm.setPivotAngle(PivotScoreSample);
                 Elevator.setTargetPosition(ElevatorScoreSample);

@@ -14,12 +14,10 @@ import org.firstinspires.ftc.teamcode.Initialization;
 @Config
 public class Elevator {
     public static CachedMotor motor;
-    public static PIDController controller = new PIDController(0.05, 0, 0.001);
-    public static PIDCoefficients pidCoefficients;
+    public static PIDController controller = new PIDController(0.013, 0, 0.0005);
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(3000, 5000, 7000);
 
     static {
-        pidCoefficients = new PIDCoefficients(0.05, 0, 0.001);
         PIDControllerInWork = true;
     }
 
@@ -31,7 +29,8 @@ public class Elevator {
         motionProfile.startMotion(targetPos, pos);
         targetPos = pos;
         motionProfile.update();
-        controller.setTargetPosition(motionProfile.getPosition());
+        controller.setTargetPosition(targetPos);
+//        controller.setTargetPosition(motionProfile.getPosition());
     }
 
     public static double getTargetPosition(){ return targetPos; }
@@ -44,7 +43,7 @@ public class Elevator {
     private static ElapsedTime time = new ElapsedTime();
 
     public static void update(){
-       /* if(targetPos <= 0 && NEED_TO_RESET) {
+       if(targetPos <= 0 && NEED_TO_RESET) {
             if(elevatorReachedStopMotion){
                 if(time.seconds() > 0.1){
                     motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -55,22 +54,23 @@ public class Elevator {
             }
             else {
                 elevatorReachedStopMotion = motor.getVelocity() <= 5;
-                motor.setPower(-1);
+                motor.setPower(1);
                 if(elevatorReachedStopMotion) {
                     time.reset();
                     motor.setPower(0);
                 }
             }
             return;
-        }
-*/
+       }
 //        controller.setPidCoefficients(pidCoefficients);
         motionProfile.update();
 //        controller.setTargetPosition(motionProfile.getPosition(), false);
         controller.setTargetPosition(targetPos);
-        motor.setPower(controller.calculatePower(motor.getCurrentPosition()));
+        motor.setPower(
+                controller.calculatePower(motor.getCurrentPosition()) + (targetPos <= 0 ? 1 : 0) * 0.2 * 12/Initialization.Voltage
+        );
         Initialization.telemetry.addData("Elevator pose from profile", motionProfile.getPosition());
-        Initialization.telemetry.addData("Elevator current pose", motor.getCurrentPosition());
+        Initialization.telemetry.addData("Elevator current pose", -motor.getCurrentPosition());
         Initialization.telemetry.addData("Elevator targetPos", motor.getTargetPosition());
     }
 

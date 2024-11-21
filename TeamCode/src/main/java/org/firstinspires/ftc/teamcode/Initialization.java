@@ -10,8 +10,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
@@ -33,10 +35,16 @@ public class Initialization {
     }
     public static AllianceColor Team;
     public static Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+    public static double Voltage = 12;
     public static void initializeHubCacheing(@NonNull HardwareMap hm){
         hubs = hm.getAll(LynxModule.class);
         for(LynxModule l : hubs){
             l.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+        try {
+            Voltage = hubs.get(0).getInputVoltage(VoltageUnit.VOLTS);
+        } catch (Exception e){
+            Voltage = 12;
         }
     }
     public static void initializeExtendo(@NonNull HardwareMap hm){

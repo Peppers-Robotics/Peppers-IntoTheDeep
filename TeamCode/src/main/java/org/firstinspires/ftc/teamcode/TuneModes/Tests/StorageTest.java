@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 public class StorageTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Storage.sensor = hardwareMap.get(FastColorRangeSensor.class, "Storage sensor");
+        Storage.sensor = hardwareMap.get(FastColorRangeSensor.class, "Storage");
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
 
         waitForStart();

@@ -25,7 +25,8 @@ class ColorRangeSensorPacket {
 )
 public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDevice {
     private long timeDistance = 0, timeRGB = 0;
-    private double freq = 50;
+    private double freq = 20;
+    private double lowPassFilter = 0.8;
     public ColorRangeSensorPacket p = new ColorRangeSensorPacket();
     public FastColorRangeSensor(I2cDeviceSynchSimple deviceClient, boolean deviceClientIsOwned) {
         super(deviceClient, deviceClientIsOwned);
@@ -36,6 +37,9 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
     // in reads / s
     public void setFreqToUpdate(double x){
         freq =  x;
+    }
+    public void setLowPassFilterCoefficient(double k){
+        this.lowPassFilter = k;
     }
     @Override
     public double getDistance(DistanceUnit unit){
@@ -72,9 +76,9 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
 
     public Colors.ColorType getColorSeenBySensor(){
         if(System.currentTimeMillis() - timeRGB > freq){
-            p.G = this.green();
-            p.R = this.red();
-            p.B = this.blue();
+            p.G = (int) (this.green() * this.lowPassFilter + p.G * (1 - lowPassFilter));
+            p.R = (int) (this.red()   * this.lowPassFilter + p.R * (1 - lowPassFilter));
+            p.B = (int) (this.blue()  * this.lowPassFilter + p.B * (1 - lowPassFilter));
             timeRGB = System.currentTimeMillis();
         }
         return Colors.getColorFromRGB(new Colors.Color(p.R, p.G, p.B));

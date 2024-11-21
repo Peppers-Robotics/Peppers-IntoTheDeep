@@ -7,7 +7,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class Controls {
     public static AutoGamepad gamepad1, gamepad2;
 
-    public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen, Grab, Retract,
+    public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen,
+            Grab,
+            Retract,
                             DunkToScore;
 
     public static void Initialize(Gamepad gamepadD1, Gamepad gamepadD2){

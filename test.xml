@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
+        <LynxModule name="Expansion Hub 2" port="2">
+            <Motor name="eM0" port="0" />
+            <Motor name="eM1" port="1" />
+            <Motor name="eM2" port="2" />
+            <Motor name="eM3" port="3" />
+            <servoPlus name="eS0" port="0" />
+            <servoPlus name="eS1" port="1" />
+            <servoPlus name="eS2" port="2" />
+            <servoPlus name="eS3" port="3" />
+            <servoPlus name="eS4" port="4" />
+            <servoPlus name="eS5" port="5" />
+            <FastColorRangeSensor name="Storage" port="0" bus="0" />
+            <FastColorRangeSensor name="Claw" port="0" bus="3" />
+        </LynxModule>
+        <LynxModule name="Control Hub" port="173">
+            <Motor name="cM0" port="0" />
+            <Motor name="cM1" port="1" />
+            <Motor name="cM2" port="2" />
+            <Motor name="cM3" port="3" />
+            <servoPlus name="cS0" port="0" />
+            <servoPlus name="cS1" port="1" />
+            <servoPlus name="cS2" port="2" />
+            <servoPlus name="cS3" port="3" />
+            <servoPlus name="cS4" port="4" />
+            <servoPlus name="cS5" port="5" />
+            <ControlHubImuBHI260AP name="imu" port="0" bus="0" />
+        </LynxModule>
+    </LynxUsbDevice>
+</Robot>

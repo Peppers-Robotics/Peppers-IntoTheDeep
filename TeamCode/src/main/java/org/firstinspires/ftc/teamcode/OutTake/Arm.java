@@ -16,7 +16,7 @@ public class Arm {
     private static final DifferentialHelper diffy;
 
     static {
-        armProfile = new AsymmetricMotionProfile(4e3, 3e3, 1e4);
+        armProfile = new AsymmetricMotionProfile(4e3, 7e3, 7e4);
         pivotProfile = new AsymmetricMotionProfile(6e3, 6e3, 5e4);
         diffy = new DifferentialHelper(3.f/4);
     }

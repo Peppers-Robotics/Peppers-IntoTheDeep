@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.HelperClasses;
 
+import androidx.annotation.BoolRes;
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -49,6 +50,7 @@ public class CachedMotor extends DcMotorImplEx implements DcMotorEx, HardwareDev
     }
     public CachedMotor(DcMotor motor){
         super(motor.getController(), motor.getPortNumber(), motor.getDirection(), motor.getMotorType());
+        motor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         lastSetPower = 69;
     }
     /**

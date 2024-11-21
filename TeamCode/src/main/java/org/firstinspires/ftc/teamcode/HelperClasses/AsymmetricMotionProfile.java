@@ -88,4 +88,5 @@ public class AsymmetricMotionProfile {
     public double getTimeUntilMotionEnd(){
         return t2 - time.seconds();
     }
+    public double getTargetPosition(){ return targetPosition; }
 }

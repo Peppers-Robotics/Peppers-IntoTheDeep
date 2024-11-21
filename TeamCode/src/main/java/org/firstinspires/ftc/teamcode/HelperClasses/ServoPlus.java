@@ -14,42 +14,30 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 @ServoType(flavor = ServoFlavor.CUSTOM)
 @DeviceProperties(name = "ServoPlus", xmlTag = "servoPlus")
 public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
-    private double positionSetted = 69;
     public ServoPlus(ServoController controller, int portNumber, Direction direction) {
         super(controller, portNumber, direction);
     }
     public ServoPlus(ServoController controller, int portNumber) {
         super(controller, portNumber);
-        positionSetted = 69;
     }
     public ServoPlus(Servo s){
         super(s.getController(), s.getPortNumber(), s.getDirection());
-        positionSetted = 69;
     }
     private volatile double MaxAngle = 355;
 
     synchronized public void setMaxAngle(double angle){
         MaxAngle = angle;
     }
-
+    private double thisAngle = 0;
     synchronized public void setAngle(double angle){
-        double toSetPos = angle / MaxAngle;
+        thisAngle = angle;
+        double toSetPos = CutOffResolution.GetResolution(angle / MaxAngle, 2);
         setPosition(toSetPos);
     }
-
-    @Override
-    synchronized public void setPosition(double pos){
-        if(pos != positionSetted){
-            positionSetted = pos;
-            if(pos < 0) pos = 0;
-            if(pos > 1) pos = 1;
-            this.controller.setServoPosition(portNumber, pos);
-        }
-    }
-    public double getPosition(){
-        return positionSetted;
-    }
     public double getAngle(){
-        return getPosition() / MaxAngle;
+        return thisAngle;
+    }
+    public boolean isEqualToAngle(double angle){
+        return Math.abs(angle - getAngle()) < 0.1;
     }
 }

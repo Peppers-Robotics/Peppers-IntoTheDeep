@@ -15,15 +15,20 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 public class Claw {
     public static ServoPlus clawServo;
     public static FastColorRangeSensor clawSensor;
-    public static double OpenPosition = 200, ClosePosition = 355;
+    public static double OpenPosition = 100, ClosePosition = 255;
     public static void open(){
         clawServo.setAngle(OpenPosition);
+//        clawServo.setPosition(OpenPosition / 355.f);
     }
     public static void close(){
         clawServo.setAngle(ClosePosition);
+//        clawServo.setPosition(ClosePosition / 355.f);
     }
     public static boolean isClosed(){
-        return clawServo.getAngle() == ClosePosition;
+        return clawServo.isEqualToAngle(ClosePosition);
+    }
+    public static boolean isOpened(){
+        return clawServo.isEqualToAngle(OpenPosition);
     }
     public static boolean HasElementInIt(){
         return clawSensor.getDistance(DistanceUnit.MM) <= 50 &&
