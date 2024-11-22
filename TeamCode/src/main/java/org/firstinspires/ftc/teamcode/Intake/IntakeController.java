@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.HelperClasses.AutoGamepad;
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
+import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
+import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogicStateMachine;
 
 public class IntakeController extends GenericController {
     private static int ExtendoPosition, MaxExtension = 1200;
@@ -15,9 +17,13 @@ public class IntakeController extends GenericController {
     }
     public static void Update(){
 //        ExtendoPosition += (int) (-gamepad1.right_stick_y * Resolution);
-        Extendo.motor.setPower(gamepad1.right_stick_y);
-        if(Math.abs(Extendo.motor.getPower()) >= 0.001) {
+        if(Math.abs(gamepad1.right_stick_y) >= 0.05){
             Extendo.CurrentState = Extendo.States.IDLE;
+        } else if(Extendo.motor.getCurrentPosition() > -30){
+            Extendo.CurrentState = Extendo.States.HOLD0;
+        }
+        if(Extendo.CurrentState == Extendo.States.IDLE){
+            Extendo.motor.setPower(gamepad1.right_stick_y);
         }
         if(gamepad2.right_trigger > 0.1) {
             Extendo.DropDown(Extendo.MaxExtension);
@@ -35,6 +41,9 @@ public class IntakeController extends GenericController {
 
             Controls.RetractExtendo = false;
         }
+
+
+
         gamepad2.update();
         gamepad1.update();
     }

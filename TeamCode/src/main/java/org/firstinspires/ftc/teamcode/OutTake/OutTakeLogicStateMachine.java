@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
 public class OutTakeLogicStateMachine {
-    public static double IdleArmAngle = 0, IdlePivotAngle = 0, IdleElevatorLevel = 0;
-    public static double ArmScoreSample = 225, PivotScoreSample = 180, ElevatorScoreSample;
+    public static double IdleArmAngle = 0, IdlePivotAngle = 0, IdleElevatorLevel = -100;
+    public static double ArmScoreSample = 225, PivotScoreSample = 200, ElevatorScoreSample;
     public static double ArmScoreSpecimen = 160, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 400, ArmPushSpecimen = 0;
     public static double ArmTakeSpecimen = 270, PivotTakeSpecimen = 200, ElevatorTakeSpecimen = 10; // DONE
-    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 260, ElevatorSample1 = 500, ElevatorSample2 = 1100;
+    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 260, ElevatorSample1 = 500, ElevatorSample2 = 1200;
     public static boolean DunkBoolean = false;
     public enum States{
         EXTEND_TO_SCORE_SPECIMEN,
@@ -17,7 +17,8 @@ public class OutTakeLogicStateMachine {
         EXTEND_TO_TAKE_SPECIMEN,
         PUSH_SPECIMEN,
         RETRACT,
-        IDLE
+        IDLE,
+        IDLE_SCORING
     }
     public static States CurrentState;
     public static boolean canDunk = false;
@@ -61,7 +62,12 @@ public class OutTakeLogicStateMachine {
                     sense = false;
                 }
                 break;
-
+            case IDLE_SCORING:
+                Claw.close();
+                Arm.setArmAngle(180);
+                Arm.setPivotAngle(0);
+                CurrentState = States.IDLE;
+                break;
             case RETRACT:
                 Claw.open();
                 Arm.setArmAngle(IdleArmAngle);

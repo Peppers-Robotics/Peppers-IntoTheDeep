@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class Controls {
     public static AutoGamepad gamepad1, gamepad2;
 
-    public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen,
+    public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen, Climbing,
             Grab,
             Retract,
                             DunkToScore;
@@ -32,6 +32,8 @@ public class Controls {
         if(gamepad2.wasPressed.circle)      Retract      = true;
         if(gamepad2.wasPressed.dpad_left || gamepad2.wasPressed.dpad_right)
                                             DunkToScore  = true;
+        if((gamepad2.gamepad.left_bumper || gamepad2.gamepad.right_bumper) && (gamepad1.gamepad.right_bumper || gamepad1.gamepad.left_bumper))
+                                            Climbing     = true;
 
 
         gamepad1.update();

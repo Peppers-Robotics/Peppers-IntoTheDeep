@@ -8,6 +8,21 @@ public class ActiveIntake {
     public static ServoPlus Blocker;
     public static double Block = 1, UnBlock = 0;
 
+    synchronized public static void powerOn(double s){
+        double t = System.currentTimeMillis();
+        new Thread(() -> {
+            while(System.currentTimeMillis() - t < s / 1000);
+            powerOn();
+        });
+    }
+    synchronized public static void powerOff(double s){
+        double t = System.currentTimeMillis();
+        new Thread(() -> {
+            while (System.currentTimeMillis() - t < s / 1000) ;
+            powerOff();
+        });
+    }
+
     synchronized public static void powerOn(){
         motor.setPower(1);
     }

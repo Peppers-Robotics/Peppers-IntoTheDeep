@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Chassis;
+import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
@@ -15,6 +17,8 @@ import org.firstinspires.ftc.teamcode.Initialization;
 public class Elevator {
     public static CachedMotor motor;
     public static PIDController controller = new PIDController(0.013, 0, 0.0005);
+    public static PIDCoefficients climb = new PIDCoefficients(0.01, 0, 0.0003);
+    public static PIDCoefficients normal = new PIDCoefficients(0.013, 0, 0.0005);
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(3000, 5000, 7000);
 
     static {
@@ -29,7 +33,7 @@ public class Elevator {
         motionProfile.startMotion(targetPos, pos);
         targetPos = pos;
         motionProfile.update();
-        controller.setTargetPosition(targetPos);
+        controller.setTargetPosition(pos);
 //        controller.setTargetPosition(motionProfile.getPosition());
     }
 
@@ -41,9 +45,10 @@ public class Elevator {
     public static boolean ReachedTargetPosition(){ return motionProfile.motionEnded(); }
     private static boolean elevatorReachedStopMotion, NEED_TO_RESET = false;
     private static ElapsedTime time = new ElapsedTime();
+    public static final double ratio = 1070/435.f;
 
     public static void update(){
-       if(targetPos <= 0 && NEED_TO_RESET) {
+       /*if(targetPos <= 0 && NEED_TO_RESET) {
             if(elevatorReachedStopMotion){
                 if(time.seconds() > 0.1){
                     motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -61,17 +66,37 @@ public class Elevator {
                 }
             }
             return;
+       }*/
+
+       if(targetPos <= 0 && getCurrentPosition() <= 10 && !Climb.isPTOEngaged()){
+           motor.setMotorDisable();
+       } else {
+           motor.setMotorEnable();
        }
+
 //        controller.setPidCoefficients(pidCoefficients);
         motionProfile.update();
 //        controller.setTargetPosition(motionProfile.getPosition(), false);
         controller.setTargetPosition(targetPos);
-        motor.setPower(
-                controller.calculatePower(motor.getCurrentPosition()) + (targetPos <= 0 ? 1 : 0) * 0.2 * 12/Initialization.Voltage
-        );
+        if(Climb.isPTOEngaged()){
+            controller.setPidCoefficients(climb);
+            controller.setTargetPosition(targetPos, false);
+            double pidp = -controller.calculatePower(motor.getCurrentPosition());
+            Initialization.telemetry.addData("power", pidp);
+            motor.setPower(-pidp * ratio);
+            Chassis.BL.setPower(pidp);
+            Chassis.BR.setPower(pidp);
+
+        } else {
+            controller.setPidCoefficients(normal);
+            motor.setPower(
+                    controller.calculatePower(motor.getCurrentPosition())
+            );
+        }
         Initialization.telemetry.addData("Elevator pose from profile", motionProfile.getPosition());
         Initialization.telemetry.addData("Elevator current pose", -motor.getCurrentPosition());
-        Initialization.telemetry.addData("Elevator targetPos", motor.getTargetPosition());
+        Initialization.telemetry.addData("Elevator targetPos", targetPos);
+        Initialization.telemetry.addData("Is elevator enabled", motor.isMotorEnabled());
     }
 
 }

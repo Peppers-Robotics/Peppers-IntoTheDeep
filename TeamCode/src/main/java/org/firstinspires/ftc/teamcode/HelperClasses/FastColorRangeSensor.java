@@ -26,7 +26,7 @@ class ColorRangeSensorPacket {
 public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDevice {
     private long timeDistance = 0, timeRGB = 0;
     private double freq = 20;
-    private double lowPassFilter = 0.8;
+    private double lowPassFilter = 0.6;
     public ColorRangeSensorPacket p = new ColorRangeSensorPacket();
     public FastColorRangeSensor(I2cDeviceSynchSimple deviceClient, boolean deviceClientIsOwned) {
         super(deviceClient, deviceClientIsOwned);

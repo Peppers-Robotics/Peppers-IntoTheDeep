@@ -4,16 +4,13 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
+import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
@@ -24,7 +21,6 @@ import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 
-import java.nio.charset.CharacterCodingException;
 import java.util.List;
 
 public class Initialization {
@@ -82,7 +78,17 @@ public class Initialization {
         initializeOuttake(hm);
         initializeStorage(hm);
         initializeHubCacheing(hm);
-        InitializeChassis(hm);
+        initializeChassis(hm);
+//        initializeClimb(hm);
+
+        Claw.clawSensor.setLowPassFilterCoefficient(0.9);
+    }
+    public static void initializeClimb(HardwareMap hm){
+        Climb.PTO = hm.get(ServoPlus.class, "cS4");
+        Climb.W1 = hm.get(ServoPlus.class, "eS1");
+        Climb.W2 = hm.get(ServoPlus.class, "eS0");
+        Climb.disengagePTO();
+        Climb.PutDown();
     }
 
     public static void startDevices(){
@@ -115,7 +121,7 @@ public class Initialization {
 
         Claw.clawServo.getController().pwmDisable();
     }
-    public static void InitializeChassis(HardwareMap hm){
+    public static void initializeChassis(HardwareMap hm){
         Chassis.BL = new CachedMotor(hm.get(DcMotorEx.class, "cM2"));
         Chassis.BR = new CachedMotor(hm.get(DcMotorEx.class, "eM2"));
         Chassis.FL = new CachedMotor(hm.get(DcMotorEx.class, "cM3"));

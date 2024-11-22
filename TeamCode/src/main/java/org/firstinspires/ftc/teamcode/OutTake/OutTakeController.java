@@ -13,11 +13,10 @@ import java.util.concurrent.RecursiveTask;
 public class OutTakeController extends GenericController {
     public static boolean ScoreSpecimen = false;
     public static void Update(){
-        if(gamepad1.left_stick_x != 0 && OutTakeLogicStateMachine.isWaitingForSample()) Claw.open();
         if(Controls.Grab){
             if(Claw.isClosed()) {
                 Claw.open();
-                if(OutTakeLogicStateMachine.isScoringSample) OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.RETRACT, 0.2);
+                if(OutTakeLogicStateMachine.isScoringSample) OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.RETRACT, 0.4);
                 ScoreSpecimen = false;
             }
             else Claw.close();
@@ -31,6 +30,7 @@ public class OutTakeController extends GenericController {
             Claw.open();
         }
         if(Controls.ScoreLevel1){
+            Claw.close();
             if(ScoreSpecimen){
                 OutTakeLogicStateMachine.ElevatorScoreSpecimen = OutTakeLogicStateMachine.ElevatorSpecimen1;
                 OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.EXTEND_TO_SCORE_SPECIMEN);
@@ -41,6 +41,7 @@ public class OutTakeController extends GenericController {
             Controls.ScoreLevel1 = false;
 
         } else if(Controls.ScoreLevel2){
+            Claw.close();
             if(ScoreSpecimen){
                 OutTakeLogicStateMachine.ElevatorScoreSpecimen = OutTakeLogicStateMachine.ElevatorSpecimen2;
                 OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.EXTEND_TO_SCORE_SPECIMEN);

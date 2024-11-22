@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
+import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogicStateMachine;
 
 @SuppressWarnings("unused")
 @Config
@@ -74,25 +75,37 @@ public class Extendo {
 
         switch (CurrentState){
             case RETRACT:
-                if(retractTime.seconds() >= 1 && motor.getVelocity() < 1){
+                DropDown(0);
+                DropDownProfile.update();
+                if(retractTime.seconds() >= 0.5 && motor.getVelocity() <= 5){
                     motor.setPower(0);
                     motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     CurrentState = States.HOLD0;
+                    motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     waitToCloseClaw.reset();
                 } else {
-                    motor.setPower(-1);
+                    if(DropDownProfile.motionEnded())
+                        motor.setPower(1);
                 }
                 break;
             case HOLD0:
-                if(waitToCloseClaw.seconds() >= 0.3){
-                    if(Storage.hasAlliancePice()) Claw.close();
-                    else Claw.open();
+                if(!DropDownProfile.motionEnded() || DropDownProfile.getPosition() > 1) waitToCloseClaw.reset();
+                if(waitToCloseClaw.seconds() >= 0.3 && waitToCloseClaw.seconds() <= 2){
+                    if(Storage.hasAlliancePice()) {
+                        Claw.close();
+                        OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.IDLE_SCORING);
+                    }
                 }
-                motor.setPower(12 / Initialization.Voltage * -0.2);
+                if(-motor.getCurrentPosition() <= 50)
+                    motor.setMotorDisable();
+                else motor.setMotorEnable();
+                motor.setPower(12 / Initialization.Voltage * 0.12);
                 retractTime.reset();
                 break;
             case IDLE:
+                motor.setMotorEnable();
                 retractTime.reset();
                 waitToCloseClaw.reset();
                 break;
