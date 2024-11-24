@@ -15,5 +15,6 @@ dependencies {
     implementation 'org.firstinspires.ftc:Vision:10.1.0'
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'org.json:json:20240303'
 }
 

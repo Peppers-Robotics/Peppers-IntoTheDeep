@@ -6,14 +6,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
-import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
-import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
-import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
-import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogicStateMachine;
 
 @SuppressWarnings("unused")
 @Config
@@ -95,7 +91,6 @@ public class Extendo {
                 if(waitToCloseClaw.seconds() >= 0.3 && waitToCloseClaw.seconds() <= 2){
                     if(Storage.hasAlliancePice()) {
                         Claw.close();
-                        OutTakeLogicStateMachine.ChangeState(OutTakeLogicStateMachine.States.IDLE_SCORING);
                     }
                 }
                 if(-motor.getCurrentPosition() <= 50)

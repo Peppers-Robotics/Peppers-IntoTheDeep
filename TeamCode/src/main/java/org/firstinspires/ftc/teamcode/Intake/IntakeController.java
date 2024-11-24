@@ -1,12 +1,7 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
-
-import org.firstinspires.ftc.teamcode.HelperClasses.AutoGamepad;
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
-import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
-import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogicStateMachine;
 
 public class IntakeController extends GenericController {
     private static int ExtendoPosition, MaxExtension = 1200;
