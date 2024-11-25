@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.AnalogInputController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -63,6 +65,8 @@ public class Initialization {
         Claw.clawServo = hm.get(ServoPlus.class, "cS2");
         Arm.servo1 = hm.get(ServoPlus.class, "eS3");
         Arm.servo2 = hm.get(ServoPlus.class, "eS5");
+        Arm.servo1.setToCRControlled(hm.get(AnalogInput.class, "cA0"));
+        Arm.servo2.setToCRControlled(hm.get(AnalogInput.class, "cA1"));
         Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");
     }
     public static void initializeIntake(@NonNull HardwareMap hm){

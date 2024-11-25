@@ -18,11 +18,9 @@ public class Claw {
     public static double OpenPosition = 100, ClosePosition = 255;
     public static void open(){
         clawServo.setAngle(OpenPosition);
-//        clawServo.setPosition(OpenPosition / 355.f);
     }
     public static void close(){
         clawServo.setAngle(ClosePosition);
-//        clawServo.setPosition(ClosePosition / 355.f);
     }
     public static boolean isClosed(){
         return clawServo.isEqualToAngle(ClosePosition);

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.HelperClasses;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.AnalogInputController;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareDeviceHealthImpl;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,14 +17,18 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 @ServoType(flavor = ServoFlavor.CUSTOM)
 @DeviceProperties(name = "ServoPlus", xmlTag = "servoPlus")
 public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
+    private boolean isCR = false;
     public ServoPlus(ServoController controller, int portNumber, Direction direction) {
         super(controller, portNumber, direction);
+        isCR = false;
     }
     public ServoPlus(ServoController controller, int portNumber) {
         super(controller, portNumber);
+        isCR = false;
     }
     public ServoPlus(Servo s){
         super(s.getController(), s.getPortNumber(), s.getDirection());
+        isCR = false;
     }
     private volatile double MaxAngle = 355;
 
@@ -35,9 +42,46 @@ public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
         setPosition(toSetPos);
     }
     public double getAngle(){
-        return thisAngle;
+        if(encoder == null)
+            return thisAngle;
+        else return encoder.getVoltage() / encoder.getMaxVoltage() * 360.f;
     }
     public boolean isEqualToAngle(double angle){
         return Math.abs(angle - getAngle()) < 0.1;
+    }
+    // -------------------- CR Implementation --------------------
+    private AnalogInput encoder = null;
+    private double lastAngle = 0;
+    private int revolutions = 0;
+    public void setToCRControlled(AnalogInput ai){
+        isCR = true;
+        encoder = ai;
+        revolutions = 0;
+        lastAngle = getCurrentRawAngle();
+    }
+    public void setToServoControlled(){
+        isCR = false;
+    }
+    public double getCurrentRawAngle(){
+        if(!isCR) return getAngle();
+        return 360.f + encoder.getVoltage() / encoder.getMaxVoltage() * 360.f;
+    }
+
+    public void update(){
+        double currentAngle = getCurrentRawAngle();
+        if(currentAngle <= 90 && lastAngle >= 270){
+            revolutions++;
+        }
+        if(currentAngle >= 270 && lastAngle <= 90){
+            revolutions --;
+        }
+        lastAngle = currentAngle;
+    }
+    public double getCurrentCorrectedAngle(){
+        return getCurrentRawAngle() + 360 * revolutions;
+    }
+    public void setPower(double p){
+        if(p < 0) setPosition(0.5 * p);
+        else setPosition(0.5 * p + 0.5);
     }
 }

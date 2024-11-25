@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
+import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 
 @TeleOp(name = ".pipers \uD83C\uDF36", group = "mainOp")
 public class MainOpMode extends LinearOpMode {
@@ -66,15 +67,12 @@ public class MainOpMode extends LinearOpMode {
             Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
                         gamepad1.left_trigger - gamepad1.right_trigger);
 
-            if(Storage.hasAlliancePice() && Extendo.CurrentState == Extendo.States.IDLE){
-                Controls.RetractExtendo = true;
-            }
-
-
+            OutTakeController.Update();
             Elevator.update();
             Arm.update();
             Extendo.update();
             IntakeController.Update();
+
 
             telemetry.addData("Claw state", Claw.isClosed() ? "open" : "closed");
             telemetry.addData("Claw color", Claw.clawSensor.getColorSeenBySensor().name());

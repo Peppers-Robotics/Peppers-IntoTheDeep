@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.DifferentialHelper;
+import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 import org.firstinspires.ftc.teamcode.Initialization;
 
@@ -14,6 +15,8 @@ public class Arm {
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;
     private static final DifferentialHelper diffy;
+
+    public static PIDController s1Controller = new PIDController(0.01, 0, 0), s2Controller = new PIDController(0.01, 0, 0);
 
     static {
         armProfile = new AsymmetricMotionProfile(4e3, 7e3, 7e4);
@@ -35,8 +38,15 @@ public class Arm {
         diffy.setAngleToSecondJoint(armProfile.getPosition());
         diffy.setAngleToFirstJoint(pivotProfile.getPosition());
 
-        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
-        servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
+//        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
+//        servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
+
+        s1Controller.setTargetPosition(diffy.getRawAngles()[0] + s1Offset);
+        s2Controller.setTargetPosition(diffy.getRawAngles()[1] + s1Offset);
+
+        servo1.setPower(s1Controller.calculatePower(servo1.getCurrentCorrectedAngle()));
+        servo2.setPower(s1Controller.calculatePower(servo2.getCurrentCorrectedAngle()));
+
         Initialization.telemetry.addData("Arm angle", armProfile.getPosition());
         Initialization.telemetry.addData("Pivot angle", pivotProfile.getPosition());
         Initialization.telemetry.addData("deg1", diffy.getRawAngles()[1]);

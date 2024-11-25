@@ -1,45 +1,67 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
+import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
 
 public class IntakeController extends GenericController {
-    private static int ExtendoPosition, MaxExtension = 1200;
     public static int Resolution;
+
     static {
-        ExtendoPosition = 0;
         Resolution = 20;
     }
-    public static void Update(){
-//        ExtendoPosition += (int) (-gamepad1.right_stick_y * Resolution);
-        if(Math.abs(gamepad1.right_stick_y) >= 0.05){
-            Extendo.CurrentState = Extendo.States.IDLE;
-        } else if(Extendo.motor.getCurrentPosition() > -30){
-            Extendo.CurrentState = Extendo.States.HOLD0;
-        }
-        if(Extendo.CurrentState == Extendo.States.IDLE){
-            Extendo.motor.setPower(gamepad1.right_stick_y);
-        }
-        if(gamepad2.right_trigger > 0.1) {
-            Extendo.DropDown(Extendo.MaxExtension);
-            ActiveIntake.powerOn();
-        }
-        else if(gamepad2.left_trigger > 0.1)
-            ActiveIntake.Reverse();
-        else {
-            Extendo.DropDown(0);
-            ActiveIntake.powerOff();
-        }
-        if(Controls.RetractExtendo){
-            if(Extendo.CurrentState == Extendo.States.IDLE)
-                Extendo.CurrentState = Extendo.States.RETRACT;
 
-            Controls.RetractExtendo = false;
+    public enum IntakeStates{
+        IDLE_RETRACTED,
+        RETRACT_EXTENDO,
+        IDLE_EXTENDED,
+    }
+    public static IntakeStates CurrentState = IntakeStates.RETRACT_EXTENDO;
+    public static ElapsedTime TimeSinceStateStartedRunning = new ElapsedTime();
+    public static void ChangeState(IntakeStates state){
+        CurrentState = state;
+        TimeSinceStateStartedRunning.reset();
+    }
+
+    public static void Update() {
+        switch (CurrentState){
+            case RETRACT_EXTENDO:
+                Extendo.Extend(0);
+                if(!Extendo.DropDownProfile.motionEnded()) break;
+
+                Extendo.motor.setPower(1);
+
+                if(TimeSinceStateStartedRunning.seconds() < 0.2) break;
+                if(Math.abs(Extendo.motor.getVelocity()) > 5) break;
+
+                Extendo.motor.setPower(0);
+                Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                if(TimeSinceStateStartedRunning.seconds() >= 0.2 + 0.2){
+                    if(Storage.hasAlliancePice())
+                        OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE_WITH_SAMPLE);
+                    ChangeState(IntakeStates.IDLE_RETRACTED);
+                }
+
+                break;
+            case IDLE_RETRACTED:
+                Extendo.motor.setPower(1);
+                if(Extendo.getCurrentPosition() > 50) Extendo.motor.setMotorDisable();
+                else Extendo.motor.setMotorEnable();
+                if(gamepad1.left_stick_y != 0){
+                    ChangeState(IntakeStates.IDLE_EXTENDED);
+                }
+                break;
+            case IDLE_EXTENDED:
+                Extendo.motor.setPower(gamepad1.left_stick_y);
+                if(Storage.hasAlliancePice()) {
+                    ChangeState(IntakeStates.RETRACT_EXTENDO);
+                }
+                break;
         }
-
-
-
-        gamepad2.update();
-        gamepad1.update();
     }
 }
