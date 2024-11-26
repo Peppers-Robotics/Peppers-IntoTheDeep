@@ -26,8 +26,7 @@ public class Climb {
     }
 
     public static boolean isPTOEngaged(){
-        return false;
-//        return PTO.isEqualToAngle(PTOEngage);
+        return PTO.isEqualToAngle(PTOEngage);
     }
 
     public static void engagePTO(){
@@ -60,7 +59,6 @@ public class Climb {
     public static boolean Continue = true;
     public static ElapsedTime timer = new ElapsedTime();
     public static void Update(){
-        if(!isPrepared) prepareForClimb();
         switch (State){
             case GND_TO1:
                 Arm.setArmAngle(180);
@@ -102,6 +100,8 @@ public class Climb {
         }
 
         Arm.update();
+        Extendo.update();
+        Elevator.update();
 
     }
 

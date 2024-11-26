@@ -77,7 +77,6 @@ public class MainOpMode extends LinearOpMode {
             telemetry.addData("Claw state", Claw.isClosed() ? "open" : "closed");
             telemetry.addData("Claw color", Claw.clawSensor.getColorSeenBySensor().name());
             telemetry.addData("Claw distance", Claw.clawSensor.getDistance(DistanceUnit.MM));
-            telemetry.addData("Claw pos", Claw.clawServo.getAngle());
             telemetry.addData("htz", 1/time.seconds());
             telemetry.addData("storage state", Storage.getStorageStatus().toString());
             time.reset();

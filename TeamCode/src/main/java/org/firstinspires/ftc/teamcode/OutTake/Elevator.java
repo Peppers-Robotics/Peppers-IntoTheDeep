@@ -44,25 +44,38 @@ public class Elevator {
     public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
 //    public static boolean ReachedTargetPosition(){ return motionProfile.motionEnded(); }
     public static final double ratio = 1070/435.f;
+    public static boolean RESET = true;
+    public static ElapsedTime time = new ElapsedTime();
 
     public static void update(){
 
-       if(targetPos <= 0 && getCurrentPosition() <= 10 && !Climb.isPTOEngaged()){
-           motor.setMotorDisable();
-       } else {
-           motor.setMotorEnable();
-       }
+        if(RESET){
+            motor.setPower(1);
+            if(motor.getVelocity() <= 3 && time.seconds() >= 0.5){
+                motor.setPower(0);
+                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                RESET = false;
+            }
+            return;
+        }
+
+        if(targetPos <= 0 && getCurrentPosition() <= 10 && !Climb.isPTOEngaged()){
+            motor.setMotorDisable();
+        } else {
+            motor.setMotorEnable();
+        }
 
         motionProfile.update();
         controller.setTargetPosition(targetPos);
         if(Climb.isPTOEngaged()){
             controller.setPidCoefficients(climb);
             controller.setTargetPosition(targetPos, false);
-            double pidp = -controller.calculatePower(motor.getCurrentPosition());
+            double pidp = controller.calculatePower(motor.getCurrentPosition());
             Initialization.telemetry.addData("power", pidp);
-            motor.setPower(-pidp * ratio);
-            Chassis.BL.setPower(pidp);
-            Chassis.BR.setPower(pidp);
+            motor.setPower(pidp * ratio);
+            Chassis.BL.setPower(-pidp);
+            Chassis.BR.setPower(-pidp);
 
         } else {
             controller.setPidCoefficients(normal);

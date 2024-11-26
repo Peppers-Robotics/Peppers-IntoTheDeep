@@ -98,7 +98,7 @@ public class OutTakeStateMachine {
                 Arm.setPivotAngle(IdlePivotAngle_Sample);
                 Arm.setArmAngle(IdleArmAngle_Sample);
 
-                if(!Arm.motionCompleted()) break;
+                if(Arm.getCurrentArmAngle() < 90) break;
                 Elevator.setTargetPosition(IdleElevatorLevel);
                 switch (CurrentAction){
                     case NULL:

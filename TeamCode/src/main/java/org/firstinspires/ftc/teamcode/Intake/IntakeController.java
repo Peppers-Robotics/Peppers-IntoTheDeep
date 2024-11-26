@@ -29,7 +29,7 @@ public class IntakeController extends GenericController {
     public static void Update() {
         switch (CurrentState){
             case RETRACT_EXTENDO:
-                Extendo.Extend(0);
+                Extendo.DropDown(0);
                 if(!Extendo.DropDownProfile.motionEnded()) break;
 
                 Extendo.motor.setPower(1);
@@ -40,6 +40,7 @@ public class IntakeController extends GenericController {
                 Extendo.motor.setPower(0);
                 Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                Extendo.motor.setPower(0.5);
 
                 if(TimeSinceStateStartedRunning.seconds() >= 0.2 + 0.2){
                     if(Storage.hasAlliancePice())
@@ -49,7 +50,7 @@ public class IntakeController extends GenericController {
 
                 break;
             case IDLE_RETRACTED:
-                Extendo.motor.setPower(1);
+                Extendo.motor.setPower(0.8);
                 if(Extendo.getCurrentPosition() > 50) Extendo.motor.setMotorDisable();
                 else Extendo.motor.setMotorEnable();
                 if(gamepad1.left_stick_y != 0){

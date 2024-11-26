@@ -7,7 +7,6 @@ public class ActiveIntake {
     public static CachedMotor motor;
     public static ServoPlus Blocker;
     public static double Block = 1, UnBlock = 0;
-
     synchronized public static void powerOn(double s){
         double t = System.currentTimeMillis();
         new Thread(() -> {

@@ -69,6 +69,9 @@ public class Extendo {
 
        DropDownProfile.update();
        DropDown(DropDownProfile.getTargetPosition());
+       if(pidEnable){
+           motor.setPower(pidController.calculatePower(-motor.getCurrentPosition()));
+       }
        Initialization.telemetry.addData("currentPosition", motor.getCurrentPosition());
        Initialization.telemetry.addData("targetPos", targetPosition);
     }
