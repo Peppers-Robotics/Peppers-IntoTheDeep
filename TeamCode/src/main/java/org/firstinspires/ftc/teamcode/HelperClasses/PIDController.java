@@ -60,6 +60,9 @@ public class PIDController {
     public void setTargetPosition(double pos){
         setTargetPosition(pos, true);
     }
+    public double getTargetPosition(){
+        return targetPosition;
+    }
     public void setMaxActuatorOutput(double mao){
         maxActuatorOutput = mao;
     }

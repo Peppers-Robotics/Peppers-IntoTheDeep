@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Initialization;
 
 @Config
 public class Arm {
-    public static double s1Offset = 0, s2Offset = 0;
+    public static double s1Offset = 355, s2Offset = 0;
     private static double armPrevPos = 0, pivotPrevPos = 0;
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;
@@ -35,17 +35,17 @@ public class Arm {
     public static void update(){
         armProfile.update();
         pivotProfile.update();
-        diffy.setAngleToSecondJoint(armProfile.getPosition());
-        diffy.setAngleToFirstJoint(pivotProfile.getPosition());
+        diffy.setAngleToFirstJoint(armProfile.getPosition());
+        diffy.setAngleToSecondJoint(pivotProfile.getPosition());
 
-//        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
-//        servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
+        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
+        servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
 
         s1Controller.setTargetPosition(diffy.getRawAngles()[0] + s1Offset);
         s2Controller.setTargetPosition(diffy.getRawAngles()[1] + s1Offset);
 
-        servo1.setPower(s1Controller.calculatePower(servo1.getCurrentCorrectedAngle()));
-        servo2.setPower(s1Controller.calculatePower(servo2.getCurrentCorrectedAngle()));
+//        servo1.setPower(s1Controller.calculatePower(servo1.getCurrentCorrectedAngle()));
+//        servo2.setPower(s1Controller.calculatePower(servo2.getCurrentCorrectedAngle()));
 
         Initialization.telemetry.addData("Arm angle", armProfile.getPosition());
         Initialization.telemetry.addData("Pivot angle", pivotProfile.getPosition());

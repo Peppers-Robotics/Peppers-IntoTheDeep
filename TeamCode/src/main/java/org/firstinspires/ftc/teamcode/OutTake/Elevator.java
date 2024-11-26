@@ -41,8 +41,8 @@ public class Elevator {
     public static double getCurrentPosition(){ return -motor.getCurrentPosition(); }
     public static boolean PIDControllerInWork;
 
-    public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
-//    public static boolean ReachedTargetPosition(){ return motionProfile.motionEnded(); }
+//    public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
+    public static boolean ReachedTargetPosition(){ return motionProfile.motionEnded(); }
     public static final double ratio = 1070/435.f;
     public static boolean RESET = true;
     public static ElapsedTime time = new ElapsedTime();
@@ -51,7 +51,7 @@ public class Elevator {
 
         if(RESET){
             motor.setPower(1);
-            if(motor.getVelocity() <= 3 && time.seconds() >= 0.5){
+            if(Math.abs(motor.getVelocity()) <= 50 && time.seconds() >= 0.5){
                 motor.setPower(0);
                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -60,7 +60,7 @@ public class Elevator {
             return;
         }
 
-        if(targetPos <= 0 && getCurrentPosition() <= 10 && !Climb.isPTOEngaged()){
+        if(controller.getTargetPosition() >= 0 && -motor.getCurrentPosition() <= 10 && !Climb.isPTOEngaged()){
             motor.setMotorDisable();
         } else {
             motor.setMotorEnable();
@@ -79,14 +79,17 @@ public class Elevator {
 
         } else {
             controller.setPidCoefficients(normal);
-            motor.setPower(
-                    controller.calculatePower(motor.getCurrentPosition())
-            );
+            if(motor.isMotorEnabled())
+                motor.setPower(
+                        controller.calculatePower(motor.getCurrentPosition())
+                );
+            else motor.setPower(0);
         }
         Initialization.telemetry.addData("Elevator pose from profile", motionProfile.getPosition());
         Initialization.telemetry.addData("Elevator current pose", -motor.getCurrentPosition());
         Initialization.telemetry.addData("Elevator targetPos", targetPos);
         Initialization.telemetry.addData("Is elevator enabled", motor.isMotorEnabled());
+        Initialization.telemetry.addData("Elevator velocity", Elevator.motor.getVelocity());
     }
 
 }

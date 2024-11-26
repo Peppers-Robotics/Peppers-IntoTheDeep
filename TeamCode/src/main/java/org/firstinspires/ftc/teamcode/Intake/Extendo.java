@@ -14,9 +14,6 @@ import org.firstinspires.ftc.teamcode.OutTake.Claw;
 @SuppressWarnings("unused")
 @Config
 public class Extendo {
-
-
-
     public static CachedMotor motor;
     public static ServoPlus dropDownIntakeRight;
     public static ServoPlus dropDownIntakeLeft;

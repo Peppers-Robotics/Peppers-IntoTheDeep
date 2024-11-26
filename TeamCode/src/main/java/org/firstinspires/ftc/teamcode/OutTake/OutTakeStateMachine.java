@@ -16,17 +16,19 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Actions;
 import org.firstinspires.ftc.teamcode.HelperClasses.States;
+import org.firstinspires.ftc.teamcode.Initialization;
 
 @Config
 public class OutTakeStateMachine {
-    public static double IdleArmAngle = 0, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 40;
+    public static double IdleArmAngle = 0, IdlePivotAngle = 0, IdleElevatorLevel = -1000, SafeElevatorLevel = 40;
     public static double IdleArmAngle_Sample = 180, IdlePivotAngle_Sample = 0;
     public static double ArmScoreSample = 225, PivotScoreSample = 200, ElevatorScoreSample;
-    public static double ArmScoreSpecimen = 160, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 400, ArmPushSpecimen = 0;
-    public static double ArmTakeSpecimen = 270, PivotTakeSpecimen = 200, ElevatorTakeSpecimen = 10; // DONE
+    public static double ArmScoreSpecimen = 160, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 400, ArmPushSpecimen = 0, ElevatorPushSpecimen = -60;
+    public static double ArmTakeSpecimen = 270, PivotTakeSpecimen = 200, ElevatorTakeSpecimen = 60; // DONE
     public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 260, ElevatorSample1 = 500, ElevatorSample2 = 1200;
     public enum OutTakeStates implements States {
         IDLE,
+        ELEVATOR_TO_IDLE_WITH_SAMPLE,
         IDLE_WITH_SAMPLE,
         ELEVATOR_TO_SAMPLE_SCORE,
         ELEVATOR_TO_SPECIMEN_SCORE,
@@ -59,7 +61,7 @@ public class OutTakeStateMachine {
         TimeSinceStateStartedRunning.reset();
         CurrentState = state;
     }
-
+    public static boolean IDLEElevatorToPos1 = false;
 
     public static void Update(OutTakeActions action){
         if(action != null)
@@ -67,6 +69,7 @@ public class OutTakeStateMachine {
         else CurrentAction = OutTakeActions.NEXT;
         switch (CurrentState){
             case IDLE:
+                IDLEElevatorToPos1 = false;
                 Arm.setArmAngle(IdleArmAngle);
                 Arm.setPivotAngle(IdlePivotAngle);
                 Elevator.setTargetPosition(IdleElevatorLevel);
@@ -85,18 +88,27 @@ public class OutTakeStateMachine {
                         break;
                 }
                 break;
-            case IDLE_WITH_SAMPLE:
+            case ELEVATOR_TO_IDLE_WITH_SAMPLE:
                 Claw.close();
-                if(TimeSinceStateStartedRunning.seconds() <= 0.2) break;
-                Elevator.setTargetPosition(SafeElevatorLevel);
-
-                if(!Elevator.ReachedTargetPosition()) break;
-
+                if(TimeSinceStateStartedRunning.seconds() < 0.1) break;
+                Elevator.setTargetPosition(SafeElevatorLevel + 150);
+                if(!(Elevator.getCurrentPosition() > SafeElevatorLevel + 70)){
+                    break;
+                }
                 Arm.setPivotAngle(IdlePivotAngle_Sample);
                 Arm.setArmAngle(IdleArmAngle_Sample);
-
-                if(Arm.getCurrentArmAngle() < 90) break;
+                if(Arm.getCurrentArmAngle() < 120) break;
+                switch (CurrentAction){
+                    case NEXT:
+                        ChangeStateTo(OutTakeStates.IDLE_WITH_SAMPLE);
+                        break;
+                }
+                break;
+            case IDLE_WITH_SAMPLE:
+                Claw.close();
                 Elevator.setTargetPosition(IdleElevatorLevel);
+                if(!Elevator.ReachedTargetPosition()) break;
+
                 switch (CurrentAction){
                     case NULL:
                     case NEXT:
@@ -112,7 +124,7 @@ public class OutTakeStateMachine {
                 break;
             case ELEVATOR_TO_SAMPLE_SCORE:
                 Elevator.setTargetPosition(ElevatorScoreSample);
-                if(Elevator.getCurrentPosition() < SafeElevatorLevel) break;
+                if(-Elevator.motor.getCurrentPosition() < SafeElevatorLevel) break;
                 switch (CurrentAction){
                     case NULL:
                     case SPECIMEN:
@@ -175,6 +187,7 @@ public class OutTakeStateMachine {
                 }
                 break;
             case IDLE_WHILE_SAMPLE_SCORE:
+                Elevator.setTargetPosition(ElevatorScoreSample);
                 if(!Arm.motionCompleted()) break;
                 if(!Elevator.ReachedTargetPosition()) break;
                 switch (CurrentAction){
@@ -192,7 +205,7 @@ public class OutTakeStateMachine {
                 CurrentAction = OutTakeActions.NULL;
                 if(Claw.HasElementInIt()){
                     Claw.close();
-                    if(TimeSinceStateStartedRunning.seconds() >= 0.1) CurrentAction = OutTakeActions.NEXT;
+                    if(TimeSinceStateStartedRunning.seconds() >= 0.4) CurrentAction = OutTakeActions.NEXT;
                 }
                 switch (CurrentAction){
                     case RETRACT:
@@ -251,7 +264,7 @@ public class OutTakeStateMachine {
                 break;
             case SCORE_SPECIMEN_ARM:
                 Arm.setArmAngle(ArmPushSpecimen);
-                if(Arm.getPrecentOfArmMotionCompleted() < 70) break;
+                if(!Arm.motionCompleted()) break;
                 switch (CurrentAction){
                     case NEXT:
                         ChangeStateTo(OutTakeStates.SCORE_SPECIMEN_ELEVATOR);
@@ -259,7 +272,13 @@ public class OutTakeStateMachine {
                 }
                 break;
             case SCORE_SPECIMEN_ELEVATOR:
-                Elevator.setTargetPosition(0);
+                Elevator.setTargetPosition(ElevatorScoreSpecimen - ElevatorPushSpecimen);
+                if(!Elevator.ReachedTargetPosition()) {
+                    TimeSinceStateStartedRunning.reset();
+                    break;
+                }
+                if(TimeSinceStateStartedRunning.seconds() < 0.5) break;
+                Claw.open();
                 switch (CurrentAction){
                     case NEXT:
                         ChangeStateTo(OutTakeStates.RETRACT_ARM);
@@ -277,7 +296,6 @@ public class OutTakeStateMachine {
                 }
                 break;
         }
+        Initialization.telemetry.addData("Action", CurrentAction);
     }
-
-
 }

@@ -39,23 +39,8 @@ public class Initialization {
     public static Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     public static double Voltage = 12;
     public static HardwareMap hardwareMap;
-    public static DcMotorController cM, eM;
-    public static ServoController cS, eS;
-    public static AnalogInputController cA, eA;
-    public static DigitalChannelController cD, eD;
     public static void initializeHubCacheing(@NonNull HardwareMap hm){
         hardwareMap = hm;
-        cM = hardwareMap.getAll(DcMotorController.class).get(0);
-        eM = hardwareMap.getAll(DcMotorController.class).get(0);
-
-        cS = hardwareMap.getAll(ServoController.class).get(0);
-        eS = hardwareMap.getAll(ServoController.class).get(0);
-
-        cA = hardwareMap.getAll(AnalogInputController.class).get(0);
-        eA = hardwareMap.getAll(AnalogInputController.class).get(0);
-
-        cD = hardwareMap.getAll(DigitalChannelController.class).get(0);
-        eD = hardwareMap.getAll(DigitalChannelController.class).get(0);
 
         hubs = hardwareMap.getAll(LynxModule.class);
         for(LynxModule l : hubs){
@@ -68,15 +53,15 @@ public class Initialization {
         }
     }
     public static void initializeExtendo(){
-//        Extendo.motor = new CachedMotor(hm.get(DcMotor.class, "cM1"));
-        Extendo.motor = new CachedMotor(cM, 1);
+        Extendo.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "cM1"));
+//        Extendo.motor = new CachedMotor(cM, 1);
 
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        Extendo.dropDownIntakeLeft = new ServoPlus(eS, 4);
-        Extendo.dropDownIntakeRight = new ServoPlus(eS, 2);
-//        Extendo.dropDownIntakeLeft = hm.get(ServoPlus.class, "eS4");
-//        Extendo.dropDownIntakeRight = hm.get(ServoPlus.class, "eS2");
+//        Extendo.dropDownIntakeLeft = new ServoPlus(eS, 4);
+//        Extendo.dropDownIntakeRight = new ServoPlus(eS, 2);
+        Extendo.dropDownIntakeLeft = hardwareMap.get(ServoPlus.class, "eS4");
+        Extendo.dropDownIntakeRight = hardwareMap.get(ServoPlus.class, "eS2");
     }
     // eS1 - hang1
     // es0 - hang2
@@ -84,27 +69,27 @@ public class Initialization {
         Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
     }
     public static void initializeElevator(){
-//        Elevator.motor = new CachedMotor (hm.get(DcMotor.class, "eM0"));
-        Elevator.motor = new CachedMotor(eM, 0);
+        Elevator.motor = new CachedMotor (hardwareMap.get(DcMotor.class, "eM0"));
+//        Elevator.motor = new CachedMotor(eM, 0);
         Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void initializeOuttake(@NonNull HardwareMap hm){
-//        Claw.clawServo = hm.get(ServoPlus.class, "cS2");
-//        Arm.servo1 = hm.get(ServoPlus.class, "eS3");
-//        Arm.servo2 = hm.get(ServoPlus.class, "eS5");
-        Claw.clawServo = new ServoPlus(cS, 2);
-        Arm.servo1 = new ServoPlus(eS, 3);
-        Arm.servo1 = new ServoPlus(eS, 5);
-        Arm.servo1.setToCRControlled(hm.get(AnalogInput.class, "cA0"));
-        Arm.servo2.setToCRControlled(hm.get(AnalogInput.class, "cA1"));
+        Claw.clawServo = hm.get(ServoPlus.class, "cS2");
+        Arm.servo1 = hm.get(ServoPlus.class, "eS3");
+        Arm.servo2 = hm.get(ServoPlus.class, "eS5");
+//        Claw.clawServo = new ServoPlus(cS, 2);
+//        Arm.servo1 = new ServoPlus(eS, 3);
+//        Arm.servo2 = new ServoPlus(eS, 5);
+//        Arm.servo1.setToCRControlled(hm.get(AnalogInput.class, "cA0"));
+//        Arm.servo2.setToCRControlled(hm.get(AnalogInput.class, "cA1"));
         Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");
     }
     public static void initializeIntake(){
-//        ActiveIntake.motor = new CachedMotor(hm.get(DcMotor.class, "eM3"));
-        ActiveIntake.motor = new CachedMotor(eM, 3);
+        ActiveIntake.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM3"));
+//        ActiveIntake.motor = new CachedMotor(eM, 3);
         ActiveIntake.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//        ServoPlus latch = hm.get(ServoPlus.class, "cS0");
-        ActiveIntake.Blocker = new ServoPlus(cS, 0);
+        ServoPlus latch = hardwareMap.get(ServoPlus.class, "cS0");
+//        ActiveIntake.Blocker = new ServoPlus(cS, 0);
         // PTO - cS4
     }
     public static void initializeRobot(@NonNull HardwareMap hm){
@@ -120,9 +105,12 @@ public class Initialization {
         Claw.clawSensor.setLowPassFilterCoefficient(0.9);
     }
     public static void initializeClimb(){
-        Climb.PTO = new ServoPlus(cS, 4);
-        Climb.W1 = new ServoPlus(eS, 1);
-        Climb.W2 = new ServoPlus(eS, 0);
+//        Climb.PTO = new ServoPlus(cS, 4);
+//        Climb.W1 = new ServoPlus(eS, 1);
+//        Climb.W2 = new ServoPlus(eS, 0);
+        Climb.PTO = hardwareMap.get(ServoPlus.class, "cS4");
+        Climb.W1 = hardwareMap.get(ServoPlus.class, "eS1");
+        Climb.W2 = hardwareMap.get(ServoPlus.class, "eS0");
         Climb.disengagePTO();
         Climb.PutDown();
     }
@@ -158,10 +146,10 @@ public class Initialization {
         Claw.clawServo.getController().pwmDisable();
     }
     public static void initializeChassis(){
-        Chassis.BL = new CachedMotor(cM, 2);
-        Chassis.BR = new CachedMotor(eM, 2);
-        Chassis.FL = new CachedMotor(cM, 3);
-        Chassis.FR = new CachedMotor(eM, 1);
+        Chassis.BL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM2"));
+        Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM2"));
+        Chassis.FL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM3"));
+        Chassis.FR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
 
     }
 

@@ -10,7 +10,7 @@ public class Controls {
     public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen, Climbing,
             Grab,
             Retract,
-                            DunkToScore;
+                            DunkToScore, IdleWithSample;
 
     public static void Initialize(Gamepad gamepadD1, Gamepad gamepadD2){
         gamepad1 = new AutoGamepad(gamepadD1);
@@ -34,7 +34,6 @@ public class Controls {
                                             DunkToScore  = true;
         if((gamepad2.gamepad.left_bumper || gamepad2.gamepad.right_bumper) && (gamepad1.gamepad.right_bumper || gamepad1.gamepad.left_bumper))
                                             Climbing     = true;
-
 
         gamepad1.update();
         gamepad2.update();

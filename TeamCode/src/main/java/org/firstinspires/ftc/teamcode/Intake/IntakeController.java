@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
+import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
 
 public class IntakeController extends GenericController {
@@ -32,37 +33,65 @@ public class IntakeController extends GenericController {
                 Extendo.DropDown(0);
                 if(!Extendo.DropDownProfile.motionEnded()) break;
 
-                Extendo.motor.setPower(1);
+                Extendo.motor.setPower(0.4);
 
                 if(TimeSinceStateStartedRunning.seconds() < 0.2) break;
-                if(Math.abs(Extendo.motor.getVelocity()) > 5) break;
+                if(Extendo.motor.getVelocity() > 200) break;
 
                 Extendo.motor.setPower(0);
                 Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                Extendo.motor.setPower(0.5);
+                Extendo.motor.setPower(0.4);
 
-                if(TimeSinceStateStartedRunning.seconds() >= 0.2 + 0.2){
+                if(TimeSinceStateStartedRunning.seconds() >= 0.2 + 0.1){
                     if(Storage.hasAlliancePice())
-                        OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE_WITH_SAMPLE);
+                        OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.ELEVATOR_TO_IDLE_WITH_SAMPLE);
                     ChangeState(IntakeStates.IDLE_RETRACTED);
                 }
 
                 break;
             case IDLE_RETRACTED:
-                Extendo.motor.setPower(0.8);
-                if(Extendo.getCurrentPosition() > 50) Extendo.motor.setMotorDisable();
+                if(gamepad2.right_trigger >= 0.1){
+                    Extendo.DropDown(Extendo.MaxExtension);
+                    ActiveIntake.powerOn();
+                } else if(gamepad2.left_trigger >= 0.1){
+                    ActiveIntake.Reverse();
+                } else {
+                    Extendo.DropDown(0);
+                    ActiveIntake.powerOff();
+                }
+                if(Extendo.DropDownProfile.motionEnded() && Extendo.DropDownProfile.getTargetPosition() == 0 && Storage.hasAlliancePice()){
+                    ChangeState(IntakeStates.RETRACT_EXTENDO);
+                }
+                Extendo.motor.setPower(1);
+                if(Extendo.motor.getCurrentPosition() > -20) Extendo.motor.setMotorDisable();
                 else Extendo.motor.setMotorEnable();
-                if(gamepad1.left_stick_y != 0){
+                if(gamepad1.right_stick_y != 0){
                     ChangeState(IntakeStates.IDLE_EXTENDED);
+                    Extendo.motor.setMotorEnable();
+                    Extendo.motor.setPower(gamepad1.right_stick_y);
                 }
                 break;
             case IDLE_EXTENDED:
-                Extendo.motor.setPower(gamepad1.left_stick_y);
-                if(Storage.hasAlliancePice()) {
+                if(gamepad2.right_trigger >= 0.1){
+                    Extendo.DropDown(Extendo.MaxExtension);
+                    ActiveIntake.powerOn();
+                } else if(gamepad2.left_trigger >= 0.1){
+                    ActiveIntake.Reverse();
+                } else {
+                    Extendo.DropDown(0);
+                    ActiveIntake.powerOff();
+                }
+                Extendo.motor.setPower(gamepad1.right_stick_y);
+                if(Extendo.motor.getCurrentPosition() > -10 && gamepad1.right_stick_y > 0) {
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
                 }
                 break;
         }
+        Initialization.telemetry.addData("Extendo current pos", Extendo.motor.getCurrentPosition());
+        Initialization.telemetry.addData("extendo motor enabled", Extendo.motor.isMotorEnabled());
+        Initialization.telemetry.addData("trigger", gamepad1.right_stick_y);
+        gamepad1.update();
+        gamepad2.update();
     }
 }
