@@ -18,6 +18,7 @@ public class Diffy extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Initialization.initializeHubCacheing(hardwareMap);
         Initialization.initializeOuttake(hardwareMap);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();

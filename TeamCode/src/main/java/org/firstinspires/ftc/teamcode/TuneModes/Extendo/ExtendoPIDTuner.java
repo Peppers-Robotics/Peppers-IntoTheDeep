@@ -18,8 +18,8 @@ public class ExtendoPIDTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Initialization.initializeExtendo(hardwareMap);
         Initialization.initializeHubCacheing(hardwareMap);
+        Initialization.initializeExtendo();
         ElapsedTime time = new ElapsedTime();
 
         waitForStart();

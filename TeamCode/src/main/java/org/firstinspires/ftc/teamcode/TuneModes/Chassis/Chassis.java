@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.Initialization;
 public class Chassis extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Initialization.initializeChassis(hardwareMap);
         Initialization.initializeHubCacheing(hardwareMap);
+        Initialization.initializeChassis();
 
         waitForStart();
 

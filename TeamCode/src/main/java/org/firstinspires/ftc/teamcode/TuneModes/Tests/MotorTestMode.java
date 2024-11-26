@@ -18,10 +18,8 @@ public class MotorTestMode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        DcMotor chMotor = hardwareMap.get(DcMotor.class, "cM0");
-        DcMotor ehMotor = hardwareMap.get(DcMotor.class, "eM0");
-        DcMotorController chController = chMotor.getController();
-        DcMotorController ehController = ehMotor.getController();
+        DcMotorController chController = hardwareMap.getAll(DcMotorController.class).get(0);
+        DcMotorController ehController = hardwareMap.getAll(DcMotorController.class).get(1);
         for(int i = 0; i < 4; i++){
             chController.setMotorMode(i, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             ehController.setMotorMode(i, DcMotor.RunMode.STOP_AND_RESET_ENCODER);

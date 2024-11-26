@@ -20,9 +20,9 @@ public class TuneClimbPID extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Initialization.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         Initialization.initializeHubCacheing(hardwareMap);
-        Initialization.initializeChassis(hardwareMap);
-        Initialization.initializeClimb(hardwareMap);
-        Initialization.initializeElevator(hardwareMap);
+        Initialization.initializeChassis();
+        Initialization.initializeClimb();
+        Initialization.initializeElevator();
 
         waitForStart();
 

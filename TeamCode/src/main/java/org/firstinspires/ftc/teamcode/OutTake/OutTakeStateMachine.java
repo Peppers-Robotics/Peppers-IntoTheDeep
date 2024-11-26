@@ -15,9 +15,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Actions;
-import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
-import org.firstinspires.ftc.teamcode.HelperClasses.OutTakeFSM;
-import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.States;
 
 @Config

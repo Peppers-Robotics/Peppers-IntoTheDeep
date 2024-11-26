@@ -17,8 +17,8 @@ public class ElevatorPIDTuner extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Initialization.initializeHubCacheing(hardwareMap);
+        Initialization.initializeElevator();
         Initialization.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        Initialization.initializeElevator(hardwareMap);
 
         waitForStart();
 

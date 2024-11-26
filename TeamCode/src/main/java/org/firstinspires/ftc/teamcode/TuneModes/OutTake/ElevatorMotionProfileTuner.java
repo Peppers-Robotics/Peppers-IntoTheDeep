@@ -27,8 +27,8 @@ public class ElevatorMotionProfileTuner extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         AutoGamepad gamepad = new AutoGamepad(gamepad1);
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
-        Initialization.initializeElevator(hardwareMap);
         Initialization.initializeHubCacheing(hardwareMap);
+        Initialization.initializeElevator();
 
         maxVelocities = new Vector<>();
         accelerations = new Vector<>();

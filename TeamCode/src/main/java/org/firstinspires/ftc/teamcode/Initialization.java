@@ -67,7 +67,7 @@ public class Initialization {
             Voltage = 12;
         }
     }
-    public static void initializeExtendo(@NonNull HardwareMap hm){
+    public static void initializeExtendo(){
 //        Extendo.motor = new CachedMotor(hm.get(DcMotor.class, "cM1"));
         Extendo.motor = new CachedMotor(cM, 1);
 
@@ -83,7 +83,7 @@ public class Initialization {
     public static void initializeStorage(@NonNull HardwareMap hm){
         Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
     }
-    public static void initializeElevator(@NonNull HardwareMap hm){
+    public static void initializeElevator(){
 //        Elevator.motor = new CachedMotor (hm.get(DcMotor.class, "eM0"));
         Elevator.motor = new CachedMotor(eM, 0);
         Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -99,7 +99,7 @@ public class Initialization {
         Arm.servo2.setToCRControlled(hm.get(AnalogInput.class, "cA1"));
         Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");
     }
-    public static void initializeIntake(@NonNull HardwareMap hm){
+    public static void initializeIntake(){
 //        ActiveIntake.motor = new CachedMotor(hm.get(DcMotor.class, "eM3"));
         ActiveIntake.motor = new CachedMotor(eM, 3);
         ActiveIntake.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -108,21 +108,21 @@ public class Initialization {
         // PTO - cS4
     }
     public static void initializeRobot(@NonNull HardwareMap hm){
-        initializeIntake(hm);
-        initializeElevator(hm);
-        initializeExtendo(hm);
+        initializeHubCacheing(hm);
+        initializeIntake();
+        initializeElevator();
+        initializeExtendo();
         initializeOuttake(hm);
         initializeStorage(hm);
-        initializeHubCacheing(hm);
-        initializeChassis(hm);
-        initializeClimb(hm);
+        initializeChassis();
+        initializeClimb();
 
         Claw.clawSensor.setLowPassFilterCoefficient(0.9);
     }
-    public static void initializeClimb(HardwareMap hm){
-        Climb.PTO = hm.get(ServoPlus.class, "cS4");
-        Climb.W1 = hm.get(ServoPlus.class, "eS1");
-        Climb.W2 = hm.get(ServoPlus.class, "eS0");
+    public static void initializeClimb(){
+        Climb.PTO = new ServoPlus(cS, 4);
+        Climb.W1 = new ServoPlus(eS, 1);
+        Climb.W2 = new ServoPlus(eS, 0);
         Climb.disengagePTO();
         Climb.PutDown();
     }
@@ -157,7 +157,7 @@ public class Initialization {
 
         Claw.clawServo.getController().pwmDisable();
     }
-    public static void initializeChassis(HardwareMap hm){
+    public static void initializeChassis(){
         Chassis.BL = new CachedMotor(cM, 2);
         Chassis.BR = new CachedMotor(eM, 2);
         Chassis.FL = new CachedMotor(cM, 3);

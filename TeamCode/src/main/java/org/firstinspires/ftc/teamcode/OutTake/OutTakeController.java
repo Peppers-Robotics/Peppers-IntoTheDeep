@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.OutTake;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
-import org.firstinspires.ftc.teamcode.HelperClasses.OutTakeFSM;
 
 public class OutTakeController extends GenericController {
     public static void Update(){

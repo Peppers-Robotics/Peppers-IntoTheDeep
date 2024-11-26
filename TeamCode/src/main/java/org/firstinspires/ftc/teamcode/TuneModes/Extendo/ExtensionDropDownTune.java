@@ -18,7 +18,8 @@ public class ExtensionDropDownTune extends LinearOpMode {
     public static double Distance = 0;
     @Override
     public void runOpMode() throws InterruptedException {
-        Initialization.initializeExtendo(hardwareMap);
+        Initialization.initializeHubCacheing(hardwareMap);
+        Initialization.initializeExtendo();
 
         waitForStart();
 
