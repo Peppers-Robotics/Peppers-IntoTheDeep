@@ -66,7 +66,6 @@ public class MainOpMode extends LinearOpMode {
                 Climb.Update();
                 continue;
             }
-
             Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
                         gamepad1.left_trigger - gamepad1.right_trigger);
 

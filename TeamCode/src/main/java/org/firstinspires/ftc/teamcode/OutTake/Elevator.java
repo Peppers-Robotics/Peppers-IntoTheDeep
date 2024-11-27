@@ -71,11 +71,12 @@ public class Elevator {
         if(Climb.isPTOEngaged()){
             controller.setPidCoefficients(climb);
             controller.setTargetPosition(targetPos, false);
-            double pidp = controller.calculatePower(motor.getCurrentPosition());
+            double pidp = -controller.calculatePower(motor.getCurrentPosition());
             Initialization.telemetry.addData("power", pidp);
-            motor.setPower(pidp * ratio);
-            Chassis.BL.setPower(-pidp);
-            Chassis.BR.setPower(-pidp);
+//            motor.setPower(-pidp * ratio);
+            motor.setPower(0);
+            Chassis.BL.setPower(pidp);
+            Chassis.BR.setPower(pidp);
 
         } else {
             controller.setPidCoefficients(normal);

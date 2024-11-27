@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
 import org.firstinspires.ftc.teamcode.Initialization;
+import org.firstinspires.ftc.teamcode.MainOpMode;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
 
 public class IntakeController extends GenericController {
@@ -44,8 +45,9 @@ public class IntakeController extends GenericController {
                 Extendo.motor.setPower(0.4);
 
                 if(TimeSinceStateStartedRunning.seconds() >= 0.2 + 0.1){
-                    if(Storage.hasAlliancePice())
+                    if(Storage.hasAlliancePice() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE) {
                         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.ELEVATOR_TO_IDLE_WITH_SAMPLE);
+                    }
                     ChangeState(IntakeStates.IDLE_RETRACTED);
                 }
 
@@ -91,7 +93,8 @@ public class IntakeController extends GenericController {
         Initialization.telemetry.addData("Extendo current pos", Extendo.motor.getCurrentPosition());
         Initialization.telemetry.addData("extendo motor enabled", Extendo.motor.isMotorEnabled());
         Initialization.telemetry.addData("trigger", gamepad1.right_stick_y);
-        gamepad1.update();
+        if(!MainOpMode.isClimbing)
+            gamepad1.update();
         gamepad2.update();
     }
 }

@@ -4,18 +4,22 @@ import android.telephony.mbms.MbmsErrors;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Chassis;
 import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.Intake.IntakeController;
+import org.firstinspires.ftc.teamcode.MainOpMode;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.xmlpull.v1.XmlPullParser;
 
+import java.sql.Time;
 import java.util.concurrent.ExecutionException;
 
 public class Climb {
     public static ServoPlus W1, W2, PTO;
-    public static double down1 = 120, down2 = 300, raise1 = 310, raise2 = 100;
-    public static double PTOEngage = 270, PTOdisengage = 170;
+    public static double down1 = 135, down2 = 290, raise1 = 310, raise2 = 100;
+    public static double PTOEngage = 270, PTOdisengage = 180;
     public static void Raise(){
         W1.setAngle(raise1);
         W2.setAngle(raise2);
@@ -36,86 +40,88 @@ public class Climb {
         PTO.setAngle(PTOdisengage);
     }
 
-    enum states{
-        GND_TO1,
-        PULL,
-        ONE_TWO,
-        KEEP
+    enum States{
+        GET_ARM_UP,
+        TILT_ROBOT,
+        RAISE_ELEVATOR_TO_CLIMB1,
+        PULL_UP,
+        EXTEND_EXTENDO_TO_MAX_AND_ETC2,
+        PULL_ELEVATOR_A_BIT,
+        RETRACT_EXTENDO,
+        IDLE_WHILE_UP
     }
-    public static states State;
+    public static States State;
     static {
-        State = states.GND_TO1;
-        isPrepared = false;
     }
-    public static boolean isPrepared = false;
-
-    private static void prepareForClimb(){
-        engagePTO();
-        Raise();
-
-        isPrepared = true;
+    public static double BAR1 = 0, BAR2 = 0, BAR2hoverOn = 300, MaxExtendo = 1300;
+    public static int action = 0;
+    public static ElapsedTime TimeSinceLastStateChange = new ElapsedTime();
+    public static void ChangeState(States s){
+        State = s;
+        TimeSinceLastStateChange.reset();
     }
-    public static double BAR1 = 0, BAR2 = 0;
-    public static boolean Continue = true;
-    public static ElapsedTime timer = new ElapsedTime();
     public static void Update(){
         switch (State){
-            case GND_TO1:
+            case GET_ARM_UP:
                 Arm.setArmAngle(180);
-                if(Arm.motionCompleted())
-                    Raise();
+                if(!Arm.motionCompleted()) break;
+                ChangeState(States.TILT_ROBOT);
+                break;
+            case TILT_ROBOT:
+                Raise();
+                ChangeState(States.RAISE_ELEVATOR_TO_CLIMB1);
+                break;
+            case RAISE_ELEVATOR_TO_CLIMB1:
+                disengagePTO();
                 Elevator.setTargetPosition(BAR1);
-                if(Elevator.ReachedTargetPosition() && Arm.motionCompleted()){
-                    engagePTO();
-                    if(timer.seconds() >= 0.1){
-                        State = states.PULL;
-                    }
-                } else timer.reset();
-                Elevator.update();
+                if(Elevator.getCurrentPosition() < BAR1 - 5) break;
+                ChangeState(States.PULL_UP);
                 break;
-            case PULL:
+            case PULL_UP:
+                engagePTO();
+                if(TimeSinceLastStateChange.seconds() < 0.05) break;
                 Elevator.setTargetPosition(0);
-                if(Elevator.ReachedTargetPosition()){
-                    Extendo.Extend(1300);
-                    Extendo.pidEnable = true;
-                    if(-Extendo.motor.getCurrentPosition() >= 1200){
-                        if(Continue)
-                            State = states.ONE_TWO;
-                        else
-                            State = states.KEEP;
+                if(Elevator.getCurrentPosition() > 10){
+                    Chassis.BL.setPower(1);
+                    Chassis.BR.setPower(1);
+                } else {
+                    Chassis.BL.setPower(0);
+                    Chassis.BR.setPower(0);
+                    disengagePTO();
+                    if(action == 0) {
+                        ChangeState(States.EXTEND_EXTENDO_TO_MAX_AND_ETC2);
+                        action = 1;
                     }
+                    else ChangeState(States.IDLE_WHILE_UP);
                 }
                 break;
-            case ONE_TWO:
+            case EXTEND_EXTENDO_TO_MAX_AND_ETC2:
+                IntakeController.gamepad1.right_stick_y = -1;
                 Elevator.setTargetPosition(BAR2);
-                if(Elevator.ReachedTargetPosition()){
-                    State = states.PULL;
-                    Continue = false;
+                if(Extendo.getCurrentPosition() < MaxExtendo - 150)
+                    IntakeController.gamepad1.right_stick_y = 0;
+                if (Extendo.motor.getPower() == 0 && Elevator.getCurrentPosition() >= BAR2) {
+                    ChangeState(States.PULL_ELEVATOR_A_BIT);
                 }
                 break;
-            case KEEP:
-                Extendo.Extend(0);
-                Elevator.setTargetPosition(0);
+            case PULL_ELEVATOR_A_BIT:
+                Elevator.setTargetPosition(BAR2hoverOn);
+                if(!Elevator.ReachedTargetPosition()) break;
+                ChangeState(States.RETRACT_EXTENDO);
+                break;
+            case RETRACT_EXTENDO:
+                if(IntakeController.CurrentState == IntakeController.IntakeStates.IDLE_EXTENDED)
+                    IntakeController.gamepad1.right_stick_y = 1;
+                else {
+                    IntakeController.gamepad1.right_stick_y = 0;
+                    ChangeState(States.PULL_UP);
+                }
+                break;
+            case IDLE_WHILE_UP:
                 break;
         }
-
-        Arm.update();
-        Extendo.update();
         Elevator.update();
-
+        IntakeController.Update();
+        Arm.update();
     }
-
-    /*
-
-    1. raise to lvl `x`
-    1.5. wait 0.1s
-    2. raise to lvl 0
-    3. ExtendExtendo to max lenght
-    4. raise to `x2`
-    4.5. wait 0.1s
-    5. raise to 0
-
-
- */
-
 }

@@ -23,6 +23,7 @@ public class TuneClimbPID extends LinearOpMode {
         Initialization.initializeChassis();
         Initialization.initializeClimb();
         Initialization.initializeElevator();
+        Elevator.RESET = false;
 
         waitForStart();
 
