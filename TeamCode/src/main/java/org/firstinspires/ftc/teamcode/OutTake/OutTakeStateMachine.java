@@ -116,6 +116,7 @@ public class OutTakeStateMachine {
                         ChangeStateTo(OutTakeStates.RETRACT_ARM);
                         break;
                     case SAMPLE:
+                    case SCORE:
                         ChangeStateTo(OutTakeStates.ELEVATOR_TO_SAMPLE_SCORE);
                         break;
                     case SPECIMEN:
@@ -190,7 +191,8 @@ public class OutTakeStateMachine {
             case IDLE_WHILE_SAMPLE_SCORE:
                 Elevator.setTargetPosition(ElevatorScoreSample);
                 if(!Arm.motionCompleted()) break;
-                if(Elevator.getCurrentPosition() < ElevatorScoreSample - 20) break;
+                if(!Elevator.ReachedTargetPosition()) break;
+//                if(Elevator.getCurrentPosition() < ElevatorScoreSample - 20) break;
                 switch (CurrentAction){
                     case SCORE:
                         ChangeStateTo(OutTakeStates.SCORE_SAMPLE);

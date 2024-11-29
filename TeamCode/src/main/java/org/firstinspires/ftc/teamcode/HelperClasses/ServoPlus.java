@@ -50,9 +50,15 @@ public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
         return Math.abs(angle - getAngle()) < 0.1;
     }
     // -------------------- CR Implementation --------------------
+
+    public void setEncoder(AnalogInput ai){
+        encoder = ai;
+    }
+
     private AnalogInput encoder = null;
     private double lastAngle = 0;
     private int revolutions = 0;
+
     public void setToCRControlled(AnalogInput ai){
         isCR = true;
         encoder = ai;

@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
+import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
 
-@TeleOp(name = ".pipers \uD83C\uDF36", group = "mainOp")
-public class MainOpMode extends LinearOpMode {
+@TeleOp(name = ".pipersRED \uD83C\uDF36", group = ".mainOp")
+public class MainOpModeRed extends LinearOpMode {
 
     public static boolean isClimbing = false;
 
@@ -30,20 +30,22 @@ public class MainOpMode extends LinearOpMode {
         Initialization.telemetry = telemetry;
         Initialization.initializeRobot(hardwareMap);
         Controls.Initialize(gamepad1, gamepad2);
+        ActiveIntake.UnblockIntake();
 
         IntakeController.Initialize(gamepad1, gamepad2);
 
         Initialization.hubs.get(0).setConstant(0xff0000);
         Initialization.hubs.get(1).setConstant(0xff0000);
 
+        gamepad2.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+
         Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE);
         Arm.setArmAngle(0);
-//        Claw.open();
-//        Climb.disengagePTO();
-//        Climb.PutDown();
+
         Initialization.Team = Initialization.AllianceColor.RED;
+
         Extendo.DropDown(0);
         while (opModeInInit()){
             Initialization.updateCacheing();
@@ -58,6 +60,28 @@ public class MainOpMode extends LinearOpMode {
         while (opModeIsActive()){
 
             Initialization.updateCacheing();
+
+            if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE){
+                switch (Storage.getStorageStatus()) {
+                    case RED:
+                        Initialization.hubs.get(0).setConstant(0xff0000);
+                        Initialization.hubs.get(1).setConstant(0xff0000);
+                        break;
+                    case BLUE:
+                        Initialization.hubs.get(0).setConstant(0x0000ff);
+                        Initialization.hubs.get(1).setConstant(0x0000ff);
+                        break;
+                    case YELLOW:
+                        Initialization.hubs.get(0).setConstant(0xffff00);
+                        Initialization.hubs.get(1).setConstant(0xffff00);
+                        break;
+                    case NONE:
+                        Initialization.hubs.get(0).setConstant(0xffffff);
+                        Initialization.hubs.get(1).setConstant(0xffffff);
+                        break;
+                }
+            }
+
             if(Controls.Climbing){
                 isClimbing = true;
                 Controls.Climbing = false;

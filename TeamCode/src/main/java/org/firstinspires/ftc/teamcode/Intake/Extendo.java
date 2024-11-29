@@ -19,6 +19,7 @@ public class Extendo {
     public static ServoPlus dropDownIntakeLeft;
     public static PIDController pidController = new PIDController(0.02, 0, 0.0007);
     public static double MaxExtension = 120;
+    public static int MaxExtendoExtension = 1300;
     private static volatile double targetPosition = 0;
 //    public static final double tensionCoeff = 10;
     public static double off1 = 10, off2 = 10, koeff = 0.11;
@@ -29,6 +30,12 @@ public class Extendo {
         DropDownProfile = new AsymmetricMotionProfile(1000, 8000, 8000);
     }
 
+    public static boolean ReachedTargetPosition(){
+        return Math.abs(targetPosition - getCurrentPosition()) <= 5;
+    }
+    public static boolean ReachedTargetPosition(double t){
+        return Math.abs(targetPosition - getCurrentPosition()) <= t;
+    }
     private static double inverseKinematicsForDropdownLinkage(double lenght){
 
         if(lenght > 2 * A) lenght = 2 * A;

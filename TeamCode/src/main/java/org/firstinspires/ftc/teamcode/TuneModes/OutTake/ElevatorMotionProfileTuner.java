@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.TuneModes.OutTake;
 
-import com.acmerobotics.dashboard.DashboardCore;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -10,7 +9,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.AutoGamepad;
 import org.firstinspires.ftc.teamcode.Initialization;
-import org.firstinspires.ftc.teamcode.MainOpMode;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 
 import java.util.Vector;

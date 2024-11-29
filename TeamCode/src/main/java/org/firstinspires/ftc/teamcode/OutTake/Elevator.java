@@ -19,7 +19,7 @@ public class Elevator {
     public static PIDController controller = new PIDController(0.013, 0, 0.0005);
     public static PIDCoefficients climb = new PIDCoefficients(0.01, 0, 0.0003);
     public static PIDCoefficients normal = new PIDCoefficients(0.013, 0, 0.0005);
-    public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(3000, 5000, 7000);
+    public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(6000, 7000, 7000);
 
     static {
         PIDControllerInWork = true;

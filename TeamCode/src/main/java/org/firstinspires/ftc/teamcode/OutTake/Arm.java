@@ -28,7 +28,8 @@ public class Arm {
     public static void setArmAngle(double angle){
         if(armProfile.getPosition() == angle) return;
 //        diffy.setAngleToSecondJoint(angle);
-        armProfile.startMotion(armPrevPos, angle);
+//        armProfile.startMotion(armPrevPos, angle);
+        armProfile.startMotion(getCurrentArmAngle(true), angle);
         armPrevPos = angle;
     }
 
@@ -71,6 +72,9 @@ public class Arm {
     }
     public static double getCurrentArmAngle(){
         return armProfile.getPosition();
+    }
+    public static double getCurrentArmAngle(boolean fromEncoder){
+        return (servo1.getAngle() + servo2.getAngle()) / 2;
     }
 
 }
