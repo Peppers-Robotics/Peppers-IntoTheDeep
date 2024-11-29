@@ -30,7 +30,7 @@ public class ThreeDeadWheelLocalizer extends Localizer{
         //TODO: put the right names here
         left = hm.get(DcMotorEx.class, "eM3");
         right = hm.get(DcMotorEx.class, "cM3");
-        perpendicular = hm.get(DcMotorEx.class, "eM0");
+        perpendicular = hm.get(DcMotorEx.class, "cM0");
         currentPosition = new Pose2D(DistanceUnit.MM, 0, 0, AngleUnit.RADIANS, 0);
         lastPosition = currentPosition;
         lastEncoderValues = new double[] {0, 0, 0};
@@ -58,13 +58,13 @@ public class ThreeDeadWheelLocalizer extends Localizer{
     public synchronized void update() {
         currentEncoderValues = new double[] {getRealDistanceFromTicks(left.getCurrentPosition()), getRealDistanceFromTicks(right.getCurrentPosition()), getRealDistanceFromTicks(perpendicular.getCurrentPosition())};
         double H = currentPosition.getHeading(AngleUnit.RADIANS), X = currentPosition.getX(DistanceUnit.MM), Y = currentPosition.getY(DistanceUnit.MM);
-        double dh = (currentEncoderValues[0] - currentEncoderValues[1]) / lateralDistance - (lastEncoderValues[0] - lastEncoderValues[1]) / lateralDistance;
+        double dh = (currentEncoderValues[0] - lastEncoderValues[0]) / lateralDistance - (currentEncoderValues[1] - lastEncoderValues[1]) / lateralDistance;
         H += dh;
 
         H = NormalizeAngle(H);
 
-        double dF = ((currentEncoderValues[1] - lastEncoderValues[1]) * leftPos.getY(DistanceUnit.MM) +
-                (currentEncoderValues[0] - lastEncoderValues[0]) * rightPos.getY(DistanceUnit.MM)) / lateralDistance;
+        double dF = ((currentEncoderValues[1] - lastEncoderValues[1]) +
+                (currentEncoderValues[0] - lastEncoderValues[0])) / 2;
         double dS = (currentEncoderValues[2] - lastEncoderValues[2]) - perpendicularDistance * dh;
 
         double R0 = dF / H, R1 = dS / H;
@@ -81,8 +81,8 @@ public class ThreeDeadWheelLocalizer extends Localizer{
         lastEncoderValues = currentEncoderValues;
 
         FtcDashboard.getInstance().getTelemetry().addData("X", currentPosition.getX(DistanceUnit.MM));
-        FtcDashboard.getInstance().getTelemetry().addData("Y", currentPosition.getX(DistanceUnit.MM));
-        FtcDashboard.getInstance().getTelemetry().addData("heading", currentPosition.getX(DistanceUnit.MM));
+        FtcDashboard.getInstance().getTelemetry().addData("Y", currentPosition.getY(DistanceUnit.MM));
+        FtcDashboard.getInstance().getTelemetry().addData("heading", currentPosition.getHeading(AngleUnit.DEGREES));
         FtcDashboard.getInstance().getTelemetry().addData("dF", dF);
         FtcDashboard.getInstance().getTelemetry().addData("dS", dS);
         FtcDashboard.getInstance().getTelemetry().addData("relX", relX);
