@@ -7,10 +7,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Chassis;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
-import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
-import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
-import org.firstinspires.ftc.teamcode.HelperClasses.CutOffResolution;
-import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 import org.firstinspires.ftc.teamcode.Initialization;
 
 @Config
@@ -26,6 +25,7 @@ public class Elevator {
     }
 
     private static double targetPos = 0;
+    public static boolean PowerOnDownToTakeSample = false;
 
     synchronized public static void setTargetPosition(double pos){
         pos *= -1;
@@ -33,7 +33,9 @@ public class Elevator {
         motionProfile.startMotion(targetPos, pos);
         targetPos = pos;
         motionProfile.update();
-        controller.setTargetPosition(pos);
+        controller.setTargetPosition(pos, false);
+        PowerOnDownToTakeSample = false;
+        motor.setMotorEnable();
 //        controller.setTargetPosition(motionProfile.getPosition());
     }
 
@@ -50,17 +52,14 @@ public class Elevator {
     public static void update(){
 
         if(RESET){
-            motor.setPower(1);
-            if(Math.abs(motor.getVelocity()) <= 50 && time.seconds() >= 0.5){
-                motor.setPower(0);
-                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                RESET = false;
-            }
+            motor.setPower(0);
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            RESET = false;
             return;
         }
 
-        if(controller.getTargetPosition() >= 0 && -motor.getCurrentPosition() <= 10 && !Climb.isPTOEngaged()){
+        if(controller.getTargetPosition() >= 0 && -motor.getCurrentPosition() <= 10 && !Climb.isPTOEngaged() && !PowerOnDownToTakeSample){
             motor.setMotorDisable();
         } else {
             motor.setMotorEnable();
@@ -79,14 +78,19 @@ public class Elevator {
             Chassis.BR.setPower(pidp);
 
         } else {
-            controller.setPidCoefficients(normal);
-            if(motor.isMotorEnabled())
-                motor.setPower(
-                        controller.calculatePower(motor.getCurrentPosition())
-                );
-            else motor.setPower(0);
+            if(PowerOnDownToTakeSample){
+                motor.setPower(1);
+            } else {
+                controller.setPidCoefficients(normal);
+                if (motor.isMotorEnabled()) {
+                    motor.setPower(
+                            controller.calculatePower(motor.getCurrentPosition())
+                    );
+                } else motor.setPower(0);
+            }
         }
         Initialization.telemetry.addData("Elevator pose from profile", motionProfile.getPosition());
+        Initialization.telemetry.addData("Elevator power", motor.getPower());
         Initialization.telemetry.addData("Elevator current pose", -motor.getCurrentPosition());
         Initialization.telemetry.addData("Elevator targetPos", targetPos);
         Initialization.telemetry.addData("Is elevator enabled", motor.isMotorEnabled());

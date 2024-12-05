@@ -1,15 +1,9 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 
-import android.graphics.Path;
-
-import com.qualcomm.robotcore.hardware.Servo;
-
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
-import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
-import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
-import org.firstinspires.ftc.teamcode.Initialization;
-import org.firstinspires.ftc.teamcode.Intake.Storage;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 
 @SuppressWarnings("unused")
 public class Claw {

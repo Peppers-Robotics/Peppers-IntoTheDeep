@@ -1,7 +1,6 @@
 package tests;
 
-import org.firstinspires.ftc.teamcode.*;
-import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 
 import java.util.Scanner;

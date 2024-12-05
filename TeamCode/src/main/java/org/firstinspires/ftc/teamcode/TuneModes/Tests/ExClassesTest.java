@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
-import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 
 @TeleOp(group = "tests")
 public class ExClassesTest extends LinearOpMode {

@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
 
 @Config
@@ -22,6 +22,7 @@ public class StorageTest extends LinearOpMode {
         while (opModeIsActive()){
             telemetry.addData("Sample color inside", Storage.getStorageStatus().toString());
             telemetry.addData("Storage empty", Storage.isStorageEmpty());
+            telemetry.addData("what sensor sees", Storage.sensor.getColorSeenBySensor());
 
             telemetry.update();
         }

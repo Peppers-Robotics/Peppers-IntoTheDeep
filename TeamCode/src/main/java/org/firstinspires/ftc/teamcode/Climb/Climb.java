@@ -1,14 +1,16 @@
 package org.firstinspires.ftc.teamcode.Climb;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Chassis;
-import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 
+@Config
 public class Climb {
     public static ServoPlus W1, W2, PTO;
     public static double down1 = 135, down2 = 290, raise1 = 310, raise2 = 100;
@@ -23,6 +25,7 @@ public class Climb {
     }
 
     public static boolean isPTOEngaged(){
+        if(PTO == null) return false;
         return PTO.isEqualToAngle(PTOEngage);
     }
 

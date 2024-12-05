@@ -9,9 +9,11 @@ buildscript {
         mavenCentral()
         google()
     }
+    ext.kotlin_version = "1.7.20"
     dependencies {
         // Note for FTC Teams: Do not modify this yourself.
         classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 

@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode.OutTake;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.AsymmetricMotionProfile;
-import org.firstinspires.ftc.teamcode.HelperClasses.DifferentialHelper;
-import org.firstinspires.ftc.teamcode.HelperClasses.PIDController;
-import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.DifferentialHelper;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Initialization;
 
 @Config
@@ -21,15 +21,15 @@ public class Arm {
     static {
         armProfile = new AsymmetricMotionProfile(4e3, 7e3, 7e4);
         pivotProfile = new AsymmetricMotionProfile(6e3, 6e3, 5e4);
-        diffy = new DifferentialHelper(3.f/4);
+        diffy = new DifferentialHelper(1/2.f);
     }
 
 
     public static void setArmAngle(double angle){
         if(armProfile.getPosition() == angle) return;
 //        diffy.setAngleToSecondJoint(angle);
-//        armProfile.startMotion(armPrevPos, angle);
-        armProfile.startMotion(getCurrentArmAngle(true), angle);
+        armProfile.startMotion(armPrevPos, angle);
+//        armProfile.startMotion(getCurrentArmAngle(true), angle);
         armPrevPos = angle;
     }
 
@@ -42,8 +42,8 @@ public class Arm {
         servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
         servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
 
-        s1Controller.setTargetPosition(diffy.getRawAngles()[0] + s1Offset);
-        s2Controller.setTargetPosition(diffy.getRawAngles()[1] + s1Offset);
+//        s1Controller.setTargetPosition(diffy.getRawAngles()[0] +//        s1Offset);
+//        s2Controller.setTargetPosition(diffy.getRawAngles()[1] + s1Offset);
 
 //        servo1.setPower(s1Controller.calculatePower(servo1.getCurrentCorrectedAngle()));
 //        servo2.setPower(s1Controller.calculatePower(servo2.getCurrentCorrectedAngle()));

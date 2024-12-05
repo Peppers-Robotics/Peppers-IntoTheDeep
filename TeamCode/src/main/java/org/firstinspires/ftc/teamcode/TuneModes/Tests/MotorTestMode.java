@@ -7,6 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorImplEx;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @Config
 @TeleOp(group = "tests")
@@ -18,8 +23,8 @@ public class MotorTestMode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        DcMotorController chController = hardwareMap.getAll(DcMotorController.class).get(0);
-        DcMotorController ehController = hardwareMap.getAll(DcMotorController.class).get(1);
+        DcMotorController chController = hardwareMap.getAll(DcMotorControllerEx.class).get(0);
+        DcMotorController ehController = hardwareMap.getAll(DcMotorControllerEx.class).get(1);
         for(int i = 0; i < 4; i++){
             chController.setMotorMode(i, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             ehController.setMotorMode(i, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -48,12 +53,17 @@ public class MotorTestMode extends LinearOpMode {
             }
             for(int i = 0; i < 4; i++){
                 telemetry.addData("ControlHub port" + Integer.toString(i) + " encoder value", chController.getMotorCurrentPosition(i));
+                DcMotorEx m = new DcMotorImplEx(chController, i);
+                telemetry.addData("ControlHub port" + i + " power", m.getCurrent(CurrentUnit.MILLIAMPS));
             }
 
             for(int i = 0; i < 4; i++){
                 telemetry.addData("ExpansionHub port" + Integer.toString(i) + " encoder value", ehController.getMotorCurrentPosition(i));
+                DcMotorEx m = new DcMotorImplEx(ehController, i);
+                telemetry.addData("ExpansionHub port" + i + " power", m.getCurrent(CurrentUnit.MILLIAMPS));
             }
             telemetry.update();
         }
     }
 }
+

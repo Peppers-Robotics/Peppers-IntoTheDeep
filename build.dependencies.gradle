@@ -3,7 +3,6 @@ repositories {
     google() // Needed for androidx
     maven { url = 'https://maven.brott.dev/' }
 }
-
 dependencies {
     implementation 'org.firstinspires.ftc:Inspection:10.1.0'
     implementation 'org.firstinspires.ftc:Blocks:10.1.0'
@@ -15,10 +14,12 @@ dependencies {
     implementation 'org.firstinspires.ftc:Vision:10.1.0'
 
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
+    implementation 'com.acmerobotics.roadrunner:core:0.5.6'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
     implementation 'org.json:json:20240303'
-
 }
 

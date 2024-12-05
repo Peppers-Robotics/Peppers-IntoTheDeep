@@ -8,8 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Climb.Climb;
-import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
+import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
+import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
@@ -39,14 +40,13 @@ public class MainOpModeBlue extends LinearOpMode {
 
         gamepad2.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
 
-        Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Extendo.pidEnable = false;
+        IntakeController.ChangeState(IntakeController.IntakeStates.RETRACT_EXTENDO);
         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE);
-        Arm.setArmAngle(0);
 
         Initialization.Team = Initialization.AllianceColor.BLUE;
 
-        Extendo.DropDown(0);
+        DropDown.GoUp();
         while (opModeInInit()){
             Initialization.updateCacheing();
             Claw.open();
@@ -97,6 +97,7 @@ public class MainOpModeBlue extends LinearOpMode {
             OutTakeController.Update();
             Elevator.update();
             Arm.update();
+            DropDown.Update();
             Extendo.update();
             IntakeController.Update();
 

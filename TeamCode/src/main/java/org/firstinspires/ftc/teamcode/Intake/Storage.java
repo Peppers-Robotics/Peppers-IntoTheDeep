@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
-
-import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.Initialization;
 
 @SuppressWarnings("unused")

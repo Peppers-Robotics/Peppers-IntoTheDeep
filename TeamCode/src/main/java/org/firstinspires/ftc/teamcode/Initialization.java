@@ -3,24 +3,21 @@ package org.firstinspires.ftc.teamcode;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.AnalogInputController;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.ServoController;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
-import org.firstinspires.ftc.teamcode.HelperClasses.CachedMotor;
-import org.firstinspires.ftc.teamcode.HelperClasses.FastColorRangeSensor;
-import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
+import org.firstinspires.ftc.teamcode.HelperClasses.LimeLightHelpers.LimeLightColorTracking;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
+import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
@@ -53,42 +50,55 @@ public class Initialization {
         }
     }
     public static void initializeExtendo(){
-        Extendo.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "cM1"));
-//        Extendo.motor = new CachedMotor(cM, 1);
+        try {
+            Extendo.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "cM1"));
 
-        Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        Extendo.dropDownIntakeLeft = new ServoPlus(eS, 4);
-//        Extendo.dropDownIntakeRight = new ServoPlus(eS, 2);
-        Extendo.dropDownIntakeLeft = hardwareMap.get(ServoPlus.class, "eS4");
-        Extendo.dropDownIntakeRight = hardwareMap.get(ServoPlus.class, "eS2");
+            DropDown.DropDownRight = hardwareMap.get(ServoPlus.class, "eS2");
+            DropDown.DropDownLeft = hardwareMap.get(ServoPlus.class, "eS4");
+        } catch (Exception e){
+            RobotLog.e("Extendo motor and servos not found");
+        }
     }
     // eS1 - hang1
     // es0 - hang2
     public static void initializeStorage(@NonNull HardwareMap hm){
-        Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
+        try {
+            Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
+            Storage.sensor.enableLed(true);
+        } catch (Exception e){
+            RobotLog.e("Storage sensor not found");
+        }
     }
     public static void initializeElevator(){
-        Elevator.motor = new CachedMotor (hardwareMap.get(DcMotor.class, "eM0"));
+        try {
+            Elevator.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM0"));
 //        Elevator.motor = new CachedMotor(eM, 0);
-        Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        } catch (Exception e){
+            RobotLog.e("Elevator motor not found");
+        }
     }
     public static void initializeOuttake(@NonNull HardwareMap hm){
-        Claw.clawServo = hm.get(ServoPlus.class, "cS2");
-        Arm.servo1 = hm.get(ServoPlus.class, "eS3");
-        Arm.servo2 = hm.get(ServoPlus.class, "eS5");
-//        Claw.clawServo = new ServoPlus(cS, 2);
-//        Arm.servo1 = new ServoPlus(eS, 3);
-//        Arm.servo2 = new ServoPlus(eS, 5);
-//        Arm.servo1.setToCRControlled(hm.get(AnalogInput.class, "cA0"));
-//        Arm.servo2.setToCRControlled(hm.get(AnalogInput.class, "cA1"));
-        Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");
+        try {
+            Claw.clawServo = hm.get(ServoPlus.class, "cS2");
+            Arm.servo1 = hm.get(ServoPlus.class, "eS3");
+            Arm.servo2 = hm.get(ServoPlus.class, "eS5");
+            Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");
+        } catch (Exception e){
+            RobotLog.e("Outtake servos not found");
+        }
     }
     public static void initializeIntake(){
-        ActiveIntake.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM3"));
+        try {
+            ActiveIntake.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM3"));
 //        ActiveIntake.motor = new CachedMotor(eM, 3);
-        ActiveIntake.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        ServoPlus latch = hardwareMap.get(ServoPlus.class, "cS0");
+            ActiveIntake.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            ActiveIntake.Blocker = hardwareMap.get(ServoPlus.class, "cS0");
+        } catch (Exception e){
+            RobotLog.e("Intake servos and motors not found");
+        }
 //        ActiveIntake.Blocker = new ServoPlus(cS, 0);
         // PTO - cS4
     }
@@ -108,11 +118,18 @@ public class Initialization {
 //        Climb.PTO = new ServoPlus(cS, 4);
 //        Climb.W1 = new ServoPlus(eS, 1);
 //        Climb.W2 = new ServoPlus(eS, 0);
-        Climb.PTO = hardwareMap.get(ServoPlus.class, "cS4");
-        Climb.W1 = hardwareMap.get(ServoPlus.class, "eS1");
-        Climb.W2 = hardwareMap.get(ServoPlus.class, "eS0");
+        try {
+            Climb.PTO = hardwareMap.get(ServoPlus.class, "cS4");
+            Climb.W1 = hardwareMap.get(ServoPlus.class, "eS1");
+            Climb.W2 = hardwareMap.get(ServoPlus.class, "eS0");
+        } catch (Exception e){
+            RobotLog.e("Climb servos not found");
+        }
         Climb.disengagePTO();
         Climb.PutDown();
+    }
+    public static void initializeLimeLight(){
+        LimeLightColorTracking.camera = hardwareMap.get(Limelight3A.class, "camera");
     }
 
     public static void startDevices(){
@@ -120,14 +137,14 @@ public class Initialization {
         Arm.servo1.getController().pwmEnable();
         Arm.servo2.getController().pwmEnable();
 
-        Extendo.dropDownIntakeRight.getController().pwmEnable();
-        Extendo.dropDownIntakeLeft.getController().pwmEnable();
-
         Claw.clawServo.getController().pwmEnable();
 
     }
 
     public synchronized static void updateCacheing(){
+        if(hubs == null){
+            Initialization.initializeHubCacheing(hardwareMap);
+        }
         for(LynxModule h : hubs){
             h.clearBulkCache();
         }
@@ -140,17 +157,22 @@ public class Initialization {
         Arm.servo1.getController().pwmDisable();
         Arm.servo2.getController().pwmDisable();
 
-        Extendo.dropDownIntakeRight.getController().pwmDisable();
-        Extendo.dropDownIntakeLeft.getController().pwmDisable();
-
         Claw.clawServo.getController().pwmDisable();
     }
     public static void initializeChassis(){
-        Chassis.BL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM2"));
-        Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM2"));
-        Chassis.FL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM3"));
-        Chassis.FR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
+        try {
+            Chassis.BL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM2"));
+            Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM2"));
+            Chassis.FL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM3"));
+            Chassis.FR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
+        } catch (Exception e){
+            RobotLog.e("Chassis motors not found");
+        }
 
+        Chassis.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Chassis.BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Chassis.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Chassis.FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
         /*
@@ -158,7 +180,5 @@ public class Initialization {
         * cM3 - stanga fata
         * eM1 - drapta fata
         * eM2 - drapta spate
-        *
-        *
         * */
 }

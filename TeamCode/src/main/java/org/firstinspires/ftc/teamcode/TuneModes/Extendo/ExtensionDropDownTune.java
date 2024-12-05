@@ -3,19 +3,15 @@ package org.firstinspires.ftc.teamcode.TuneModes.Extendo;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 import org.firstinspires.ftc.teamcode.Initialization;
-import org.firstinspires.ftc.teamcode.Intake.Extendo;
-
-import java.nio.file.attribute.DosFileAttributes;
+import org.firstinspires.ftc.teamcode.Intake.DropDown;
 
 @TeleOp(group = "Intake")
 @Config
 public class ExtensionDropDownTune extends LinearOpMode {
+    public static boolean goUp = false, goDown = false, goMiddle = false;
 
-    public static double Distance = 0;
     @Override
     public void runOpMode() throws InterruptedException {
         Initialization.initializeHubCacheing(hardwareMap);
@@ -24,9 +20,19 @@ public class ExtensionDropDownTune extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()){
-            Extendo.DropDown(Distance);
-//            Extendo.update();
-            Extendo.DropDownProfile.update();
+            if(goUp){
+                DropDown.GoUp();
+                goUp = false;
+            }
+            if(goDown){
+                DropDown.GoDown();
+                goDown = false;
+            }
+            if(goMiddle){
+                DropDown.GoMiddle();
+                goMiddle = false;
+            }
+            DropDown.Update();
             Initialization.telemetry.update();
         }
     }

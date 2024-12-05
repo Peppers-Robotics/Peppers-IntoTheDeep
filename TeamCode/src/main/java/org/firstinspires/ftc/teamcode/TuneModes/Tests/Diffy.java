@@ -5,9 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.ServoPlus;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 
@@ -24,6 +22,7 @@ public class Diffy extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()){
+            Initialization.updateCacheing();
             Arm.setArmAngle(ArmAngle);
             Arm.setPivotAngle(PivotAngle);
 

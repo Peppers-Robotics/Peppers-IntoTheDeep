@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.Actions;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
 
 @TeleOp
@@ -21,7 +20,7 @@ public class OutTakeFSM extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         while (opModeIsActive()){
-            telemetry.addData("Next state", org.firstinspires.ftc.teamcode.HelperClasses.OutTakeFSM.getNextState(s, a));
+            telemetry.addData("Next state", org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.OutTakeFSM.getNextState(s, a));
             telemetry.update();
         }
     }

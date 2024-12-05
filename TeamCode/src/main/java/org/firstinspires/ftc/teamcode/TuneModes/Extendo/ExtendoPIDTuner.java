@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Initialization;
 
@@ -26,7 +27,7 @@ public class ExtendoPIDTuner extends LinearOpMode {
         time.reset();
 
         while (opModeIsActive()){
-            Extendo.DropDown(0);
+            DropDown.GoUp();
             if(AutoUpdateTargetPosition && time.seconds() > freqToUpdateTargetPosition){
                 TargetPosition = step - TargetPosition;
                 time.reset();
@@ -35,6 +36,7 @@ public class ExtendoPIDTuner extends LinearOpMode {
             Extendo.Extend((int) TargetPosition);
             Initialization.updateCacheing();
             Extendo.update();
+            DropDown.Update();
             Initialization.telemetry.update();
         }
 //        Initialization.UninitializeRobot();

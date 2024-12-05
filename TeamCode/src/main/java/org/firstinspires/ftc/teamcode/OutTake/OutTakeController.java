@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.Controls;
-import org.firstinspires.ftc.teamcode.HelperClasses.GenericController;
+import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
+import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
 
 public class OutTakeController extends GenericController {
     public static void Update(){
@@ -22,17 +22,31 @@ public class OutTakeController extends GenericController {
             Controls.GrabSpecimen = false;
         }
         if(Controls.Retract){
-            action = OutTakeStateMachine.OutTakeActions.RETRACT;
+//            action = OutTakeStateMachine.OutTakeActions.RETRACT;
+            OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.RETRACT_ARM);
             Controls.Retract = false;
         }
         if(Controls.Grab || Controls.DunkToScore){
-            action = OutTakeStateMachine.OutTakeActions.SCORE;
+            if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SPECIMEN_TAKE) {
+
+                Claw.close();
+            }else if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE){
+                OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.TRANSFER_ARM);
+            } else {
+                action = OutTakeStateMachine.OutTakeActions.SCORE;
+            }
             Controls.Grab = false;
             Controls.DunkToScore = false;
         }
         if(Controls.IdleWithSample){
-            OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.ELEVATOR_TO_IDLE_WITH_SAMPLE);
+            OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.TRANSFER_ARM);
             Controls.IdleWithSample = false;
+        }
+        if(Controls.Throw){
+            if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WITH_SAMPLE) {
+                OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.THROW);
+            }
+            Controls.Throw = false;
         }
         OutTakeStateMachine.Update(action);
     }
