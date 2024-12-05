@@ -20,7 +20,9 @@ import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
+import org.firstinspires.ftc.teamcode.drive.opmode.StrafeTest;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 
 @Config
 @Autonomous
@@ -28,26 +30,27 @@ public class CyliisSample extends LinearOpMode {
 
     public enum States{
         PLACE_SAMPLE,
+        TAKE_SAMPLE_HUMAN,
         GOTO_SAMPLE1,
         GOTO_SAMPLE2,
         GOTO_SAMPLE3,
         TAKE_SAMPLE,
         GOTO_BASKET_AND_SCORE,
         SCORE,
-        IDLE;
+        IDLE, GOTO_BASKETH_AND_SCORE;
         public boolean trajRan = false;
     }
     public static States CurrentState = States.PLACE_SAMPLE;
-    public static int takeSample1Extend = 690, takeSample2Extend = 700, takeSample3Extend = 700;
+    public static int takeSample1Extend = 700, takeSample2Extend = 720, takeSample3Extend = 720;
     public static double SlowExtendoPower = -0.4, dropDownPos = 0.6;
 
-    public static Pose2d putSample = new Pose2d(-35, 14, 0),
-            takeSamplehuman = new Pose2d(-15.5, -27, Math.toRadians(50)),
-            takeSamplePre = new Pose2d(0, 0, 0),
-            preTakeSample1 = new Pose2d(-13, -26, Math.toRadians(20)),
-            takeSample2 = new Pose2d(-11, -40, Math.toRadians(16)),
+    public static Pose2d putSample = new Pose2d(-10, -46.5, Math.toRadians(318)),
+            takeSamplehuman = new Pose2d(-2, 31, Math.toRadians(270)),
+            takeSample1 = new Pose2d(-11, -41.5, Math.toRadians(350)),
+            takeSample2 = new Pose2d(-11, -40.5, Math.toRadians(16)),
             takeSample3 = new Pose2d(-12, -37, Math.toRadians(40)),
-            basketPosition = new Pose2d(-4.5, -43 ,Math.toRadians(330));
+            basketPosition = new Pose2d(-4.5, -43 ,Math.toRadians(330)),
+            basketHumanPosition = new Pose2d(-10, -45, Math.toRadians(318));
     public static int samplesScored = 0;
     public static ElapsedTime time = new ElapsedTime();
 
@@ -77,12 +80,22 @@ public class CyliisSample extends LinearOpMode {
                 })
 //                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(50, Math.PI * 2, DriveConstants.TRACK_WIDTH))
                 .lineToLinearHeading(putSample)
+                .waitSeconds(0.2)
                 .addTemporalMarker(() -> {
                     OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
                     OutTakeStateMachine.inAuto = false;
                 })
 
                 .build();
+
+        TrajectorySequence takeSampleHuman = drive.trajectorySequenceBuilder(putSampleT.end())
+                .lineToLinearHeading(takeSamplehuman)
+                .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
+                    IntakeController.gamepad2.right_trigger = (float) dropDownPos;
+                    Extendo.Extend(takeSample2Extend);
+                })
+                .build();
+
         while (opModeInInit()){
             Claw.close();
             Initialization.updateCacheing();
@@ -101,14 +114,34 @@ public class CyliisSample extends LinearOpMode {
             switch (CurrentState) {
                 case PLACE_SAMPLE:
                     if (!drive.isBusy()) {
+                        if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ARM){
+                            drive.followTrajectorySequenceAsync(takeSampleHuman);
+                            CurrentState = States.TAKE_SAMPLE_HUMAN;
+                            CurrentState.trajRan = false;
+                        }
+                    }
+                    break;
+                case TAKE_SAMPLE_HUMAN:
+                    if(Storage.hasAlliancePice()){
+                        Extendo.pidEnable = false;
+                        IntakeController.gamepad1.right_stick_y = 1;
+                        CurrentState = States.GOTO_BASKET_AND_SCORE;
                         CurrentState.trajRan = false;
-                        CurrentState = States.GOTO_SAMPLE1;
+                        if(drive.isBusy())
+                            drive.breakFollowing();
+                        break;
                     }
                     break;
                 case GOTO_SAMPLE1:
                     if (!CurrentState.trajRan) {
                         CurrentState.trajRan = true;
-                        drive.followTrajectorySequenceAsync(goToSample1);
+                        drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineToLinearHeading(takeSample1)
+                                .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
+                                    Extendo.Extend(takeSample2Extend);
+
+                                })
+                                .build());
                         IntakeController.gamepad2.right_trigger = (float) dropDownPos;
                     }
                     if (!drive.isBusy()) {
@@ -167,7 +200,7 @@ public class CyliisSample extends LinearOpMode {
                     if (!CurrentState.trajRan) {
                         if(samplesScored == 0){
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToLinearHeading(new Pose2d(basketPosition.getX(), basketPosition.getY() - 2, basketPosition.getHeading() - Math.toRadians(15)))
+                                    .lineToLinearHeading(basketHumanPosition)
                                     .build()
                             );
                         } else {
@@ -199,19 +232,26 @@ public class CyliisSample extends LinearOpMode {
                     if (OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ELEVATOR) {
                         switch (samplesScored) {
                             case 0:
-                                samplesScored++;
-                                CurrentState = States.GOTO_SAMPLE2;
+                                samplesScored ++;
+                                CurrentState = States.GOTO_SAMPLE1;
                                 CurrentState.trajRan = false;
                                 break;
                             case 1:
-                                samplesScored++;
+                                samplesScored ++;
+                                CurrentState = States.GOTO_SAMPLE2;
+                                CurrentState.trajRan = false;
+                                break;
+                            case 2:
+                                samplesScored ++;
                                 CurrentState = States.GOTO_SAMPLE3;
                                 CurrentState.trajRan = false;
                                 break;
-                            default:
+                            case 3:
+                                samplesScored ++;
                                 CurrentState = States.IDLE;
                                 CurrentState.trajRan = false;
                                 break;
+
                         }
                     }
                     break;
