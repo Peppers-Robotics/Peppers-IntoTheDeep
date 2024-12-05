@@ -33,6 +33,9 @@ public class MainOpModeBlue extends LinearOpMode {
         Controls.Initialize(gamepad1, gamepad2);
         ActiveIntake.UnblockIntake();
 
+        OutTakeStateMachine.inAuto = false;
+        IntakeController.autoIntake = false;
+
         IntakeController.Initialize(gamepad1, gamepad2);
 
         Initialization.hubs.get(0).setConstant(0xff0000);

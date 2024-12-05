@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -13,6 +14,7 @@ import java.sql.Time;
 
 public class IntakeController extends GenericController {
     public static int Resolution;
+    public static boolean isInAuto = false;
 
     static {
         Resolution = 20;
@@ -25,14 +27,17 @@ public class IntakeController extends GenericController {
     }
     public static IntakeStates CurrentState = IntakeStates.RETRACT_EXTENDO;
     public static ElapsedTime TimeSinceStateStartedRunning = new ElapsedTime();
-    public static boolean wasReseted = false;
+    public static boolean wasReseted = false, autoIntake = false;
     public static void ChangeState(IntakeStates state){
         CurrentState = state;
         TimeSinceStateStartedRunning.reset();
     }
     public static boolean optimization = true;
+    public static void Update(){
+        Update(false);
+    }
 
-    public static void Update() {
+    public static void Update(boolean isAuto) {
         if(Extendo.pidEnable){
             CurrentState = IntakeStates.IDLE_EXTENDED;
         }
@@ -92,14 +97,14 @@ public class IntakeController extends GenericController {
                 }
                 break;
             case IDLE_EXTENDED:
-                if(gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
+                if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
                     if (gamepad2.gamepad.right_bumper) {
                         DropDown.GoMiddle();
                     } else if (gamepad2.right_trigger >= 0.05) {
                         DropDown.setInstantPosition(gamepad2.right_trigger);
                     }
                     ActiveIntake.powerOn();
-                } else if(gamepad2.left_trigger >= 0.1){
+                } else if (gamepad2.left_trigger >= 0.1) {
                     ActiveIntake.Reverse();
                 } else {
                     DropDown.GoUp();
@@ -109,6 +114,7 @@ public class IntakeController extends GenericController {
                 if(!Extendo.pidEnable) Extendo.motor.setPower(gamepad1.right_stick_y);
                 if(Extendo.motor.getCurrentPosition() > -10 && gamepad1.right_stick_y > 0) {
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
+                    wasReseted = false;
                 }
                 break;
 
@@ -116,8 +122,10 @@ public class IntakeController extends GenericController {
         Initialization.telemetry.addData("Extendo current pos", Extendo.motor.getCurrentPosition());
         Initialization.telemetry.addData("extendo motor enabled", Extendo.motor.isMotorEnabled());
         Initialization.telemetry.addData("trigger", gamepad1.right_stick_y);
-        if(!MainOpModeRed.isClimbing)
-            gamepad1.update();
-        gamepad2.update();
+        if(!isAuto) {
+            if (!MainOpModeRed.isClimbing)
+                gamepad1.update();
+            gamepad2.update();
+        }
     }
 }

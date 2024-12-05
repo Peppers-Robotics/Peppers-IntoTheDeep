@@ -59,8 +59,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDriveCancelable extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(10,0.5, 1.5);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5, 1, 1);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1.5,0.5, 1.5);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(2, 0, 0.5);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -101,10 +101,10 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
         // TODO: adjust the names of the following hardware devices to match your configuration
 
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "eM2");
-        leftRear = hardwareMap.get(DcMotorEx.class, "eM0"); // 1
-        rightRear = hardwareMap.get(DcMotorEx.class, "cM0");
-        rightFront = hardwareMap.get(DcMotorEx.class, "cM3"); // 2
+        leftFront = hardwareMap.get(DcMotorEx.class, "cM3");
+        leftRear = hardwareMap.get(DcMotorEx.class, "cM2"); // 1
+        rightRear = hardwareMap.get(DcMotorEx.class, "eM2");
+        rightFront = hardwareMap.get(DcMotorEx.class, "eM1"); // 2
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -127,8 +127,6 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
         // TODO: reverse any motors using DcMotor.setDirection()
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         List<Integer> lastTrackingEncPositions = new ArrayList<>();
         List<Integer> lastTrackingEncVels = new ArrayList<>();

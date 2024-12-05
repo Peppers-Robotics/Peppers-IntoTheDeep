@@ -17,11 +17,13 @@ public class Elevator {
     public static CachedMotor motor;
     public static PIDController controller = new PIDController(0.013, 0, 0.0005);
     public static PIDCoefficients climb = new PIDCoefficients(0.01, 0, 0.0003);
-    public static PIDCoefficients normal = new PIDCoefficients(0.013, 0, 0.0005);
+    public static PIDCoefficients normal = new PIDCoefficients(0.009, 0, 0.0003);
+    public static double kf = -0.1, kff = 1;
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(6000, 7000, 7000);
 
     static {
         PIDControllerInWork = true;
+        controller.setFreq(20);
     }
 
     private static double targetPos = 0;
@@ -84,7 +86,8 @@ public class Elevator {
                 controller.setPidCoefficients(normal);
                 if (motor.isMotorEnabled()) {
                     motor.setPower(
-                            controller.calculatePower(motor.getCurrentPosition())
+                            controller.calculatePower(motor.getCurrentPosition()) * kff
+                            + kf
                     );
                 } else motor.setPower(0);
             }

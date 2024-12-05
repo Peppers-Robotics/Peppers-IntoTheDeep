@@ -25,6 +25,13 @@ public class Extendo {
         return -motor.getCurrentPosition();
     }
 
+    public synchronized static void Extend(int position, double afterMs){
+        new Thread(() -> {
+            double time = System.currentTimeMillis();
+            while (System.currentTimeMillis() - time < afterMs);
+            Extend(position);
+        }).start();
+    }
     public synchronized static void Extend(int position){
         pidEnable = true;
         position *= -1;

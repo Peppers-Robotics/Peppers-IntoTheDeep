@@ -27,10 +27,7 @@ public class OutTakeController extends GenericController {
             Controls.Retract = false;
         }
         if(Controls.Grab || Controls.DunkToScore){
-            if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SPECIMEN_TAKE) {
-
-                Claw.close();
-            }else if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE){
+            if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE){
                 OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.TRANSFER_ARM);
             } else {
                 action = OutTakeStateMachine.OutTakeActions.SCORE;

@@ -38,6 +38,10 @@ public class MainOpModeRed extends LinearOpMode {
         Initialization.hubs.get(0).setConstant(0xff0000);
         Initialization.hubs.get(1).setConstant(0xff0000);
 
+        OutTakeStateMachine.inAuto = false;
+        IntakeController.autoIntake = false;
+        IntakeController.optimization = true;
+
         gamepad2.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
 
         Extendo.pidEnable = false;
