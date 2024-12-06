@@ -26,6 +26,7 @@ public class Controls {
         if(ScoreLevel2) ScoreLevel2 = false;
         if(GrabSpecimen) GrabSpecimen = false;
     }
+    private static boolean ClimbingHelp = false;
 
     public static void Update(){
         if(gamepad1.wasPressed.circle)      Throw        = true;
@@ -37,8 +38,10 @@ public class Controls {
         if(gamepad2.wasPressed.circle)      Retract      = true;
         if(gamepad2.wasPressed.dpad_left || gamepad2.wasPressed.dpad_right)
                                             DunkToScore  = true;
-        if((gamepad2.gamepad.left_bumper || gamepad2.gamepad.right_bumper) && (gamepad1.gamepad.right_bumper || gamepad1.gamepad.left_bumper))
-                                            Climbing     = true;
+        if((gamepad2.gamepad.left_bumper && gamepad2.gamepad.right_bumper) && (gamepad1.gamepad.right_bumper && gamepad1.gamepad.left_bumper) && !ClimbingHelp) {
+            Climbing = true;
+            ClimbingHelp = true;
+        } else ClimbingHelp = false;
 
         if(gamepad1.wasPressed.ps){
             if(Storage.sensor.isLightOn()) Storage.sensor.enableLed(false);

@@ -42,10 +42,10 @@ public class SampleAlone extends LinearOpMode {
     public static double SlowExtendoPower = -0.4, dropDownPos = 0.6;
 
     public static Pose2d putSpecimen = new Pose2d(-35, 14, 0),
-                         takeSample1 = new Pose2d(-15.5, -27, Math.toRadians(50)), preTakeSample1 = new Pose2d(-13, -26, Math.toRadians(20)),
-                         takeSample2 = new Pose2d(-11, -40, Math.toRadians(16)),
-                         takeSample3 = new Pose2d(-12, -37, Math.toRadians(40)),
-                         basketPosition = new Pose2d(-4.5, -43 ,Math.toRadians(330));
+            takeSample1 = new Pose2d(-15.5, -27, Math.toRadians(50)), preTakeSample1 = new Pose2d(-13, -26, Math.toRadians(20)),
+            takeSample2 = new Pose2d(-11, -40, Math.toRadians(16)),
+            takeSample3 = new Pose2d(-12, -37, Math.toRadians(40)),
+            basketPosition = new Pose2d(-4.5, -43 ,Math.toRadians(330));
     public static int samplesScored = 0;
     public static ElapsedTime time = new ElapsedTime();
 

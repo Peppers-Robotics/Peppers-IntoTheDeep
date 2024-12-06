@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Chassis;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
+import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
@@ -56,7 +57,20 @@ public class Climb {
         State = s;
         TimeSinceLastStateChange.reset();
     }
+
     public static void Update(){
+        engagePTO();
+        Raise();
+        Elevator.Disable = true;
+
+//        Elevator.motor.setPower(Controls.gamepad2.right_stick_y);
+        Chassis.BL.setPower(Controls.gamepad2.right_stick_y);
+        Chassis.BR.setPower(Controls.gamepad2.right_stick_y);
+        Extendo.motor.setPower(Controls.gamepad1.right_stick_y);
+
+    }
+
+    public static void UpdateAuto(){
         switch (State){
             case GET_ARM_UP:
                 Arm.setArmAngle(180);

@@ -38,6 +38,9 @@ public class MainOpModeRed extends LinearOpMode {
         Initialization.hubs.get(0).setConstant(0xff0000);
         Initialization.hubs.get(1).setConstant(0xff0000);
 
+        Initialization.hubs.get(0).disengage();
+        Initialization.hubs.get(1).disengage();
+
         OutTakeStateMachine.inAuto = false;
         IntakeController.autoIntake = false;
         IntakeController.optimization = true;
@@ -49,16 +52,22 @@ public class MainOpModeRed extends LinearOpMode {
         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE);
 
         Initialization.Team = Initialization.AllianceColor.RED;
+        Climb.PutDown();
+        Climb.disengagePTO();
 
         DropDown.GoUp();
         while (opModeInInit()){
-            Initialization.updateCacheing();
-            Claw.open();
-            Elevator.update();
-            Extendo.update();
-            Arm.update();
+//            Initialization.updateCacheing();
+//            Claw.open();
+//            Elevator.update();
+//            Extendo.update();
+//            Arm.update();
             Initialization.telemetry.update();
         }
+
+        Initialization.hubs.get(0).engage();
+        Initialization.hubs.get(1).engage();
+
         ElapsedTime time = new ElapsedTime();
         Claw.open();
         while (opModeIsActive()){
@@ -87,10 +96,17 @@ public class MainOpModeRed extends LinearOpMode {
             }
 
             if(Controls.Climbing){
+                ActiveIntake.powerOff();
+                DropDown.GoUp();
                 isClimbing = true;
+                Climb.engagePTO();
+                Climb.Raise();
                 Controls.Climbing = false;
             }
             if(isClimbing){
+                if(Controls.gamepad2.wasPressed.touchpad){
+                    Climb.PutDown();
+                }
                 Climb.Update();
                 continue;
             }

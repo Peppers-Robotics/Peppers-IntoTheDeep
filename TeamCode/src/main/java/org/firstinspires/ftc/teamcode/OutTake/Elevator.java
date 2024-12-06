@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.Initialization;
 
 @Config
 public class Elevator {
+    public static boolean Disable = false;
     public static CachedMotor motor;
     public static PIDController controller = new PIDController(0.013, 0, 0.0005);
     public static PIDCoefficients climb = new PIDCoefficients(0.01, 0, 0.0003);
@@ -52,6 +53,7 @@ public class Elevator {
     public static ElapsedTime time = new ElapsedTime();
 
     public static void update(){
+        if(Disable){ return; }
 
         if(RESET){
             motor.setPower(0);
