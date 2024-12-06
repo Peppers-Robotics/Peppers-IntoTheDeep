@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Chassis;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
@@ -56,14 +57,16 @@ public class Elevator {
         if(Disable){ return; }
 
         if(RESET){
-            motor.setPower(0);
+            motor.setPower(1);
+            if(motor.getCurrent(CurrentUnit.AMPS) < 3) return;
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             RESET = false;
+            motor.setPower(0);
             return;
         }
 
-        if(controller.getTargetPosition() >= 0 && -motor.getCurrentPosition() <= 10 && !Climb.isPTOEngaged() && !PowerOnDownToTakeSample){
+        if(controller.getTargetPosition() >= 0 && -motor.getCurrentPosition() <= 20 && !Climb.isPTOEngaged() && !PowerOnDownToTakeSample){
             motor.setMotorDisable();
         } else {
             motor.setMotorEnable();

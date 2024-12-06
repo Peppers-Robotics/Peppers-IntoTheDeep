@@ -38,8 +38,6 @@ public class MainOpModeRed extends LinearOpMode {
         Initialization.hubs.get(0).setConstant(0xff0000);
         Initialization.hubs.get(1).setConstant(0xff0000);
 
-        Initialization.hubs.get(0).disengage();
-        Initialization.hubs.get(1).disengage();
 
         OutTakeStateMachine.inAuto = false;
         IntakeController.autoIntake = false;
@@ -47,6 +45,7 @@ public class MainOpModeRed extends LinearOpMode {
 
         gamepad2.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
 
+        isClimbing = false;
         Extendo.pidEnable = false;
         IntakeController.ChangeState(IntakeController.IntakeStates.RETRACT_EXTENDO);
         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE);
@@ -108,6 +107,7 @@ public class MainOpModeRed extends LinearOpMode {
                     Climb.PutDown();
                 }
                 Climb.Update();
+                Controls.Update();
                 continue;
             }
             Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,

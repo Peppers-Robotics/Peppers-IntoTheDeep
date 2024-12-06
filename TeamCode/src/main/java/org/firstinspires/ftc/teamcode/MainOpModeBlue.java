@@ -42,6 +42,7 @@ public class MainOpModeBlue extends LinearOpMode {
         Initialization.hubs.get(1).setConstant(0xff0000);
 
         gamepad2.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+        isClimbing = false;
 
         Extendo.pidEnable = false;
         IntakeController.ChangeState(IntakeController.IntakeStates.RETRACT_EXTENDO);
@@ -53,8 +54,6 @@ public class MainOpModeBlue extends LinearOpMode {
         Climb.PutDown();
         Climb.disengagePTO();
 
-        Initialization.hubs.get(0).disengage();
-        Initialization.hubs.get(1).disengage();
 
         while (opModeInInit()){
 //            Initialization.updateCacheing();

@@ -104,6 +104,8 @@ public class Initialization {
     }
     public static void initializeRobot(@NonNull HardwareMap hm){
         initializeHubCacheing(hm);
+        Initialization.hubs.get(0).disengage();
+        Initialization.hubs.get(1).disengage();
         initializeIntake();
         initializeElevator();
         initializeExtendo();

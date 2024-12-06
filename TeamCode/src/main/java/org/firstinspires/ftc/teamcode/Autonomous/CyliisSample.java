@@ -42,15 +42,15 @@ public class CyliisSample extends LinearOpMode {
     }
     public static States CurrentState = States.PLACE_SAMPLE;
     public static int takeSample1Extend = 700, takeSample2Extend = 720, takeSample3Extend = 720;
-    public static double SlowExtendoPower = -0.4, dropDownPos = 0.6;
+    public static double SlowExtendoPower = -0.4, dropDownPos = 0.55;
 
-    public static Pose2d putSample = new Pose2d(-10, -46.5, Math.toRadians(318)),
-            takeSamplehuman = new Pose2d(-2, 31, Math.toRadians(270)),
-            takeSample1 = new Pose2d(-11, -41.5, Math.toRadians(350)),
-            takeSample2 = new Pose2d(-11, -40.5, Math.toRadians(16)),
-            takeSample3 = new Pose2d(-12, -37, Math.toRadians(40)),
-            basketPosition = new Pose2d(-4.5, -43 ,Math.toRadians(330)),
-            basketHumanPosition = new Pose2d(-10, -45, Math.toRadians(318));
+    public static Pose2d putSample = new Pose2d(-9, -42, Math.toRadians(318)),
+            takeSamplehuman = new Pose2d(-3, 30, Math.toRadians(270)),
+            takeSample1 = new Pose2d(-13, -34, Math.toRadians(0)),
+            takeSample2 = new Pose2d(-15, -40, Math.toRadians(10)),
+            takeSample3 = new Pose2d(-12, -37, Math.toRadians(35)),
+            basketPosition = new Pose2d(-5, -41 ,Math.toRadians(330)),
+            basketHumanPosition = new Pose2d(-7, -42, Math.toRadians(318));
     public static int samplesScored = 0;
     public static ElapsedTime time = new ElapsedTime();
 
@@ -64,6 +64,10 @@ public class CyliisSample extends LinearOpMode {
         OutTakeController.Initialize(gamepad1, gamepad2);
         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SAMPLE_SCORE);
         OutTakeStateMachine.ElevatorScoreSpecimen = 0;
+
+        double tmp = OutTakeStateMachine.ArmScoreSample;
+        OutTakeStateMachine.ArmScoreSample = 20;
+
         samplesScored = 0;
         CurrentState = States.PLACE_SAMPLE;
         DropDown.GoUp();
@@ -77,6 +81,7 @@ public class CyliisSample extends LinearOpMode {
         TrajectorySequence putSampleT = drive.trajectorySequenceBuilder(new Pose2d())
                 .addTemporalMarker(() -> {
                     OutTakeStateMachine.ElevatorScoreSample = OutTakeStateMachine.ElevatorSample2;
+                    OutTakeStateMachine.ArmScoreSample = tmp;
                 })
 //                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(50, Math.PI * 2, DriveConstants.TRACK_WIDTH))
                 .lineToLinearHeading(putSample)
@@ -198,11 +203,17 @@ public class CyliisSample extends LinearOpMode {
                     break;
                 case GOTO_BASKET_AND_SCORE:
                     if (!CurrentState.trajRan) {
-                        if(samplesScored == 0){
+                        if(samplesScored == 0) {
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                     .lineToLinearHeading(basketHumanPosition)
                                     .build()
                             );
+                        } else if(samplesScored >= 2){
+                            drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                    .lineToLinearHeading(new Pose2d(basketPosition.getX() - 1, basketPosition.getY() - 2, basketPosition.getHeading()))
+                                    .build()
+                            );
+
                         } else {
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                     .lineToLinearHeading(basketPosition)
@@ -217,7 +228,7 @@ public class CyliisSample extends LinearOpMode {
 //                        IntakeController.gamepad1.update();
 //                        IntakeController.gamepad2.update();
                     }
-                    if (!drive.isBusy() && IntakeController.CurrentState == IntakeController.IntakeStates.IDLE_RETRACTED) {
+                    if (IntakeController.CurrentState == IntakeController.IntakeStates.IDLE_RETRACTED) {
                         CurrentState = States.SCORE;
                     }
                     break;
