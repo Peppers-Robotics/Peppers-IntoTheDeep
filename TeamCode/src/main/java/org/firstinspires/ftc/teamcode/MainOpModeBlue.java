@@ -31,30 +31,30 @@ public class MainOpModeBlue extends LinearOpMode {
         Initialization.telemetry = telemetry;
         Initialization.initializeRobot(hardwareMap);
         Controls.Initialize(gamepad1, gamepad2);
-
-        OutTakeStateMachine.inAuto = false;
-        IntakeController.autoIntake = false;
-        IntakeController.optimization = true;
+        ActiveIntake.UnblockIntake();
 
         IntakeController.Initialize(gamepad1, gamepad2);
 
         Initialization.hubs.get(0).setConstant(0xff0000);
         Initialization.hubs.get(1).setConstant(0xff0000);
 
-        gamepad2.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
-        isClimbing = false;
 
+        OutTakeStateMachine.inAuto = false;
+        IntakeController.autoIntake = false;
+        IntakeController.optimization = true;
+
+        gamepad2.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+
+        isClimbing = false;
         Extendo.pidEnable = false;
         IntakeController.ChangeState(IntakeController.IntakeStates.RETRACT_EXTENDO);
         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE);
 
         Initialization.Team = Initialization.AllianceColor.BLUE;
-
-        DropDown.GoUp();
         Climb.PutDown();
         Climb.disengagePTO();
 
-
+        DropDown.GoUp();
         while (opModeInInit()){
 //            Initialization.updateCacheing();
 //            Claw.open();
@@ -69,8 +69,6 @@ public class MainOpModeBlue extends LinearOpMode {
 
         ElapsedTime time = new ElapsedTime();
         Claw.open();
-        ActiveIntake.UnblockIntake();
-
         while (opModeIsActive()){
 
             Initialization.updateCacheing();
@@ -103,17 +101,24 @@ public class MainOpModeBlue extends LinearOpMode {
                 Climb.engagePTO();
                 Climb.Raise();
                 Controls.Climbing = false;
+                Arm.setArmAngle(300);
             }
             if(isClimbing){
-                if(Controls.gamepad2.wasPressed.touchpad) {
+                if(Controls.gamepad2.wasPressed.touchpad){
                     Climb.PutDown();
                 }
                 Climb.Update();
                 Controls.Update();
+                Chassis.rBL = 0;
+                Chassis.rBR = 0;
+                Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
+                        gamepad1.left_trigger - gamepad1.right_trigger);
+                IntakeController.Update();
                 continue;
             }
+
             Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
-                        gamepad1.left_trigger - gamepad1.right_trigger);
+                    gamepad1.left_trigger - gamepad1.right_trigger);
 
             Controls.Update();
             OutTakeController.Update();

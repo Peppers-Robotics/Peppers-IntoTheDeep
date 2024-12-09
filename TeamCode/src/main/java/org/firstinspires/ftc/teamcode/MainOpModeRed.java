@@ -101,13 +101,20 @@ public class MainOpModeRed extends LinearOpMode {
                 Climb.engagePTO();
                 Climb.Raise();
                 Controls.Climbing = false;
+                Arm.setArmAngle(300);
             }
             if(isClimbing){
                 if(Controls.gamepad2.wasPressed.touchpad){
                     Climb.PutDown();
                 }
                 Climb.Update();
+                Arm.update();
                 Controls.Update();
+                Chassis.rBL = 0;
+                Chassis.rBR = 0;
+                Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
+                        gamepad1.left_trigger - gamepad1.right_trigger);
+                IntakeController.Update();
                 continue;
             }
             Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,

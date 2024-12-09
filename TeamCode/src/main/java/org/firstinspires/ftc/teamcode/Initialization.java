@@ -171,6 +171,11 @@ public class Initialization {
             RobotLog.e("Chassis motors not found");
         }
 
+        Chassis.rFL = -1;
+        Chassis.rFR = 1;
+        Chassis.rBL = -1;
+        Chassis.rBR = 1;
+
         Chassis.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Chassis.BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Chassis.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -43,7 +43,7 @@ public class Elevator {
 //        controller.setTargetPosition(motionProfile.getPosition());
     }
 
-    public static double getTargetPosition(){ return targetPos; }
+    public static double getTargetPosition(){ return -targetPos; }
     public static double getCurrentPosition(){ return -motor.getCurrentPosition(); }
     public static boolean PIDControllerInWork;
 

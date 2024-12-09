@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -42,17 +43,24 @@ public class CyliisSample extends LinearOpMode {
     }
     public static States CurrentState = States.PLACE_SAMPLE;
     public static int takeSample1Extend = 700, takeSample2Extend = 720, takeSample3Extend = 720;
-    public static double SlowExtendoPower = -0.4, dropDownPos = 0.55;
+    public static double SlowExtendoPower = -0.4, dropDownPos = 0.65;
+    public static double parkTimeStamp = 24;
 
-    public static Pose2d putSample = new Pose2d(-9, -42, Math.toRadians(318)),
+    public static boolean failSafe = false;
+
+    public static Pose2d putSample = new Pose2d(-10, -42, Math.toRadians(318)),
             takeSamplehuman = new Pose2d(-3, 30, Math.toRadians(270)),
             takeSample1 = new Pose2d(-13, -34, Math.toRadians(0)),
-            takeSample2 = new Pose2d(-15, -40, Math.toRadians(10)),
-            takeSample3 = new Pose2d(-12, -37, Math.toRadians(35)),
-            basketPosition = new Pose2d(-5, -41 ,Math.toRadians(330)),
-            basketHumanPosition = new Pose2d(-7, -42, Math.toRadians(318));
+            takeSample2 = new Pose2d(-15, -41, Math.toRadians(10)),
+            takeSample3 = new Pose2d(-12, -40, Math.toRadians(35)),
+            basketPosition = new Pose2d(-6.5, -43 ,Math.toRadians(320)),
+            basketHumanPosition = new Pose2d(-7, -42, Math.toRadians(318)),
+            ParkPos = new Pose2d(-8, 76, Math.toRadians(270)),
+            Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
+            Climb2 = new Pose2d(-56, -4, Math.toRadians(272));
     public static int samplesScored = 0;
     public static ElapsedTime time = new ElapsedTime();
+    public static ElapsedTime autoTimer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -112,6 +120,7 @@ public class CyliisSample extends LinearOpMode {
         CurrentState = States.PLACE_SAMPLE;
         CurrentState.trajRan = true;
         drive.followTrajectorySequenceAsync(putSampleT);
+        autoTimer.reset();
 
         while (opModeIsActive()){
             Initialization.updateCacheing();
@@ -193,8 +202,11 @@ public class CyliisSample extends LinearOpMode {
 //                        Extendo.motor.setPower(SlowExtendoPower);
                         CurrentState.trajRan = true;
                         IntakeController.gamepad2.right_trigger = (float) dropDownPos;
+                        time.reset();
+                        failSafe = false;
                     }
-                    if (Storage.hasAlliancePice()) {
+                    if (Storage.hasAlliancePice() || time.seconds() >= 1.5) {
+                        if(time.seconds() >= 1) failSafe = true;
                         Extendo.pidEnable = false;
                         IntakeController.gamepad1.right_stick_y = 1;
                         CurrentState = States.GOTO_BASKET_AND_SCORE;
@@ -210,7 +222,7 @@ public class CyliisSample extends LinearOpMode {
                             );
                         } else if(samplesScored >= 2){
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToLinearHeading(new Pose2d(basketPosition.getX() - 1, basketPosition.getY() - 2, basketPosition.getHeading()))
+                                    .lineToLinearHeading(new Pose2d(basketPosition.getX() + 2.5, basketPosition.getY(), basketPosition.getHeading()))
                                     .build()
                             );
 
@@ -225,6 +237,7 @@ public class CyliisSample extends LinearOpMode {
                     if (IntakeController.CurrentState == IntakeController.IntakeStates.RETRACT_EXTENDO) {
                         IntakeController.gamepad1.right_stick_y = 0;
                         IntakeController.gamepad2.right_trigger = 0;
+                        if(failSafe) OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.TRANSFER_ARM);
 //                        IntakeController.gamepad1.update();
 //                        IntakeController.gamepad2.update();
                     }
@@ -264,6 +277,14 @@ public class CyliisSample extends LinearOpMode {
                                 break;
 
                         }
+                    }
+                    break;
+                case IDLE:
+                    if(!CurrentState.trajRan && autoTimer.seconds() >= parkTimeStamp){
+                        CurrentState.trajRan = true;
+                        drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineToLinearHeading(ParkPos)
+                                .build());
                     }
                     break;
             }

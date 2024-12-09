@@ -22,12 +22,14 @@ public class Chassis {
         h = h * 0.7;
         double div = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(h), 1);
         double pow = 1;
-        if(Controls.gamepad1.gamepad.right_bumper) pow = 0.7;
+        if(Controls.gamepad1.gamepad.cross) pow = 0.7;
 
         FL.setPower((y + x + h) / div * rFL * pow);
         FR.setPower((y - x - h) / div * rFR * pow);
-        BL.setPower((y - x + h) / div * rBL * pow);
-        BR.setPower((y + x - h) / div * rBR * pow);
+        if(rBL != 0)
+            BL.setPower((y - x + h) / div * rBL * pow);
+        if(rBL != 0)
+            BR.setPower((y + x - h) / div * rBR * pow);
     }
 
 
