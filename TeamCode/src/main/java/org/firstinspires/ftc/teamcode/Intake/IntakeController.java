@@ -79,6 +79,17 @@ public class IntakeController extends GenericController {
                     DropDown.GoUp();
                     ActiveIntake.powerOff();
                 }
+
+                /*if(gamepad1.right_stick_x > 0.15){
+                    DropDown.setInstantPosition(gamepad1.right_stick_x);
+                    ActiveIntake.powerOn();
+                } else if(gamepad1.right_stick_y < -0.15){
+                    ActiveIntake.Reverse();
+                } else if(gamepad2.right_trigger <= 0.05){
+                    ActiveIntake.powerOff();
+                    DropDown.GoUp();
+                }*/
+
                 if(DropDown.isUp() && Storage.hasAlliancePice()){
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
                 }
@@ -111,6 +122,16 @@ public class IntakeController extends GenericController {
                     ActiveIntake.powerOff();
                 }
 
+                /*if(gamepad1.right_stick_x > 0.15){
+                    DropDown.setInstantPosition(gamepad1.right_stick_x);
+                    ActiveIntake.powerOn();
+                } else if(gamepad1.right_stick_y < -0.15){
+                    ActiveIntake.Reverse();
+                } else {
+                    ActiveIntake.powerOff();
+                    DropDown.GoUp();
+                }*/
+
                 if(!Extendo.pidEnable) Extendo.motor.setPower(gamepad1.right_stick_y);
                 if(Extendo.motor.getCurrentPosition() > -10 && gamepad1.right_stick_y > 0) {
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
@@ -123,8 +144,7 @@ public class IntakeController extends GenericController {
         Initialization.telemetry.addData("extendo motor enabled", Extendo.motor.isMotorEnabled());
         Initialization.telemetry.addData("trigger", gamepad1.right_stick_y);
         if(!isAuto) {
-            if (!MainOpModeRed.isClimbing)
-                gamepad1.update();
+            gamepad1.update();
             gamepad2.update();
         }
     }

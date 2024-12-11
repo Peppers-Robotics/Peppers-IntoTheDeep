@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Initialization;
 public class Extendo {
     public static CachedMotor motor;
     public static PIDController pidController = new PIDController(0.01, 0, 0.00045);
-    public static int MaxExtendoExtension = 1300;
+    public static int MaxExtendoExtension = 710;
     private static volatile double targetPosition = 0;
     public static boolean ReachedTargetPosition(){
         return Math.abs(targetPosition - getCurrentPosition()) <= 5;
@@ -52,4 +52,7 @@ public class Extendo {
     }
 
 
+    public static boolean isMaxExtended() {
+        return getCurrentPosition() >= MaxExtendoExtension;
+    }
 }

@@ -28,15 +28,16 @@ public class Controls {
     }
     private static boolean ClimbingHelp = false;
 
+
     public static void Update(){
-        if(gamepad1.wasPressed.circle)      Throw        = true;
-        if(gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
-        if(gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
-        if(gamepad2.wasPressed.triangle)    GrabSpecimen = true;
+        if(gamepad1.wasPressed.dpad_left)      Throw        = true;
+        if(gamepad1.wasPressed.dpad_down || gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
+        if(gamepad1.wasPressed.dpad_up || gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
+        if(gamepad1.wasPressed.triangle || gamepad2.wasPressed.triangle)    GrabSpecimen = true;
         if(gamepad1.wasPressed.square || gamepad2.wasPressed.square)
                                             Grab         = true;
-        if(gamepad2.wasPressed.circle)      Retract      = true;
-        if(gamepad2.wasPressed.dpad_left || gamepad2.wasPressed.dpad_right)
+        if(gamepad1.wasPressed.left_bumper || gamepad2.wasPressed.circle)      Retract      = true;
+        if(gamepad2.wasPressed.circle || gamepad2.wasPressed.dpad_right)
                                             DunkToScore  = true;
         if((gamepad2.gamepad.left_bumper && gamepad2.gamepad.right_bumper) && (gamepad1.gamepad.right_bumper && gamepad1.gamepad.left_bumper) && !ClimbingHelp) {
             Climbing = true;

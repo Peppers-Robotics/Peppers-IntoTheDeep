@@ -196,26 +196,26 @@ public class OutTakeStateMachine {
                 Arm.setArmAngle(ArmScoreSpecimen);
                 Arm.setPivotAngle(PivotScoreSpecimen);
                 if(!Elevator.ReachedTargetPosition() && !reatched){
-                    reatched = false;
                     break;
-                } else reatched = true;
+                }
                 if(!Arm.motionCompleted()) break;
                 switch (CurrentAction){
                     case SCORE:
 //                        ChangeStateTo(OutTakeStates.SCORE_SPECIMEN_ELEVATOR);
                     case RETRACT:
-                        reatched = false;
                         ChangeStateTo(OutTakeStates.RETRACT_ARM);
                         break;
                 }
                 break;
             case IDLE_WHILE_SAMPLE_SCORE:
                 Elevator.setTargetPosition(ElevatorScoreSample);
+
                 if(Elevator.getCurrentPosition() < ElevatorScoreSample - 50) break;
+
                 Arm.setArmAngle(ArmScoreSample);
                 Arm.setPivotAngle(PivotScoreSample);
+
                 if(!Arm.motionCompleted()) break;
-//                if(Elevator.getCurrentPosition() < ElevatorScoreSample - 20) break;
                 switch (CurrentAction){
                     case SCORE:
                         ChangeStateTo(OutTakeStates.SCORE_SAMPLE);
@@ -228,7 +228,7 @@ public class OutTakeStateMachine {
             case IDLE_WHILE_SPECIMEN_TAKE:
                 if(!Arm.motionCompleted() && !inAuto) break;
                 if(!Elevator.ReachedTargetPosition() && !inAuto) break;
-//                if(Claw.HasElementInIt()){
+//                if(Claw.HasElementInIt()){ TODO: make it work
 //                    Claw.close();
 //                    if(TimeSinceStateStartedRunning.seconds() >= 0.4) CurrentAction = OutTakeActions.NEXT;
 //                }
@@ -325,7 +325,7 @@ public class OutTakeStateMachine {
             case THROW:
                 Arm.setArmAngle(ArmThrow);
                 if(Arm.getCurrentArmAngle() >= ArmTrowRelease){
-                    if(TimeSinceStateStartedRunning.seconds() >= 0.1) {
+                    if(TimeSinceStateStartedRunning.seconds() >= 0.2) {
                         Claw.open();
                         if(TimeSinceStateStartedRunning.seconds() >= 0.1 + 0.15) {
                             ChangeStateTo(OutTakeStates.RETRACT_ELEVATOR);
@@ -334,21 +334,7 @@ public class OutTakeStateMachine {
                 } else TimeSinceStateStartedRunning.reset();
                 break;
             case AUTO_PARK:
-                Arm.setArmAngle(120);
-                if(!a) {
-                    Elevator.setTargetPosition(300);
-                    a = true;
-                }
-                else if(Elevator.getCurrentPosition() > 220 && Elevator.getTargetPosition() == 300) Elevator.setTargetPosition(200);
-
-                switch (CurrentAction){
-                    case RETRACT:
-                        ChangeStateTo(OutTakeStates.RETRACT_ARM);
-                        break;
-                }
-                break;
+               break;
         }
-        Initialization.telemetry.addData("Action", CurrentAction);
     }
-    public static boolean a = false;
 }
