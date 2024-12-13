@@ -66,29 +66,26 @@ public class IntakeController extends GenericController {
 
                 break;
             case IDLE_RETRACTED:
-                if(gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
+                if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
                     if (gamepad2.gamepad.right_bumper) {
                         DropDown.GoMiddle();
                     } else if (gamepad2.right_trigger >= 0.05) {
                         DropDown.setInstantPosition(gamepad2.right_trigger);
                     }
                     ActiveIntake.powerOn();
-                } else if(gamepad2.left_trigger >= 0.1){
+                } else if (gamepad2.left_trigger >= 0.1) {
                     ActiveIntake.Reverse();
                 } else {
-                    DropDown.GoUp();
-                    ActiveIntake.powerOff();
+                    if (gamepad1.right_stick_x > 0.15) {
+                        DropDown.setInstantPosition(gamepad1.right_stick_x);
+                        ActiveIntake.powerOn();
+                    } else if (gamepad1.right_stick_y < -0.15) {
+                        ActiveIntake.Reverse();
+                    } else {
+                        ActiveIntake.powerOff();
+                        DropDown.GoUp();
+                    }
                 }
-
-                /*if(gamepad1.right_stick_x > 0.15){
-                    DropDown.setInstantPosition(gamepad1.right_stick_x);
-                    ActiveIntake.powerOn();
-                } else if(gamepad1.right_stick_y < -0.15){
-                    ActiveIntake.Reverse();
-                } else if(gamepad2.right_trigger <= 0.05){
-                    ActiveIntake.powerOff();
-                    DropDown.GoUp();
-                }*/
 
                 if(DropDown.isUp() && Storage.hasAlliancePice()){
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
@@ -118,19 +115,16 @@ public class IntakeController extends GenericController {
                 } else if (gamepad2.left_trigger >= 0.1) {
                     ActiveIntake.Reverse();
                 } else {
-                    DropDown.GoUp();
-                    ActiveIntake.powerOff();
+                    if (gamepad1.right_stick_x > 0.15) {
+                        DropDown.setInstantPosition(gamepad1.right_stick_x);
+                        ActiveIntake.powerOn();
+                    } else if (gamepad1.right_stick_y < -0.15) {
+                        ActiveIntake.Reverse();
+                    } else {
+                        ActiveIntake.powerOff();
+                        DropDown.GoUp();
+                    }
                 }
-
-                /*if(gamepad1.right_stick_x > 0.15){
-                    DropDown.setInstantPosition(gamepad1.right_stick_x);
-                    ActiveIntake.powerOn();
-                } else if(gamepad1.right_stick_y < -0.15){
-                    ActiveIntake.Reverse();
-                } else {
-                    ActiveIntake.powerOff();
-                    DropDown.GoUp();
-                }*/
 
                 if(!Extendo.pidEnable) Extendo.motor.setPower(gamepad1.right_stick_y);
                 if(Extendo.motor.getCurrentPosition() > -10 && gamepad1.right_stick_y > 0) {
