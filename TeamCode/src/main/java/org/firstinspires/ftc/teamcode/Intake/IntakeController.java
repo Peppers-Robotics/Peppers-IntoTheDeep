@@ -118,7 +118,7 @@ public class IntakeController extends GenericController {
                     if (gamepad1.right_stick_x > 0.15) {
                         DropDown.setInstantPosition(gamepad1.right_stick_x);
                         ActiveIntake.powerOn();
-                    } else if (gamepad1.right_stick_y < -0.15) {
+                    } else if (gamepad1.right_stick_x < -0.15) {
                         ActiveIntake.Reverse();
                     } else {
                         ActiveIntake.powerOff();
