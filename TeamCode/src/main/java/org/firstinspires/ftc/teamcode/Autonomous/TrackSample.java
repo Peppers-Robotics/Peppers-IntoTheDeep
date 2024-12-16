@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
 
-@Autonomous
+@Autonomous(group = "limelight color")
 @Config
 public class TrackSample extends LinearOpMode {
     public static PIDController TController = new PIDController(SampleMecanumDriveCancelable.TRANSLATIONAL_PID);

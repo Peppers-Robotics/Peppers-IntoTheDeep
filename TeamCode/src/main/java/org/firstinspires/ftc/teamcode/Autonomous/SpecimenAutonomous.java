@@ -33,16 +33,7 @@ public class SpecimenAutonomous extends LinearOpMode {
         OutTakeStateMachine.CurrentState = OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SPECIMEN_SCORE;
         OutTakeStateMachine.ElevatorScoreSpecimen = 0;
 
-        TrajectorySequence scoreSpecimen1 = drive.trajectorySequenceBuilder(new Pose2d())
-                .addTemporalMarker(() -> {
-                    OutTakeStateMachine.ElevatorScoreSpecimen = OutTakeStateMachine.ElevatorSpecimen2;
-                })
-                .lineToLinearHeading(new Pose2d(specimenX[0], specimenY[0], specimenH[0]))
-                .addTemporalMarker(() -> {
-                    OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
-                })
-                .lineToLinearHeading(new Pose2d(sampleX[0], sampleY[0], sampleH[0]))
-                .build();
+//        TrajectorySequence ScoreFromInit = new TrajectorySequence()
 
 
         while(opModeInInit()){

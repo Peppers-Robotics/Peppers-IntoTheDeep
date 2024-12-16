@@ -74,7 +74,7 @@ public class CyliisSample extends LinearOpMode {
         OutTakeStateMachine.ElevatorScoreSpecimen = 0;
 
         double tmp = OutTakeStateMachine.ArmScoreSample;
-        OutTakeStateMachine.ArmScoreSample = 20;
+        OutTakeStateMachine.ArmScoreSample = OutTakeStateMachine.IdleArmAngle_Sample;
 
         samplesScored = 0;
         CurrentState = States.PLACE_SAMPLE;
@@ -275,7 +275,6 @@ public class CyliisSample extends LinearOpMode {
                                 CurrentState = States.IDLE;
                                 CurrentState.trajRan = false;
                                 break;
-
                         }
                     }
                     break;

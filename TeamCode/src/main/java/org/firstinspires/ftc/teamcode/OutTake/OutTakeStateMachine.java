@@ -28,13 +28,13 @@ import java.text.CharacterIterator;
 
 @Config
 public class OutTakeStateMachine {
-    public static double IdleArmAngle = 21.3, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 50;
-    public static double IdleArmAngle_Sample = 200, IdlePivotAngle_Sample = 200;
+    public static double IdleArmAngle = 13, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 50;
+    public static double IdleArmAngle_Sample = 190, IdlePivotAngle_Sample = 0;
     public static double ArmScoreSample = 245, PivotScoreSample = 200, ElevatorScoreSample;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 330, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
-    public static double ArmTakeSpecimen = 320, PivotTakeSpecimen = 198, ElevatorTakeSpecimen = 60; // DONE
-    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 350, ElevatorSample1 = 500, ElevatorSample2 = 1075;
-    public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5;
+    public static double ArmTakeSpecimen = 328.5, PivotTakeSpecimen = 190, ElevatorTakeSpecimen = 60; // DONE
+    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 300, ElevatorSample1 = 500, ElevatorSample2 = 1075;
+    public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5, d2powerI = 3;
     public static double TransferArm = 60, TransferPivot = 0;
     public static boolean reatched = false;
     public enum OutTakeStates implements States {
@@ -192,13 +192,21 @@ public class OutTakeStateMachine {
                 }
                 break;
             case IDLE_WHILE_SPECIMEN_SCORE:
-                Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * d2power);
+                if(!Controls.ImogenDriver) {
+                    ElevatorScoreSpecimen -= Controls.gamepad2.right_stick_y * d2power;
+                } else {
+                    ElevatorScoreSpecimen += (Controls.gamepad1.gamepad.dpad_left ? 1 : 0) * (-d2powerI) + (Controls.gamepad1.gamepad.dpad_left ? 1 : 0) * (d2powerI);
+                }
+//                Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * d2power);
+                Elevator.setTargetPosition(ElevatorScoreSpecimen);
                 Arm.setArmAngle(ArmScoreSpecimen);
                 Arm.setPivotAngle(PivotScoreSpecimen);
                 if(!Elevator.ReachedTargetPosition() && !reatched){
                     break;
                 }
                 if(!Arm.motionCompleted()) break;
+                if(OutTakeController.wasL2Activated) ElevatorSpecimen2 = ElevatorScoreSpecimen;
+                else ElevatorSpecimen1 = ElevatorScoreSpecimen;
                 switch (CurrentAction){
                     case SCORE:
 //                        ChangeStateTo(OutTakeStates.SCORE_SPECIMEN_ELEVATOR);
@@ -325,9 +333,9 @@ public class OutTakeStateMachine {
             case THROW:
                 Arm.setArmAngle(ArmThrow);
                 if(Arm.getCurrentArmAngle() >= ArmTrowRelease){
-                    if(TimeSinceStateStartedRunning.seconds() >= 0.2) {
+                    if(TimeSinceStateStartedRunning.seconds() >= 0.1) {
                         Claw.open();
-                        if(TimeSinceStateStartedRunning.seconds() >= 0.1 + 0.15) {
+                        if(TimeSinceStateStartedRunning.seconds() >= 0.1 + 0.08) {
                             ChangeStateTo(OutTakeStates.RETRACT_ELEVATOR);
                         }
                     }

@@ -44,6 +44,7 @@ public class MainOpModeRed extends LinearOpMode {
         IntakeController.optimization = true;
 
         gamepad2.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+        gamepad1.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
 
         isClimbing = false;
         Extendo.pidEnable = false;

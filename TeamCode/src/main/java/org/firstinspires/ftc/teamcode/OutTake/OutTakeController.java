@@ -4,17 +4,30 @@ import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Control
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
 
 public class OutTakeController extends GenericController {
+    public static boolean wasL2Activated = false;
     public static void Update(){
         OutTakeStateMachine.OutTakeActions action = null;
         if(Controls.ScoreLevel1){
             action = OutTakeStateMachine.OutTakeActions.SAMPLE;
-            OutTakeStateMachine.ElevatorScoreSample = OutTakeStateMachine.ElevatorSample1;
-            OutTakeStateMachine.ElevatorScoreSpecimen = OutTakeStateMachine.ElevatorSpecimen1;
+
+            if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SPECIMEN_SCORE) {
+                OutTakeStateMachine.ElevatorScoreSpecimen = OutTakeStateMachine.ElevatorSpecimen1;
+                wasL2Activated = false;
+            }
+            else
+                OutTakeStateMachine.ElevatorScoreSample = OutTakeStateMachine.ElevatorSample1;
+
             Controls.ScoreLevel1 = false;
         } else if(Controls.ScoreLevel2){
             action = OutTakeStateMachine.OutTakeActions.SAMPLE;
-            OutTakeStateMachine.ElevatorScoreSample = OutTakeStateMachine.ElevatorSample2;
-            OutTakeStateMachine.ElevatorScoreSpecimen = OutTakeStateMachine.ElevatorSpecimen2;
+
+            if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SPECIMEN_SCORE) {
+                OutTakeStateMachine.ElevatorScoreSpecimen = OutTakeStateMachine.ElevatorSpecimen2;
+                wasL2Activated = true;
+            }
+            else
+                OutTakeStateMachine.ElevatorScoreSample = OutTakeStateMachine.ElevatorSample2;
+
             Controls.ScoreLevel2 = false;
         }
         if(Controls.GrabSpecimen){

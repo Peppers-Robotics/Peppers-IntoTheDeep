@@ -13,7 +13,7 @@ public class Controls {
     public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen, Climbing,
             Grab,
             Retract,
-                            DunkToScore, IdleWithSample, Throw;
+                            DunkToScore, IdleWithSample, Throw, SlowDown, ImogenDriver;
 
     public static void Initialize(Gamepad gamepadD1, Gamepad gamepadD2){
         gamepad1 = new AutoGamepad(gamepadD1);
@@ -30,16 +30,40 @@ public class Controls {
 
 
     public static void Update(){
-        if(gamepad1.wasPressed.dpad_left)      Throw        = true;
-        if(gamepad1.wasPressed.dpad_down || gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
-        if(gamepad1.wasPressed.dpad_up || gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
-        if(gamepad1.wasPressed.triangle || gamepad2.wasPressed.triangle)    GrabSpecimen = true;
-        if(gamepad1.wasPressed.square || gamepad2.wasPressed.square)
-                                            Grab         = true;
-        if(gamepad1.wasPressed.left_bumper || gamepad2.wasPressed.circle)      Retract      = true;
-        if(gamepad2.wasPressed.circle || gamepad2.wasPressed.dpad_right)
-                                            DunkToScore  = true;
-        if((gamepad2.gamepad.left_bumper && gamepad2.gamepad.right_bumper) && (gamepad1.gamepad.right_bumper && gamepad1.gamepad.left_bumper) && !ClimbingHelp) {
+        if((gamepad1.gamepad.triangle && gamepad1.gamepad.options) ||
+           (gamepad2.gamepad.triangle && gamepad2.gamepad.options)){
+            ImogenDriver = !ImogenDriver;
+            if(ImogenDriver){
+                gamepad1.gamepad.setLedColor((double) 0xf8, (double) 0x86, (double) 0x05, (int) 1e10);
+                gamepad2.gamepad.setLedColor((double) 0xf8, (double) 0x86, (double) 0x05, (int) 1e10);
+            } else {
+                gamepad2.gamepad.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+                gamepad1.gamepad.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+            }
+        }
+
+        SlowDown = gamepad1.gamepad.left_bumper;
+
+        if(ImogenDriver){
+            if(gamepad1.wasPressed.dpad_down)   ScoreLevel1  = true;
+            if(gamepad1.wasPressed.dpad_up)     ScoreLevel2  = true;
+            if(gamepad1.wasPressed.square)      Grab         = true;
+            if(gamepad1.wasPressed.circle)      Retract      = true;
+            if(gamepad1.wasPressed.triangle)    GrabSpecimen = true;
+            if(gamepad1.wasPressed.dpad_right)  Throw        = true;
+            return;
+        }
+
+
+        if(gamepad1.wasPressed.triangle)    Throw        = true;
+        if(gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
+        if(gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
+        if(gamepad2.wasPressed.triangle)    GrabSpecimen = true;
+        if(gamepad2.wasPressed.square)      Grab         = true;
+        if(gamepad2.wasPressed.circle)      Retract      = true;
+        if(gamepad2.wasPressed.dpad_right)  DunkToScore  = true;
+        if((gamepad2.gamepad.left_stick_button || gamepad2.gamepad.right_stick_button) &&
+                (gamepad1.gamepad.left_stick_button || gamepad1.gamepad.right_stick_button) && !ClimbingHelp) {
             Climbing = true;
             ClimbingHelp = true;
         } else ClimbingHelp = false;

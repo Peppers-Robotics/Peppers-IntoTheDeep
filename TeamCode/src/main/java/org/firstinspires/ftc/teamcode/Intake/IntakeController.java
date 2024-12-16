@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.MainOpModeRed;
@@ -66,15 +67,19 @@ public class IntakeController extends GenericController {
 
                 break;
             case IDLE_RETRACTED:
-                if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
-                    if (gamepad2.gamepad.right_bumper) {
-                        DropDown.GoMiddle();
-                    } else if (gamepad2.right_trigger >= 0.05) {
-                        DropDown.setInstantPosition(gamepad2.right_trigger);
+                if(!Controls.ImogenDriver) {
+                    if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
+                        if (gamepad2.gamepad.right_bumper) {
+                            DropDown.GoMiddle();
+                        } else if (gamepad2.right_trigger >= 0.05) {
+                            DropDown.setInstantPosition(gamepad2.right_trigger);
+                        } else if(gamepad2.left_trigger >= 0.12){
+                            DropDown.GoUp();
+                        }
+                        ActiveIntake.powerOn();
+                    } else if (gamepad2.gamepad.left_bumper) {
+                        ActiveIntake.Reverse();
                     }
-                    ActiveIntake.powerOn();
-                } else if (gamepad2.left_trigger >= 0.1) {
-                    ActiveIntake.Reverse();
                 } else {
                     if (gamepad1.right_stick_x > 0.15) {
                         DropDown.setInstantPosition(gamepad1.right_stick_x);
@@ -100,20 +105,24 @@ public class IntakeController extends GenericController {
                 if(gamepad1.right_stick_y != 0){
                     ChangeState(IntakeStates.IDLE_EXTENDED);
                     Extendo.motor.setMotorEnable();
-                    Extendo.motor.setPower(gamepad1.right_stick_y);
+                    Extendo.motor.setPower(gamepad1.right_stick_y * (Controls.SlowDown ? 0.8 : 1));
                     wasReseted = false;
                 }
                 break;
             case IDLE_EXTENDED:
-                if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
-                    if (gamepad2.gamepad.right_bumper) {
-                        DropDown.GoMiddle();
-                    } else if (gamepad2.right_trigger >= 0.05) {
-                        DropDown.setInstantPosition(gamepad2.right_trigger);
+                if(!Controls.ImogenDriver) {
+                    if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
+                        if (gamepad2.gamepad.right_bumper) {
+                            DropDown.GoMiddle();
+                        } else if (gamepad2.right_trigger >= 0.05) {
+                            DropDown.setInstantPosition(gamepad2.right_trigger);
+                        } else if(gamepad2.left_trigger >= 0.12){
+                            DropDown.GoUp();
+                        }
+                        ActiveIntake.powerOn();
+                    } else if (gamepad2.gamepad.left_bumper) {
+                        ActiveIntake.Reverse();
                     }
-                    ActiveIntake.powerOn();
-                } else if (gamepad2.left_trigger >= 0.1) {
-                    ActiveIntake.Reverse();
                 } else {
                     if (gamepad1.right_stick_x > 0.15) {
                         DropDown.setInstantPosition(gamepad1.right_stick_x);
