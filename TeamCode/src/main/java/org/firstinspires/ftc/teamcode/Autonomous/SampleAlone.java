@@ -65,6 +65,7 @@ public class SampleAlone extends LinearOpMode {
         OutTakeStateMachine.ElevatorScoreSpecimen = 0;
         samplesScored = 0;
         CurrentState = States.PLACE_SPECIMEN;
+        CurrentState.trajRan = false;
         DropDown.GoUp();
 
         OutTakeStateMachine.inAuto = true;
