@@ -40,6 +40,7 @@ public class Controls {
                 gamepad2.gamepad.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
                 gamepad1.gamepad.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
             }
+            return;
         }
 
         SlowDown = gamepad1.gamepad.left_bumper;
@@ -51,6 +52,8 @@ public class Controls {
             if(gamepad1.wasPressed.circle)      Retract      = true;
             if(gamepad1.wasPressed.triangle)    GrabSpecimen = true;
             if(gamepad1.wasPressed.dpad_right)  Throw        = true;
+            gamepad1.update();
+            gamepad2.update();
             return;
         }
 
