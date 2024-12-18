@@ -56,8 +56,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1.5, 0.5, 1.5);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(2, 0, 0.5);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2.5, 1.5, 1);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(3, 0.2, 0.5);
 
     public static double LATERAL_MULTIPLIER = 1.4;
 
@@ -75,7 +75,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
 
-    public LazyIMUBNO055 imu;
+    public IMU imu;
     private VoltageSensor batteryVoltageSensor;
 
     private List<Integer> lastEncPositions = new ArrayList<>();
@@ -128,7 +128,8 @@ public class SampleMecanumDrive extends MecanumDrive {
                 follower, HEADING_PID, batteryVoltageSensor,
                 lastEncPositions, lastEncVels, lastTrackingEncPositions, lastTrackingEncVels
         );
-        imu = hardwareMap.get(LazyIMUBNO055.class, "imu");
+        imu = hardwareMap.get(IMU.class, "imu");
+        imu.resetYaw();
         imu.initialize(new IMU.Parameters(
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -199,9 +200,10 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void update() {
         updatePoseEstimate();
-        if(System.currentTimeMillis() - time > 2000){
+        if(System.currentTimeMillis() - time > 100){
+            double degree = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+//            setPoseEstimate(new Pose2d(getPoseEstimate().getX(), getPoseEstimate().getY(), degree));
             time = System.currentTimeMillis();
-//            setPoseEstimate(new Pose2d(getPoseEstimate().getX(), getPoseEstimate().getY(), imu.getHeading(AngleUnit.RADIANS)));
         }
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         if (signal != null) setDriveSignal(signal);

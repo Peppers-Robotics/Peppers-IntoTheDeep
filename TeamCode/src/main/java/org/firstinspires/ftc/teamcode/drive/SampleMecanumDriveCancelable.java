@@ -18,6 +18,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationCon
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -39,6 +40,7 @@ import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
@@ -59,8 +61,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDriveCancelable extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1.5,0.5, 1.5);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(2, 0, 0.5);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2.5,1.5, 1);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(3, 0.2, 0.5);
 
     public static double LATERAL_MULTIPLIER = 2;
 
@@ -133,6 +135,13 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+        imu = hardwareMap.get(IMU.class, "imu");
+        imu.resetYaw();
+
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+        )));
 
         trajectorySequenceRunner = new TrajectorySequenceRunnerCancelable(
                 follower, HEADING_PID, batteryVoltageSensor,
@@ -201,9 +210,14 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
     public Pose2d getLastError() {
         return trajectorySequenceRunner.getLastPoseError();
     }
+    long time = 0;
 
     public void update() {
         updatePoseEstimate();
+        if (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - time) > 0.5) {
+//            setPoseEstimate(new Pose2d(getPoseEstimate().getX(), getPoseEstimate().getY(), imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)));
+            time = System.currentTimeMillis();
+        }
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         if (signal != null) setDriveSignal(signal);
     }
