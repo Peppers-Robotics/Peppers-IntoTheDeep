@@ -12,19 +12,13 @@ import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeController;
-import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
-import org.firstinspires.ftc.teamcode.util.RegressionUtil;
-
-import javax.crypto.Cipher;
 
 @Autonomous
 @Config
@@ -41,15 +35,15 @@ public class SpecimenAutonomous extends LinearOpMode {
     }
 
 
-    public static double[] specimenX = {-36, -36, -36, -36, -36}, specimenY = {-12, -14, -16, -18, -20}, specimenH = {0, 0, 0, 0, 0};
-    public static double[] sampleX = {-17, -23, -26}, sampleY = {10, 21, 33}, sampleH = {314, 320, 320};
-    public static double[] getSpecimenX = {0, 0, 0, 0}, getSpecimenY = {18, 18, 18, 18}, getSampleH = {0, 0, 0, 0};
-    public static double[] ReverseToHumanX = {-18, -21, -22}, ReverseToHumanY = {12, 30, 35}, ReverseToHumanH = {235, 205, 215};
+    public static double[] specimenX = {-38, -45, -46, -47, -48}, specimenY = {-10, -14, -16, -18, -20}, specimenH = {0, 0, 0, 0, 0};
+    public static double[] sampleX = {-16.5, -21, -26}, sampleY = {11, 21, 31}, sampleH = {280, 330, 335};
+    public static double[] getSpecimenX = {10, 0, 0, 0}, getSpecimenY = {26, 18, 18, 18}, getSpecimenH = {15, 0, 0, 0};
+    public static double[] ReverseToHumanX = {-18, -21, -22}, ReverseToHumanY = {12, 30, 35}, ReverseToHumanH = {215, 205, 190};
     public static double parkX = 0, parkY = 18, parkH = 0;
-    public static int[] ExtendoPose = {700, 500, 350}, ExtendoPoseHuman = {700, 500, 400};
+    public static int[] ExtendoPose = {700, 690, 600}, ExtendoPoseHuman = {500, 400, 350};
     SampleMecanumDriveCancelable drive;
     public int specimensScored = 0, samplesTook = 0;
-    public static double dropDownPose = 0.5;
+    public static double dropDownPose = 0.65;
 
     private TrajectorySequence ScoreSpecimen(){
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
@@ -61,6 +55,15 @@ public class SpecimenAutonomous extends LinearOpMode {
                 .build();
     }
     private TrajectorySequence GoToSample(){
+        if(specimensScored == 1 && samplesTook == 0){
+            return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                    .forward(4)
+                    .addTemporalMarker(ActiveIntake::BlockIntake)
+                    .splineToSplineHeading(new Pose2d(sampleX[samplesTook], sampleY[samplesTook], Math.toRadians(sampleH[samplesTook])), Math.toRadians(70))
+                    .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> Extendo.Extend(ExtendoPose[samplesTook]))
+                    .addTemporalMarker(() -> samplesTook ++)
+                    .build();
+        }
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .addTemporalMarker(ActiveIntake::BlockIntake)
                 .lineToLinearHeading(new Pose2d(sampleX[samplesTook], sampleY[samplesTook], Math.toRadians(sampleH[samplesTook])))
@@ -70,19 +73,33 @@ public class SpecimenAutonomous extends LinearOpMode {
     }
     private TrajectorySequence GoToHuman(){
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .addTemporalMarker(() -> {
+                .lineToLinearHeading(new Pose2d(ReverseToHumanX[samplesTook - 1], ReverseToHumanY[samplesTook - 1], Math.toRadians(ReverseToHumanH[samplesTook - 1])))
+                .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
                     Extendo.Extend(ExtendoPoseHuman[samplesTook - 1]);
                 })
-                .lineToLinearHeading(new Pose2d(ReverseToHumanX[samplesTook - 1], ReverseToHumanY[samplesTook - 1], Math.toRadians(ReverseToHumanH[samplesTook - 1])))
+                .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
+                    driveIsFree = true;
+                })
                 .build();
     }
     private TrajectorySequence TakeFromWall(){
+        if(specimensScored == 1){
+            return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                    .addTemporalMarker(() -> {
+                        OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SPECIMEN);
+                    })
+                    .splineToSplineHeading(new Pose2d(getSpecimenX[specimensScored - 1], getSpecimenY[specimensScored - 1], Math.toRadians(getSpecimenH[specimensScored - 1])), Math.toRadians(0))
+                    .addTemporalMarker(() -> {
+                        OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
+                    })
+                    .build();
+
+        }
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .addTemporalMarker(() -> {
                     OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SPECIMEN);
                 })
-                .lineToLinearHeading(new Pose2d(getSpecimenX[specimensScored - 1], getSpecimenY[specimensScored - 1], Math.toRadians(getSampleH[specimensScored - 1])))
-                .waitSeconds(0.2)
+                .lineToLinearHeading(new Pose2d(getSpecimenX[specimensScored - 1], getSpecimenY[specimensScored - 1], Math.toRadians(getSpecimenH[specimensScored - 1])))
                 .addTemporalMarker(() -> {
                     OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
                 })
@@ -118,8 +135,9 @@ public class SpecimenAutonomous extends LinearOpMode {
         }
 
         OutTakeStateMachine.ElevatorScoreSpecimen = OutTakeStateMachine.ElevatorSpecimen2;
+        ActiveIntake.BlockIntake();
 
-        while(isStarted()){
+        while(opModeIsActive()){
             Initialization.updateCacheing();
             switch (CurrentState){
                 case SCORE:
@@ -136,8 +154,8 @@ public class SpecimenAutonomous extends LinearOpMode {
                         if(samplesTook < 3) CurrentState = States.GO_TO_SAMPLES;
                         else {
                             CurrentState = States.TAKE_SPECIMEN;
-                            IntakeController.gamepad1.right_stick_y = -1;
                             Extendo.pidEnable = false;
+                            IntakeController.gamepad1.right_stick_y = 1;
 
                         }
                     }
@@ -150,34 +168,41 @@ public class SpecimenAutonomous extends LinearOpMode {
                         break;
                     }
                     if(drive.isBusy()) time.reset();
-                    if(!drive.isBusy() && trajRan && time.seconds() >= 0.3){
-                        if(time.seconds() >= 0.3 + 0.2){
-                            trajRan = false;
-                            CurrentState = States.GO_TO_HUMAN;
-                        }
+                    if(!drive.isBusy() && trajRan && time.seconds() >= 0.15){
+                        trajRan = false;
+                        CurrentState = States.GO_TO_HUMAN;
                     } else {
-                        ActiveIntake.powerOn();
-                        DropDown.setInstantPosition(dropDownPose);
+                        ActiveIntake.power = 1;
+                        IntakeController.gamepad2.right_trigger = (float) dropDownPose;
+//                        DropDown.setInstantPosition(dropDownPose);
                     }
                     break;
                 case GO_TO_HUMAN:
                     if(!drive.isBusy() && !trajRan){
                         drive.followTrajectorySequenceAsync(GoToHuman());
+                        ActiveIntake.power = 0.3;
                         trajRan = true;
                     }
                     if(!drive.isBusy() && trajRan){
-                        ActiveIntake.Reverse();
-                        if(time.seconds() >= 0.2){
+                        drive.breakFollowing();
+                        IntakeController.gamepad2.gamepad.left_bumper = true;
+                        ActiveIntake.power = 1;
+                        IntakeController.Update(false);
+                        ActiveIntake.UnblockIntake();
+                        if(time.seconds() >= 0.3){
                             trajRan = false;
+                            Extendo.Extend(100);
                             if(samplesTook < 3) CurrentState = States.GO_TO_SAMPLES;
-                            else CurrentState = States.TAKE_SPECIMEN;
-                            ActiveIntake.powerOff();
+                            else {
+                                CurrentState = States.TAKE_SPECIMEN;
+                                IntakeController.gamepad1.right_stick_y = 1;
+                            }
+                            IntakeController.gamepad2.gamepad.left_bumper = false;
                         }
                     } else time.reset();
                     break;
                 case TAKE_SPECIMEN:
                     if(!drive.isBusy() && !trajRan){
-                        IntakeController.gamepad1.right_stick_y = 1;
                         Extendo.pidEnable = false;
                         trajRan = true;
                         drive.followTrajectorySequenceAsync(TakeFromWall());
@@ -201,8 +226,14 @@ public class SpecimenAutonomous extends LinearOpMode {
             Elevator.update();
             Arm.update();
             Extendo.update();
+            DropDown.Update();
             IntakeController.Update(true);
             OutTakeController.Update();
+            Initialization.telemetry.addData("htz", 1/freq.seconds());
+            Initialization.telemetry.update();
+            freq.reset();
         }
     }
+    public static ElapsedTime freq = new ElapsedTime();
+    public static boolean driveIsFree = false;
 }

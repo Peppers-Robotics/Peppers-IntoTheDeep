@@ -68,7 +68,7 @@ public class IntakeController extends GenericController {
                 break;
             case IDLE_RETRACTED:
                 if(!Controls.ImogenDriver) {
-                    if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
+                    if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper || gamepad2.left_trigger >= 0.1) {
                         if (gamepad2.gamepad.right_bumper) {
                             DropDown.GoMiddle();
                         } else if (gamepad2.right_trigger >= 0.05) {
@@ -92,6 +92,7 @@ public class IntakeController extends GenericController {
                     }
                 }
 
+
                 if(DropDown.isUp() && Storage.hasAlliancePice()){
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
                 }
@@ -111,7 +112,7 @@ public class IntakeController extends GenericController {
                 break;
             case IDLE_EXTENDED:
                 if(!Controls.ImogenDriver) {
-                    if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper) {
+                    if (gamepad2.right_trigger >= 0.05 || gamepad2.gamepad.right_bumper || gamepad2.gamepad.left_trigger >= 0.1) {
                         if (gamepad2.gamepad.right_bumper) {
                             DropDown.GoMiddle();
                         } else if (gamepad2.right_trigger >= 0.05) {

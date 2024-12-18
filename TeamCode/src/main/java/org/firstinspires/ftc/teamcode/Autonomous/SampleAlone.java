@@ -70,7 +70,6 @@ public class SampleAlone extends LinearOpMode {
 
         OutTakeStateMachine.inAuto = true;
         IntakeController.autoIntake = true;
-        IntakeController.isInAuto = true;
 
         Initialization.Team = Initialization.AllianceColor.RED;
 

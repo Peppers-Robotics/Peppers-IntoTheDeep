@@ -28,11 +28,11 @@ import java.text.CharacterIterator;
 
 @Config
 public class OutTakeStateMachine {
-    public static double IdleArmAngle = 13, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 50;
+    public static double IdleArmAngle = 17, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 50;
     public static double IdleArmAngle_Sample = 190, IdlePivotAngle_Sample = 0;
     public static double ArmScoreSample = 245, PivotScoreSample = 200, ElevatorScoreSample;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 330, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
-    public static double ArmTakeSpecimen = 328.5, PivotTakeSpecimen = 190, ElevatorTakeSpecimen = 60; // DONE
+    public static double ArmTakeSpecimen = 310, PivotTakeSpecimen = 190, ElevatorTakeSpecimen = 60; // DONE
     public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 300, ElevatorSample1 = 500, ElevatorSample2 = 1075;
     public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5, d2powerI = 3;
     public static double TransferArm = 60, TransferPivot = 0;

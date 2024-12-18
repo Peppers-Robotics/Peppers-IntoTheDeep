@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 
 @SuppressWarnings("unused")
+@Config
 public class Claw {
     public static ServoPlus clawServo;
     public static FastColorRangeSensor clawSensor;
-    public static double OpenPosition = 60, ClosePosition = 255;
+    public static double OpenPosition = 55, ClosePosition = 255;
     public static void open(){
         clawServo.setAngle(OpenPosition);
     }
