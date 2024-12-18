@@ -8,6 +8,8 @@ import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotion
 @Config
 public class ArmMK2 {
     public static ServoPlus ArmL, ArmR, Turret;
+    public static double CurrentRobotAngle = 0;
+    public static double TargetAngle = 0;
     public static AsymmetricMotionProfile armProfile = new AsymmetricMotionProfile(4e3, 7e3, 7e4),
                                           turretProfile = new AsymmetricMotionProfile(6e3, 6e3, 5e4);
 
@@ -17,8 +19,18 @@ public class ArmMK2 {
     public static void setTurretAngle(double angle){
         turretProfile.startMotion(turretProfile.getTargetPosition(), angle);
     }
-    public static void update(){
 
+    public static void setTurretHoldPlane(double angle){
+        TargetAngle = angle;
+    }
+    public static void stopHolding(){
+        TargetAngle = 0xbeef; // magic number
+    }
+
+    public static void update(){
+        if(TargetAngle != 0xbeef){
+            Turret.setAngle(-CurrentRobotAngle + TargetAngle);
+        }
 
         ArmR.setAngle(-armProfile.getPosition()); // they are mirrored?
         ArmL.setAngle(armProfile.getPosition());
