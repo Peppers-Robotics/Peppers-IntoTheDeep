@@ -39,11 +39,11 @@ public class SpecimenAutonomous extends LinearOpMode {
 
 
     public static double[] specimenX = {-39, -40, -41, -42, -43}, specimenY = {-12, -14, -16, -18, -20}, specimenH = {0, 0, 0, 0, 0};
-    public static double[] sampleX = {-19, -21, -26}, sampleY = {16, 21, 31}, sampleH = {315, 315, 315};
-    public static double[] getSpecimenX = {3, 2, 2, 2}, getSpecimenY = {20.5, 19, 19.5, 20}, getSpecimenH = {5, 1, 2, 3};
+    public static double[] sampleX = {-19, -21, -26}, sampleY = {16, 21, 31}, sampleH = {310, 315, 310};
+    public static double[] getSpecimenX = {5, 2, 2, 2}, getSpecimenY = {19, 18.5, 18.5, 19}, getSpecimenH = {5, 3, 2, 3};
     public static double[] ReverseToHumanX = {-10, -21, -22}, ReverseToHumanY = {12, 30, 35}, ReverseToHumanH = {215, 213, 190};
     public static double parkX = 0, parkY = 18, parkH = 0;
-    public static int[] ExtendoPose = {700, 690, 600}, ExtendoPoseHuman = {500, 400, 350};
+    public static int[] ExtendoPose = {700, 690, 600}, ExtendoPoseHuman = {500, 400, 450};
     SampleMecanumDriveCancelable drive;
     public int specimensScored = 0, samplesTook = 0;
     public static double dropDownPose = 0.65;

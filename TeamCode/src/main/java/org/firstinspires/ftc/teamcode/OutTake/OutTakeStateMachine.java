@@ -108,7 +108,7 @@ public class OutTakeStateMachine {
 
                 Elevator.PowerOnDownToTakeSample = true;
                 IntakeController.optimization = false;
-                if(TimeSinceStateStartedRunning.seconds() < 0.05) break;
+                if(TimeSinceStateStartedRunning.seconds() < 0.15) break;
                 Claw.close();
                 if(TimeSinceStateStartedRunning.seconds() < 0.05 + 0.1) break;
                 IntakeController.optimization = true;

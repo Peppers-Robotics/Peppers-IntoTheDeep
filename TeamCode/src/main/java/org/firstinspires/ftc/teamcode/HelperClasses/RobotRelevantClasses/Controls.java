@@ -62,7 +62,7 @@ public class Controls {
         if(gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
         if(gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
         if(gamepad2.wasPressed.triangle)    GrabSpecimen = true;
-        if(gamepad2.wasPressed.square)      Grab         = true;
+        if(gamepad2.wasPressed.square || gamepad1.wasPressed.square)      Grab         = true;
         if(gamepad2.wasPressed.circle)      Retract      = true;
         if(gamepad2.wasPressed.dpad_right)  DunkToScore  = true;
         if((gamepad2.gamepad.left_stick_button || gamepad2.gamepad.right_stick_button) &&
