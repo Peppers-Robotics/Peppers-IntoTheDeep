@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 @Config
 public class Climb {
     public static ServoPlus W1, W2, PTO;
-    public static double down1 = 135, down2 = 290, raise1 = 315, raise2 = 100;
+    public static double down1 = 135, down2 = 290, raise1 = 300, raise2 = 115;
     public static double PTOEngage = 232, PTOdisengage = 180;
     public static void Raise(){
         W1.setAngle(raise1);

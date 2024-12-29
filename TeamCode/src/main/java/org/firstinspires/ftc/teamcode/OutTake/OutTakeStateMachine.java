@@ -28,7 +28,7 @@ import java.text.CharacterIterator;
 
 @Config
 public class OutTakeStateMachine {
-    public static double IdleArmAngle = 17, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 50;
+    public static double IdleArmAngle = 14, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 50;
     public static double IdleArmAngle_Sample = 190, IdlePivotAngle_Sample = 0;
     public static double ArmScoreSample = 245, PivotScoreSample = 200, ElevatorScoreSample;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 330, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
@@ -110,9 +110,9 @@ public class OutTakeStateMachine {
                 IntakeController.optimization = false;
                 if(TimeSinceStateStartedRunning.seconds() < 0.15) break;
                 Claw.close();
-                if(TimeSinceStateStartedRunning.seconds() < 0.05 + 0.1) break;
+                if(TimeSinceStateStartedRunning.seconds() < 0.15 + 0.1) break;
                 IntakeController.optimization = true;
-                if(TimeSinceStateStartedRunning.seconds() < 0.05 + 0.15) break;
+                if(TimeSinceStateStartedRunning.seconds() < 0.15 + 0.15) break;
                 Elevator.PowerOnDownToTakeSample = false;
                 Elevator.setTargetPosition(SafeElevatorLevel);
                 if(Elevator.getCurrentPosition() < SafeElevatorLevel - 10) break;
@@ -342,7 +342,9 @@ public class OutTakeStateMachine {
                 } else TimeSinceStateStartedRunning.reset();
                 break;
             case AUTO_PARK:
-               break;
+                Elevator.setTargetPosition(ElevatorScoreSpecimen);
+                Arm.setArmAngle(ArmThrow);
+                break;
         }
     }
 }

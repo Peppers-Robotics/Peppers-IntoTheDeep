@@ -43,7 +43,7 @@ public class SampleAlone extends LinearOpMode {
     public static double SlowExtendoPower = -0.4, dropDownPos = 0.6;
 
     public static Pose2d putSpecimen = new Pose2d(-36.5, 14, 0),
-            takeSample1 = new Pose2d(-15.5, -27, Math.toRadians(50)), preTakeSample1 = new Pose2d(-13, -20, Math.toRadians(20)),
+            takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-13, -20, Math.toRadians(20)),
             takeSample2 = new Pose2d(-15, -41, Math.toRadians(10)),
             takeSample3 = new Pose2d(-12, -43, Math.toRadians(35)),
             basketPosition = new Pose2d(-6.5, -42 ,Math.toRadians(320)),
@@ -87,9 +87,14 @@ public class SampleAlone extends LinearOpMode {
 
                 .build();
         TrajectorySequence goToSample1 = drive.trajectorySequenceBuilder(putSpecimenT.end())
+                .lineToSplineHeading(takeSample1)
                 .lineToLinearHeading(preTakeSample1)
-                .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
-                    Extendo.Extend(takeSample1Extend);
+                .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
+                    Extendo.Extend(takeSample1Extend-70);
+                })
+                .waitSeconds(0.3)
+                .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
+                    Extendo.Extend(takeSample1Extend + 40);
                 })
                 .build();
 
@@ -134,8 +139,11 @@ public class SampleAlone extends LinearOpMode {
                         drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(takeSample2)
                                 .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
+                                    Extendo.Extend(takeSample2Extend-200);
+                                })
+                                        .waitSeconds(0.3)
+                                .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
                                     Extendo.Extend(takeSample2Extend);
-
                                 })
                                 .build());
                     }
@@ -231,14 +239,15 @@ public class SampleAlone extends LinearOpMode {
                     }
                     break;
                 case IDLE:
-                    if(CurrentState.trajRan){
+                    if(!CurrentState.trajRan){
                         drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(Climb1)
                                 .addTemporalMarker(() -> {
                                     OutTakeStateMachine.CurrentState = OutTakeStateMachine.OutTakeStates.AUTO_PARK;
+                                    OutTakeStateMachine.TimeSinceStateStartedRunning.reset();
                                 })
                                 .lineToLinearHeading(Climb2)
-                                .UNSTABLE_addTemporalMarkerOffset(-1.2, () -> {
+                                .UNSTABLE_addTemporalMarkerOffset(-1, () -> {
                                     Climb.Raise();
                                 })
 
