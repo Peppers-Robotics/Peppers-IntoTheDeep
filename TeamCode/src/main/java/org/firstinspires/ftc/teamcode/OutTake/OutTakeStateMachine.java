@@ -29,7 +29,7 @@ import java.text.CharacterIterator;
 
 @Config
 public class OutTakeStateMachine {
-    public static double IdleArmAngle = 16, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 200;
+    public static double IdleArmAngle = 12, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 200;
     public static double IdleArmAngle_Sample = 190, IdlePivotAngle_Sample = 0;
     public static double ArmScoreSample = 245, PivotScoreSample = 200, ElevatorScoreSample;
     public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 500, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
@@ -106,15 +106,15 @@ public class OutTakeStateMachine {
                 }
                 break;
             case TRANSFER_ARM:
-
+                ActiveIntake.powerOn();
                 Elevator.PowerOnDownToTakeSample = true;
                 IntakeController.optimization = false;
-                if(TimeSinceStateStartedRunning.seconds() < 0.15) break;
-                ActiveIntake.powerOn();
+                if(TimeSinceStateStartedRunning.seconds() < 0.20 + 0.1) Controls.gamepad1.right_stick_y = 1;
+                if(TimeSinceStateStartedRunning.seconds() < 0.20) break;
                 Claw.close();
-                if(TimeSinceStateStartedRunning.seconds() < 0.15 + 0.1) break;
+                if(TimeSinceStateStartedRunning.seconds() < 0.20 + 0.1) break;
                 IntakeController.optimization = true;
-                if(TimeSinceStateStartedRunning.seconds() < 0.15 + 0.15) break;
+                if(TimeSinceStateStartedRunning.seconds() < 0.20 + 0.15) break;
                 Elevator.PowerOnDownToTakeSample = false;
                 Elevator.setTargetPosition(SafeElevatorLevel);
                 ActiveIntake.powerOff();
