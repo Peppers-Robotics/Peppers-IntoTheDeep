@@ -63,10 +63,10 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
     }
 
     public Colors.ColorType getColorSeenBySensor(){
-        if(System.currentTimeMillis() - timeRGB > freq){
+        if(System.currentTimeMillis() - timeRGB > freq) {
             p.G = (int) (this.green() * this.lowPassFilter + p.G * (1 - lowPassFilter));
-            p.R = (int) (this.red()   * this.lowPassFilter + p.R * (1 - lowPassFilter));
-            p.B = (int) (this.blue()  * this.lowPassFilter + p.B * (1 - lowPassFilter));
+            p.R = (int) (this.red() * this.lowPassFilter + p.R * (1 - lowPassFilter));
+            p.B = (int) (this.blue() * this.lowPassFilter + p.B * (1 - lowPassFilter));
             p.A = Math.max(p.G, Math.max(p.R, p.B));
 
             RGB.R = Range.clip((p.R / p.A) * 255, 0, 255);

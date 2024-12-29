@@ -33,7 +33,6 @@ public class Controls {
         if((gamepad1.gamepad.triangle && gamepad1.gamepad.options) ||
            (gamepad2.gamepad.triangle && gamepad2.gamepad.options)){
             ImogenDriver = !ImogenDriver;
-            ImogenDriver = false; // BE CAREFUL HERE TODO
             if(ImogenDriver){
                 gamepad1.gamepad.setLedColor((double) 0xf8, (double) 0x86, (double) 0x05, (int) 1e10);
                 gamepad2.gamepad.setLedColor((double) 0xf8, (double) 0x86, (double) 0x05, (int) 1e10);

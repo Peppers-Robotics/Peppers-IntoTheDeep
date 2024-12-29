@@ -124,6 +124,7 @@ public class Initialization {
             Climb.PTO = hardwareMap.get(ServoPlus.class, "cS4");
             Climb.W1 = hardwareMap.get(ServoPlus.class, "eS1");
             Climb.W2 = hardwareMap.get(ServoPlus.class, "eS0");
+            Climb.PTO2 = hardwareMap.get(ServoPlus.class, "cS1");
         } catch (Exception e){
             RobotLog.e("Climb servos not found");
         }

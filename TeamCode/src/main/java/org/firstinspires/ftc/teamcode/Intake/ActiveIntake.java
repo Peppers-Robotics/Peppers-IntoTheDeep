@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 
+@Config
 public class ActiveIntake {
     public static CachedMotor motor;
     public static ServoPlus Blocker;
-    public static double Block = 90, UnBlock = 220;
-    public static double power = 1;
+    public static double Block = 90, UnBlock = 90;
+    public static double power = 0.5;
     synchronized public static void powerOn(double s){
         double t = System.currentTimeMillis();
         new Thread(() -> {

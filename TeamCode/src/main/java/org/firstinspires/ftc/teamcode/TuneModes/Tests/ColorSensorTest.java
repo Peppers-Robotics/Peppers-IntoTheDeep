@@ -35,7 +35,7 @@ public class ColorSensorTest extends LinearOpMode {
             telemetry.addData("red value", sensor.p.R);
             telemetry.addData("green value", sensor.p.G);
             telemetry.addData("blue value", sensor.p.B);
-            telemetry.addData("distance value", sensor.p.D);
+            telemetry.addData("distance value", sensor.getDistance(DistanceUnit.CM));
             telemetry.addData("(r, g, b)", sensor.RGB.toString());
             telemetry.addData("alpha", sensor.p.A);
             telemetry.update();

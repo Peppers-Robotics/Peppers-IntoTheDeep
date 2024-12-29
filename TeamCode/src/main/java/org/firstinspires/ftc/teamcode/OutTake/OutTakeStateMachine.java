@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Actions
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.States;
 import org.firstinspires.ftc.teamcode.Initialization;
+import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 
@@ -28,12 +29,12 @@ import java.text.CharacterIterator;
 
 @Config
 public class OutTakeStateMachine {
-    public static double IdleArmAngle = 14, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 50;
+    public static double IdleArmAngle = 16, IdlePivotAngle = 0, IdleElevatorLevel = -100, SafeElevatorLevel = 200;
     public static double IdleArmAngle_Sample = 190, IdlePivotAngle_Sample = 0;
     public static double ArmScoreSample = 245, PivotScoreSample = 200, ElevatorScoreSample;
-    public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 330, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
-    public static double ArmTakeSpecimen = 310, PivotTakeSpecimen = 190, ElevatorTakeSpecimen = 60; // DONE
-    public static double ElevatorSpecimen1 = 100, ElevatorSpecimen2 = 300, ElevatorSample1 = 500, ElevatorSample2 = 1075;
+    public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 500, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
+    public static double ArmTakeSpecimen = 320, PivotTakeSpecimen = 0, ElevatorTakeSpecimen = 60; // DONE
+    public static double ElevatorSpecimen1 = 500, ElevatorSpecimen2 = 750, ElevatorSample1 = 500, ElevatorSample2 = 1075;
     public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5, d2powerI = 3;
     public static double TransferArm = 60, TransferPivot = 0;
     public static boolean reatched = false;
@@ -109,12 +110,14 @@ public class OutTakeStateMachine {
                 Elevator.PowerOnDownToTakeSample = true;
                 IntakeController.optimization = false;
                 if(TimeSinceStateStartedRunning.seconds() < 0.15) break;
+                ActiveIntake.powerOn();
                 Claw.close();
                 if(TimeSinceStateStartedRunning.seconds() < 0.15 + 0.1) break;
                 IntakeController.optimization = true;
                 if(TimeSinceStateStartedRunning.seconds() < 0.15 + 0.15) break;
                 Elevator.PowerOnDownToTakeSample = false;
                 Elevator.setTargetPosition(SafeElevatorLevel);
+                ActiveIntake.powerOff();
                 if(Elevator.getCurrentPosition() < SafeElevatorLevel - 10) break;
 
                 ChangeStateTo(OutTakeStates.IDLE_WITH_SAMPLE);
@@ -127,7 +130,7 @@ public class OutTakeStateMachine {
                 if(Arm.getCurrentArmAngle() < 90){
                     break;
                 }
-                Elevator.setTargetPosition(IdleElevatorLevel);
+                Elevator.setTargetPosition(SafeElevatorLevel);
 
                 switch (CurrentAction){
                     case NULL:
@@ -205,8 +208,8 @@ public class OutTakeStateMachine {
                     break;
                 }
                 if(!Arm.motionCompleted()) break;
-                if(OutTakeController.wasL2Activated) ElevatorSpecimen2 = ElevatorScoreSpecimen;
-                else ElevatorSpecimen1 = ElevatorScoreSpecimen;
+//                if(OutTakeController.wasL2Activated) ElevatorSpecimen2 = ElevatorScoreSpecimen;
+//                else ElevatorSpecimen1 = ElevatorScoreSpecimen;
                 switch (CurrentAction){
                     case SCORE:
 //                        ChangeStateTo(OutTakeStates.SCORE_SPECIMEN_ELEVATOR);
@@ -243,6 +246,7 @@ public class OutTakeStateMachine {
                 switch (CurrentAction){
                     case RETRACT:
                         ChangeStateTo(OutTakeStates.RETRACT_ARM);
+                        Elevator.PowerOnDownToTakeSample = false;
                         break;
                     case SCORE:
                         ChangeStateTo(OutTakeStates.TAKE_SPECIMEN);
@@ -264,6 +268,7 @@ public class OutTakeStateMachine {
                 Elevator.setTargetPosition(0);
                 Arm.setArmAngle(ArmTakeSpecimen);
                 Arm.setPivotAngle(PivotTakeSpecimen);
+                Elevator.PowerOnDownToTakeSample = true;
                 if(Arm.getCurrentArmAngle() < 180) break;
                 switch (CurrentAction) {
                     case NEXT:

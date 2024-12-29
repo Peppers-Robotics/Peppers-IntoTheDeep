@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
+import android.text.format.Time;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -9,9 +11,9 @@ import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Control
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.MainOpModeRed;
+import org.firstinspires.ftc.teamcode.OutTake.Arm;
+import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
-
-import java.sql.Time;
 
 public class IntakeController extends GenericController {
     public static int Resolution;
@@ -57,7 +59,13 @@ public class IntakeController extends GenericController {
                     Extendo.motor.setPower(1);
                     wasReseted = true;
                 }
-
+                if(Arm.getCurrentArmAngle() == OutTakeStateMachine.IdleArmAngle) {
+                    if (TimeSinceStateStartedRunning.seconds() > 0.05) {
+                        ActiveIntake.powerOn();
+                    } else {
+                        ActiveIntake.Reverse();
+                    }
+                }
                 if(TimeSinceStateStartedRunning.seconds() >= 0.2 + 0.1 || !wasReseted){
                     if(Storage.hasAlliancePice() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE) {
                         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.TRANSFER_ARM);

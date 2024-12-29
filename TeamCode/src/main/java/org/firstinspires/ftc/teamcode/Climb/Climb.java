@@ -13,9 +13,10 @@ import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 
 @Config
 public class Climb {
-    public static ServoPlus W1, W2, PTO;
+    public static ServoPlus W1, W2, PTO, PTO2;
     public static double down1 = 135, down2 = 290, raise1 = 300, raise2 = 115;
-    public static double PTOEngage = 232, PTOdisengage = 180;
+    public static double PTOEngage = 232, PTOdisengage = 170;
+    public static double PTO2Engage = 150, PTO2Disengage = 185;
     public static void Raise(){
         W1.setAngle(raise1);
         W2.setAngle(raise2);
@@ -32,9 +33,11 @@ public class Climb {
 
     public static void engagePTO(){
         PTO.setAngle(PTOEngage);
+        PTO2.setAngle(PTO2Engage);
     }
     public static void disengagePTO(){
         PTO.setAngle(PTOdisengage);
+        PTO2.setAngle(PTO2Disengage);
     }
 
     enum States{
@@ -66,6 +69,7 @@ public class Climb {
 //        Elevator.motor.setPower(Controls.gamepad2.right_stick_y);
         Chassis.BL.setPower(Controls.gamepad2.right_stick_y);
         Chassis.BR.setPower(Controls.gamepad2.right_stick_y);
+        Extendo.pidEnable = false;
         Extendo.motor.setPower(Controls.gamepad1.right_stick_y);
 
     }
