@@ -2,46 +2,30 @@ package org.firstinspires.ftc.teamcode.Intake;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
 
 @Config
 public class DropDown {
-    public static ServoPlus DropDownLeft, DropDownRight;
-    public static AsymmetricMotionProfile profile = new AsymmetricMotionProfile(5000, 50000, 50000);
-    public static double UpPosition = 275, MiddlePosition = 173, DownPosition = 130;
-    public static double instantPosition = UpPosition, step = 15;
+    public static ServoPlus left;
+    public static double IdleUp = 0, UpIntake = 10, MiddleIntake = 90, LowIntake = 180;
+    public static AsymmetricMotionProfile DropDownProfile = new AsymmetricMotionProfile(0, 0, 0);
 
     public static void GoUp(){
-        profile.startMotion(profile.getPosition(), UpPosition);
-        instantPosition = UpPosition;
+        DropDownProfile.startMotion(DropDownProfile.getPosition(), IdleUp);
     }
-    public static void GoMiddle(){
-        profile.startMotion(profile.getPosition(), MiddlePosition);
+    public static void IntakeUp(){
+        DropDownProfile.startMotion(DropDownProfile.getPosition(), UpIntake);
     }
-    public static void GoDown(){
-        profile.startMotion(profile.getPosition(), DownPosition);
-        instantPosition = DownPosition;
+    public static void IntakeMiddle(){
+        DropDownProfile.startMotion(DropDownProfile.getPosition(), MiddleIntake);
     }
-
-    public static boolean isUp(){
-        return Math.abs(profile.getPosition() - UpPosition) <= 1.5f;
-    }
-    public static void setInstantPosition(double k){
-        instantPosition = UpPosition - Math.abs(DownPosition - UpPosition) * k;
-        profile.setInstant(instantPosition);
+    public static void IntakeLow(){
+        DropDownProfile.startMotion(DropDownProfile.getPosition(), LowIntake);
     }
 
-    public static boolean isMiddle(){
-        return Math.abs(profile.getPosition() - MiddlePosition) <= 1.5f;
-    }
-
-    public static boolean isDown(){
-        return Math.abs(profile.getPosition() - DownPosition) <= 1.5f;
-    }
-    public synchronized static void Update(){
-        DropDownLeft.setAngle(profile.getPosition());
-        DropDownRight.setAngle(profile.getPosition());
-        profile.update();
+    public static void Update(){
+        DropDownProfile.update();
+        left.setAngle(DropDownProfile.getPosition());
     }
 }

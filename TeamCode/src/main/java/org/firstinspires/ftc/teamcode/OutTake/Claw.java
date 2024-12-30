@@ -1,31 +1,38 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
+import com.acmerobotics.dashboard.config.Config;
+
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
+import org.firstinspires.ftc.teamcode.Intake.Storage;
 
-@SuppressWarnings("unused")
+@Config
 public class Claw {
-    public static ServoPlus clawServo;
-    public static FastColorRangeSensor clawSensor;
-    public static double OpenPosition = 60, ClosePosition = 255;
-    public static void open(){
-        clawServo.setAngle(OpenPosition);
+    public static double Closed = 0, Opened = 90;
+    public static ServoPlus servo;
+    public static FastColorRangeSensor sensor;
+    private static boolean closed = false;
+
+    public static void Close(){
+        servo.setAngle(Closed);
+        closed = true;
     }
-    public static void close(){
-        clawServo.setAngle(ClosePosition);
+    public static void Open(){
+        servo.setAngle(Opened);
+        closed = false;
     }
     public static boolean isClosed(){
-        return clawServo.isEqualToAngle(ClosePosition);
+        return closed; // avoid servo.getAngle() because java and double funny
     }
-    public static boolean isOpened(){
-        return clawServo.isEqualToAngle(OpenPosition);
+    public static Storage.PiceColor GetSensorStatus(){
+        switch (sensor.getColorSeenBySensor()){
+            case YELLOW: return Storage.PiceColor.YELLOW;
+            case RED: return Storage.PiceColor.RED;
+            case BLUE: return Storage.PiceColor.BLUE;
+            default: return Storage.PiceColor.NONE;
+        }
     }
-    public static boolean HasElementInIt(){
-        return clawSensor.getDistance(DistanceUnit.MM) <= 50 &&
-                (clawSensor.getColorSeenBySensor() ==  Colors.ColorType.YELLOW ||
-                 clawSensor.getColorSeenBySensor() == Colors.ColorType.RED ||
-                 clawSensor.getColorSeenBySensor() == Colors.ColorType.BLUE );
+    public static boolean isEmpty(){
+        return GetSensorStatus() == Storage.PiceColor.NONE;
     }
 }
