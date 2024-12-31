@@ -34,7 +34,7 @@ public class OutTakeStateMachine {
     public static double ArmScoreSample = 245, PivotScoreSample = 200, ElevatorScoreSample;
     public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 0, ElevatorScoreSpecimen = 500, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
     public static double ArmTakeSpecimen = 320, PivotTakeSpecimen = 0, ElevatorTakeSpecimen = 60; // DONE
-    public static double ElevatorSpecimen1 = 500, ElevatorSpecimen2 = 750, ElevatorSample1 = 500, ElevatorSample2 = 1075;
+    public static double ElevatorSpecimen1 = 500, ElevatorSpecimen2 = 750, ElevatorSample1 = 400, ElevatorSample2 = 1050;
     public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5, d2powerI = 3;
     public static double TransferArm = 60, TransferPivot = 0;
     public static boolean reatched = false;
@@ -109,16 +109,15 @@ public class OutTakeStateMachine {
                 ActiveIntake.powerOn();
                 Elevator.PowerOnDownToTakeSample = true;
                 IntakeController.optimization = false;
-                if(TimeSinceStateStartedRunning.seconds() < 0.20 + 0.1) Controls.gamepad1.right_stick_y = 1;
-                if(TimeSinceStateStartedRunning.seconds() < 0.20) break;
+                if(TimeSinceStateStartedRunning.seconds() < 0.10 + 0.1) Controls.gamepad1.right_stick_y = 1;
+                if(TimeSinceStateStartedRunning.seconds() < 0.10) break;
                 Claw.close();
-                if(TimeSinceStateStartedRunning.seconds() < 0.20 + 0.1) break;
                 IntakeController.optimization = true;
-                if(TimeSinceStateStartedRunning.seconds() < 0.20 + 0.15) break;
+                if(TimeSinceStateStartedRunning.seconds() < 0.10 + 0.1) break;
                 Elevator.PowerOnDownToTakeSample = false;
                 Elevator.setTargetPosition(SafeElevatorLevel);
                 ActiveIntake.powerOff();
-                if(Elevator.getCurrentPosition() < SafeElevatorLevel - 10) break;
+//                if(Elevator.getCurrentPosition() < SafeElevatorLevel - 10) break;
 
                 ChangeStateTo(OutTakeStates.IDLE_WITH_SAMPLE);
                 break;
@@ -175,7 +174,7 @@ public class OutTakeStateMachine {
                 }
                 break;
             case ARM_TO_SAMPLE_SCORE:
-                Arm.setPivotAngle(PivotScoreSample);
+                Arm.setPivotAngle(IdlePivotAngle);
                 switch (CurrentAction){
                     case NEXT:
                         if(Arm.getPrecentOfArmMotionCompleted() < 90) break;
@@ -224,7 +223,7 @@ public class OutTakeStateMachine {
                 if(Elevator.getCurrentPosition() < ElevatorScoreSample - 50) break;
 
                 Arm.setArmAngle(ArmScoreSample);
-                Arm.setPivotAngle(PivotScoreSample);
+                Arm.setPivotAngle(IdlePivotAngle);
 
                 if(!Arm.motionCompleted()) break;
                 switch (CurrentAction){
