@@ -7,6 +7,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -23,7 +24,9 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
+import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Initialization {
@@ -168,6 +171,8 @@ public class Initialization {
             Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM2"));
             Chassis.FL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM3"));
             Chassis.FR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
+            Chassis.localizer = new StandardTrackingWheelLocalizer(hardwareMap, new ArrayList<>(), new ArrayList<>());
+            Chassis.imu = hardwareMap.get(IMU.class, "imu");
         } catch (Exception e){
             RobotLog.e("Chassis motors not found");
         }
