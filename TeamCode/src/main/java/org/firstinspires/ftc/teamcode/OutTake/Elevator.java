@@ -32,7 +32,7 @@ public class Elevator {
     public static boolean PowerOnDownToTakeSample = false;
 
     synchronized public static void setTargetPosition(double pos){
-        pos *= -1;
+        pos *= 1;
         if(pos == targetPos) return;
         motionProfile.startMotion(targetPos, pos);
         targetPos = pos;
@@ -43,8 +43,8 @@ public class Elevator {
 //        controller.setTargetPosition(motionProfile.getPosition());
     }
 
-    public static double getTargetPosition(){ return -targetPos; }
-    public static double getCurrentPosition(){ return -motor.getCurrentPosition(); }
+    public static double getTargetPosition(){ return targetPos; }
+    public static double getCurrentPosition(){ return motor.getCurrentPosition(); }
     public static boolean PIDControllerInWork;
 
 //    public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
@@ -57,16 +57,13 @@ public class Elevator {
         if(Disable){ return; }
 
         if(RESET){
-            motor.setPower(1);
-            if(motor.getCurrent(CurrentUnit.AMPS) < 3) return;
-            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             RESET = false;
             motor.setPower(0);
-            return;
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
-        if(controller.getTargetPosition() >= 0 && -motor.getCurrentPosition() <= 20 && !Climb.isPTOEngaged() && !PowerOnDownToTakeSample){
+        if(controller.getTargetPosition() <= 0 && getCurrentPosition() <= 15 && !Climb.isPTOEngaged() && !PowerOnDownToTakeSample){
             motor.setMotorDisable();
         } else {
             motor.setMotorEnable();
@@ -86,7 +83,7 @@ public class Elevator {
 
         } else {
             if(PowerOnDownToTakeSample){
-                motor.setPower(1);
+                motor.setPower(-1);
             } else {
                 controller.setPidCoefficients(normal);
                 if (motor.isMotorEnabled()) {
@@ -99,7 +96,7 @@ public class Elevator {
         }
         Initialization.telemetry.addData("Elevator pose from profile", motionProfile.getPosition());
         Initialization.telemetry.addData("Elevator power", motor.getPower());
-        Initialization.telemetry.addData("Elevator current pose", -motor.getCurrentPosition());
+        Initialization.telemetry.addData("Elevator current pose", getCurrentPosition());
         Initialization.telemetry.addData("Elevator targetPos", targetPos);
         Initialization.telemetry.addData("Is elevator enabled", motor.isMotorEnabled());
         Initialization.telemetry.addData("Elevator velocity", Elevator.motor.getVelocity());

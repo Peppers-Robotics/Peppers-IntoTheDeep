@@ -32,6 +32,7 @@ public class MainOpModeRed extends LinearOpMode {
         Initialization.initializeRobot(hardwareMap);
         Controls.Initialize(gamepad1, gamepad2);
         ActiveIntake.UnblockIntake();
+        OutTakeStateMachine.autoTakingSamples = false;
 
         IntakeController.Initialize(gamepad1, gamepad2);
 

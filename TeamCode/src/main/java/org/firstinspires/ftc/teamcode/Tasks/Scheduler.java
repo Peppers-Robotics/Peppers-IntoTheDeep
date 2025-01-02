@@ -2,10 +2,11 @@ package org.firstinspires.ftc.teamcode.Tasks;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.lang.reflect.Array;
+import org.firstinspires.ftc.teamcode.HelperClasses.Pose2D;
+
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Stack;
 
 public class Scheduler {
     public static class Wait extends Task {
@@ -20,7 +21,7 @@ public class Scheduler {
             return time.seconds() >= s;
         }
     }
-    public static Queue<Task> tasks;
+    public static LinkedList<Task> tasks;
     public Scheduler(){
         tasks = new LinkedList<>();
     }
@@ -36,14 +37,34 @@ public class Scheduler {
         tasks.poll();
     }
     public Scheduler waitSeconds(double seconds){
-        tasks.add(new Wait(seconds));
+        tasks.addLast(new Wait(seconds));
         return this;
     }
+    public void removeAllTasks(){
+        tasks = new LinkedList<>();
+    }
+    public Scheduler goTo(Pose2D pose){
+        tasks.addLast(new GoToPoint(pose));
+        return this;
+    }
+    public Scheduler goToWithoutBlock(Pose2D pose){
+        tasks.addLast(new GoToPoint(pose, false));
+        return this;
+    }
+    public boolean DEBUG = false;
+    public boolean Next = false;
     public void update(){
-        if(tasks.peek() == null) return;
-        boolean result = tasks.peek().Run();
+        if(done()) return;
+        boolean result = tasks.getFirst().Run();
+        if(DEBUG){
+            if(Next){
+                tasks.removeFirst();
+                Next = false;
+            }
+            return;
+        }
         if(result)
-            tasks.poll();
+            tasks.removeFirst();
     }
 
 }

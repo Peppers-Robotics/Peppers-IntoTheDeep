@@ -7,25 +7,30 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Pose2D;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 
 @Config
 public class Chassis {
-    public static PIDController xController = new PIDController(0, 0, 0), yController = new PIDController(0, 0, 0);
-    public static PIDController hController = new PIDController(0, 0, 0);
+    public static PIDController xController = new PIDController(-0.15, -0.001, -0.014), yController = new PIDController(-0.15, -0.001, 0.015);
+    public static PIDController hController = new PIDController(1, 0, -0.04);
     public static StandardTrackingWheelLocalizer localizer;
-    private static Pose2d targetPosition;
+    private static Pose2D targetPosition;
     public static IMU imu;
 
 
     public static CachedMotor FL, FR, BL, BR;
     public static double rFL = -1, rFR = 1, rBL = -1, rBR = 1;
     public static void drive(double x, double y, double h){
-        h = h * 0.7;
         double pow = 0.5;
-        if(Controls.gamepad1.gamepad.cross) pow = 1;
+        if(Controls.gamepad1 != null) {
+            if (Controls.gamepad1.gamepad.cross) pow = 1;
+            h = h * 0.7;
+        } else {
+            pow = 1;
+        }
 
         FL.setPower((y + x + h) / rFL * pow);
         FR.setPower((y - x - h) / rFR * pow);
@@ -35,26 +40,39 @@ public class Chassis {
             BR.setPower((y + x - h) / rBR * pow);
     }
 
-    public static void SetTargetPosition(Pose2d pos){
-        hController.setTargetPosition(pos.getHeading(), targetPosition != pos);
-        xController.setTargetPosition(pos.getX(), targetPosition != pos);
-        yController.setTargetPosition(pos.getY(), targetPosition != pos);
+    public static void SetTargetPosition(Pose2D pos){
+        xController.setTargetPosition(0, targetPosition != pos);
+        yController.setTargetPosition(0, targetPosition != pos);
+        hController.setTargetPosition(0, targetPosition != pos);
         targetPosition = pos;
     }
-    public static Pose2d GetCurrentPosition(){
-        return localizer.getPoseEstimate();
+    public static Pose2D GetCurrentPosition(){
+        return new Pose2D(localizer.getPoseEstimate());
     }
-    public static Pose2d GetTargetPosition(){
+    public static Pose2D GetTargetPosition(){
         return targetPosition;
     }
     public static double DistanceToTarget(){
         return Math.sqrt(
-            (GetCurrentPosition().getX() - targetPosition.getX()) * (GetCurrentPosition().getX() - targetPosition.getX()) +
-            (GetCurrentPosition().getY() - targetPosition.getY()) * (GetCurrentPosition().getY() - targetPosition.getY())
+            (GetCurrentPosition().x - targetPosition.x) * (GetCurrentPosition().x - targetPosition.x) +
+            (GetCurrentPosition().y - targetPosition.y) * (GetCurrentPosition().y - targetPosition.y)
         );
     }
     public static void Update(){
-        drive(xController.calculatePower(GetCurrentPosition().getX()), yController.calculatePower(GetCurrentPosition().getY()), hController.calculatePower(GetCurrentPosition().getHeading()));
+        localizer.update();
+        Pose2D normal = new Pose2D(GetTargetPosition().x - GetCurrentPosition().x, GetTargetPosition().y - GetCurrentPosition().y, GetCurrentPosition().h);
+        double He = normal.h - targetPosition.h;
+        while(He < -Math.PI) He += 2*Math.PI;
+        while(He > Math.PI) He -= 2 * Math.PI;
+        Pose2D error = new Pose2D(
+                Math.cos(GetCurrentPosition().h) * normal.x + Math.sin(GetCurrentPosition().h) * normal.y,
+                Math.sin(GetCurrentPosition().h) * normal.x - Math.cos(GetCurrentPosition().h) * normal.y,
+                He
+        );
+        double xP = xController.calculatePower(error.x, localizer.getPoseVelocity().getX()),
+                yP = yController.calculatePower(error.y, localizer.getPoseVelocity().getY()),
+                hP = hController.calculatePower(error.h, localizer.getPoseVelocity().getHeading());
+        drive(yP, xP, hP);
     }
     public static double getYaw(AngleUnit u) {
         return imu.getRobotYawPitchRollAngles().getYaw(u);

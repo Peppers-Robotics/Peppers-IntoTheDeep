@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Initialization;
 
 @Config
 public class Arm {
-    public static double s1Offset = 355, s2Offset = 0;
+    public static double s1Offset = 173, s2Offset = 173;
     private static double armPrevPos = 0, pivotPrevPos = 0;
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;

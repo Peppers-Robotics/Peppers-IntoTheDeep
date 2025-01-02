@@ -173,6 +173,11 @@ public class Initialization {
             Chassis.FR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
             Chassis.localizer = new StandardTrackingWheelLocalizer(hardwareMap, new ArrayList<>(), new ArrayList<>());
             Chassis.imu = hardwareMap.get(IMU.class, "imu");
+
+            Chassis.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            Chassis.BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            Chassis.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            Chassis.FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } catch (Exception e){
             RobotLog.e("Chassis motors not found");
         }
@@ -182,10 +187,6 @@ public class Initialization {
         Chassis.rBL = -1;
         Chassis.rBR = 1;
 
-        Chassis.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Chassis.BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Chassis.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Chassis.FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
         /*
