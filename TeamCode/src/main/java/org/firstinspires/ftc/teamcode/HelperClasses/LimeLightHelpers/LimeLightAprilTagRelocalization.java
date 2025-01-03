@@ -7,6 +7,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.Chassis;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 public class LimeLightAprilTagRelocalization {
@@ -36,6 +37,16 @@ public class LimeLightAprilTagRelocalization {
 
         Pose3D pose = result.getBotpose_MT2();
         drive.setPoseEstimate(new Pose2d(pose.getPosition().x, pose.getPosition().y, pose.getOrientation().getYaw(AngleUnit.RADIANS)));
+
+        return true;
+    }
+    public static boolean Relocalize(){
+        camera.updateRobotOrientation(Chassis.getYaw(AngleUnit.RADIANS));
+        LLResult result = camera.getLatestResult();
+        if(!result.isValid()) return false;
+
+        Pose3D pose = result.getBotpose_MT2();
+        Chassis.localizer.setPoseEstimate(new Pose2d(pose.getPosition().x, pose.getPosition().y, pose.getOrientation().getYaw(AngleUnit.RADIANS)));
 
         return true;
     }

@@ -32,6 +32,9 @@ public class PIDController {
     private ElapsedTime time = new ElapsedTime();
     private double lastReturn = 0;
     public double calculatePower(double currentPosition){
+        return calculatePower(currentPosition, null);
+    }
+    public double calculatePower(double currentPosition, Double d){
         if(time.seconds() < 1.0/freq) return lastReturn;
         time.reset();
         error = targetPosition - currentPosition;
@@ -39,6 +42,9 @@ public class PIDController {
 
         double P = error;
         double D = (error - lastError) / et.seconds();
+        if(d != null){
+            D = d;
+        }
         Isum += P * dtime * clamp;
         double r = pidCoefficients.p * P + pidCoefficients.i * Isum + pidCoefficients.d * D;
 
