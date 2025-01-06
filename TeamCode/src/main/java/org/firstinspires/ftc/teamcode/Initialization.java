@@ -131,8 +131,8 @@ public class Initialization {
         } catch (Exception e){
             RobotLog.e("Climb servos not found");
         }
-        Climb.disengagePTO();
-        Climb.PutDown();
+//        Climb.disengagePTO();
+//        Climb.PutDown();
     }
     public static void initializeLimeLight(){
         LimeLightColorTracking.camera = hardwareMap.get(Limelight3A.class, "camera");

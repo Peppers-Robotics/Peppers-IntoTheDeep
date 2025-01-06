@@ -11,6 +11,7 @@ public class ActiveIntake {
     public static ServoPlus Blocker;
     public static double Block = 90, UnBlock = 90;
     public static double power = 0.5;
+    public static boolean wasDriverActivated = false;
     synchronized public static void powerOn(double s){
         double t = System.currentTimeMillis();
         new Thread(() -> {
@@ -26,7 +27,10 @@ public class ActiveIntake {
         });
     }
 
-    synchronized public static void powerOn(){
+    public static void powerOn(){
+        powerOn(false);
+    }
+    synchronized public static void powerOn(boolean driver){
         motor.setPower(-1);
     }
     synchronized public static void powerOff(){

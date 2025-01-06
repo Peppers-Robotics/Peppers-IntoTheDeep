@@ -31,21 +31,18 @@ public class SpecimenAutonomous extends LinearOpMode {
     public enum States{
         SCORE,
         GO_TO_SAMPLES,
-        TAKE_SAMPLES,
         GO_TO_HUMAN,
-        SPIT,
         TAKE_SPECIMEN,
-        SCORE_SPECIMEN,
         PARK
     }
 
 
-    public static double[] specimenX = {-39, -41, -42, -43, -44}, specimenY = {-12, -14, -16, -18, -20}, specimenH = {0, 0, 0, 0, 0};
-    public static double[] sampleX = {-19, -21, -26}, sampleY = {16, 21, 31}, sampleH = {315, 320, 315};
-    public static double[] getSpecimenX = {1, 0.5, 0, 0}, getSpecimenY = {19, 18.5, 19, 19.5}, getSpecimenH = {5, 3, 2, 3};
+    public static double[] specimenX = {-39, -41.5, -43, -44, -44.5}, specimenY = {-12, -13.5, -16, -18, -20}, specimenH = {0, 0, 0, 0, 0};
+    public static double[] sampleX = {-19, -22, -26}, sampleY = {16, 21.5, 31}, sampleH = {317, 323, 317};
+    public static double[] getSpecimenX = {1, 1, 1.5, 1.5}, getSpecimenY = {18.7, 18.1, 18.5, 19.4}, getSpecimenH = {0, 1, 2, 3};
     public static double[] ReverseToHumanX = {-18, -21, -26}, ReverseToHumanY = {15, 30, 31.5}, ReverseToHumanH = {215, 213, 200};
-    public static double parkX = 0, parkY = 18, parkH = 0;
-    public static int[] ExtendoPose = {700, 690, 600}, ExtendoPoseHuman = {600, 400, 400};
+    public static double parkX = 0, parkY = 22, parkH = 0;
+    public static int[] ExtendoPose = {720, 710, 620}, ExtendoPoseHuman = {600, 400, 400};
     SampleMecanumDriveCancelable drive;
     public int specimensScored = 0, samplesTook = 0;
     public static double dropDownPose = 0.65;
@@ -72,7 +69,7 @@ public class SpecimenAutonomous extends LinearOpMode {
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(DriveConstants.MAX_VEL, Math.PI * 3, DriveConstants.TRACK_WIDTH))
                 .lineToLinearHeading(new Pose2d(sampleX[samplesTook], sampleY[samplesTook], Math.toRadians(sampleH[samplesTook])))
-                .UNSTABLE_addTemporalMarkerOffset(-0.2, () -> Extendo.Extend(ExtendoPose[samplesTook]))
+                .UNSTABLE_addTemporalMarkerOffset(-0.05, () -> Extendo.Extend(ExtendoPose[samplesTook]))
                 .addTemporalMarker(() -> samplesTook ++)
                 .resetConstraints()
                 .build();
@@ -84,7 +81,7 @@ public class SpecimenAutonomous extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
                     Extendo.Extend(ExtendoPoseHuman[samplesTook - 1]);
                 })
-                .UNSTABLE_addTemporalMarkerOffset(-0.001, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(-0.01, () -> {
                     driveIsFree = true;
                 })
                 .resetConstraints()
@@ -92,11 +89,12 @@ public class SpecimenAutonomous extends LinearOpMode {
     }
     private TrajectorySequence TakeFromWall(){
         if(specimensScored == 1){
-            return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+            return drive.trajectorySequenceBuilder(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(), drive.getPoseEstimate().getHeading() + Math.toRadians(getSpecimenH[specimensScored - 1])))
                     .addTemporalMarker(() -> {
+                        Elevator.controller.pidCoefficients.i = 0.05;
                         OutTakeStateMachine.autoTakingSamples = false;
 //                        OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SPECIMEN);
-                        OutTakeStateMachine.ElevatorTakeSpecimen += 10;
+//                        OutTakeStateMachine.ElevatorTakeSpecimen += 10;
                         OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.ELEVATOR_TO_SPECIMEN_TAKE);
                     })
 //                    .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(70, Math.PI * 2, DriveConstants.TRACK_WIDTH))
@@ -108,7 +106,8 @@ public class SpecimenAutonomous extends LinearOpMode {
                     .addTemporalMarker(() -> {
                         if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SPECIMEN_TAKE) {
                             OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
-                            OutTakeStateMachine.ElevatorTakeSpecimen -= 10;
+//                            OutTakeStateMachine.ElevatorTakeSpecimen -= 10;
+                            Elevator.controller.pidCoefficients.i = 0;
                         }
                     })
                     .resetConstraints()
@@ -117,6 +116,7 @@ public class SpecimenAutonomous extends LinearOpMode {
         }
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .addTemporalMarker(() -> {
+                    Elevator.controller.pidCoefficients.i = 0.05;
                     OutTakeStateMachine.autoTakingSamples = false;
                     OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SPECIMEN);
                 })
@@ -220,7 +220,8 @@ public class SpecimenAutonomous extends LinearOpMode {
                         trajRan = true;
                         driveIsFree = false;
                     }
-                    if(!drive.isBusy() && trajRan){
+                    if(!driveIsFree) timeHuman.reset();
+                    if(driveIsFree && trajRan && timeHuman.seconds() >= 0.1){
                         drive.breakFollowing();
                         IntakeController.gamepad2.gamepad.left_bumper = true;
                         IntakeController.Update(false);
@@ -279,6 +280,6 @@ public class SpecimenAutonomous extends LinearOpMode {
         }
         OutTakeStateMachine.autoTakingSamples = false;
     }
-    public static ElapsedTime freq = new ElapsedTime();
+    public static ElapsedTime freq = new ElapsedTime(), timeHuman = new ElapsedTime();
     public static boolean driveIsFree = false;
 }

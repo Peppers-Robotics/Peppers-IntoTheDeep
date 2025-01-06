@@ -28,6 +28,10 @@ public class Storage {
         }
         return false;
     }
+    public static boolean wrongPice(){
+        if(getStorageStatus() == SpecimenType.NONE) return false;
+        return !hasAlliancePice();
+    }
 
     public static SpecimenType getStorageStatus(){
         if(sensor.getDistance(DistanceUnit.CM) > 5) return SpecimenType.NONE;

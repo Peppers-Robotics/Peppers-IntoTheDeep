@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.DifferentialHelp
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Initialization;
+import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 
 @Config
 public class Arm {
@@ -34,6 +36,9 @@ public class Arm {
     }
 
     public static void update(){
+        if(Extendo.getCurrentPosition() > 600){
+            if(Arm.getCurrentArmAngle() > 210) Arm.setArmAngle(200);
+        }
         armProfile.update();
         pivotProfile.update();
         diffy.setAngleToFirstJoint(armProfile.getPosition());

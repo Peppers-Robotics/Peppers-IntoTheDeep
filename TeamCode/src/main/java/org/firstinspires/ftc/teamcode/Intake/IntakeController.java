@@ -85,7 +85,7 @@ public class IntakeController extends GenericController {
                             DropDown.GoUp();
                         }
                         ActiveIntake.powerOn();
-                    } else if (gamepad2.gamepad.left_bumper) {
+                    } else if (gamepad2.gamepad.left_bumper || Storage.wrongPice()) {
                         ActiveIntake.Reverse();
                     } else {
                         ActiveIntake.powerOff();
@@ -114,10 +114,10 @@ public class IntakeController extends GenericController {
                 else {
                     Extendo.motor.setMotorEnable();
                 }
-                if(gamepad1.right_stick_y != 0){
-                    ChangeState(IntakeStates.IDLE_EXTENDED);
+                if(Math.abs(gamepad1.right_stick_y) >= 0.01){
                     Extendo.motor.setMotorEnable();
                     Extendo.motor.setPower(gamepad1.right_stick_y * (Controls.SlowDown ? 0.8 : 1));
+                    ChangeState(IntakeStates.IDLE_EXTENDED);
                     wasReseted = false;
                 }
                 break;
@@ -132,7 +132,7 @@ public class IntakeController extends GenericController {
                             DropDown.GoUp();
                         }
                         ActiveIntake.powerOn();
-                    } else if (gamepad2.gamepad.left_bumper) {
+                    } else if (gamepad2.gamepad.left_bumper || Storage.wrongPice()) {
                         ActiveIntake.Reverse();
                     } else {
                         ActiveIntake.powerOff();
@@ -149,8 +149,9 @@ public class IntakeController extends GenericController {
                         DropDown.GoUp();
                     }
                 }
-
-                if(!Extendo.pidEnable) Extendo.motor.setPower(gamepad1.right_stick_y);
+                if(!Extendo.pidEnable) {
+                    Extendo.motor.setPower(gamepad1.right_stick_y);
+                }
                 if(Extendo.motor.getCurrentPosition() > -10 && gamepad1.right_stick_y > 0) {
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
                     wasReseted = false;
@@ -158,6 +159,7 @@ public class IntakeController extends GenericController {
                 break;
 
         }
+
         Initialization.telemetry.addData("Extendo current pos", Extendo.motor.getCurrentPosition());
         Initialization.telemetry.addData("extendo motor enabled", Extendo.motor.isMotorEnabled());
         Initialization.telemetry.addData("trigger", gamepad1.right_stick_y);

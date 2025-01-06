@@ -63,7 +63,7 @@ public class Elevator {
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
-        if(controller.getTargetPosition() <= 0 && getCurrentPosition() <= 15 && !Climb.isPTOEngaged() && !PowerOnDownToTakeSample){
+        if(controller.getTargetPosition() <= 0 && getCurrentPosition() <= 25 && !Climb.isPTOEngaged() && !PowerOnDownToTakeSample){
             motor.setMotorDisable();
         } else {
             motor.setMotorEnable();

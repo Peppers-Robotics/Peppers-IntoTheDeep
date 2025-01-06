@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.OutTake;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
+import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 
 public class OutTakeController extends GenericController {
     public static boolean wasL2Activated = false;
@@ -30,7 +32,7 @@ public class OutTakeController extends GenericController {
 
             Controls.ScoreLevel2 = false;
         }
-        if(Controls.GrabSpecimen){
+        if(Controls.GrabSpecimen && Extendo.getCurrentPosition() < 600){
             action = OutTakeStateMachine.OutTakeActions.SPECIMEN;
             Controls.GrabSpecimen = false;
         }

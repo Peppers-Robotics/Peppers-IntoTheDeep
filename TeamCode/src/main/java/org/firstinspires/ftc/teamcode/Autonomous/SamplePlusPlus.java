@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Config
 @Autonomous
-public class CyliisSample extends LinearOpMode {
+public class SamplePlusPlus extends LinearOpMode {
 
     public enum States{
         PLACE_SPECIMEN,
@@ -36,6 +36,7 @@ public class CyliisSample extends LinearOpMode {
         GOTO_SAMPLE3,
         TAKE_SAMPLE,
         GOTO_BASKET_AND_SCORE,
+        HUMAN,
         SCORE,
         IDLE;
         public boolean trajRan = false;
@@ -49,6 +50,7 @@ public class CyliisSample extends LinearOpMode {
             takeSample2 = new Pose2d(-15, -41, Math.toRadians(5)),
             takeSample3 = new Pose2d(-12, -43, Math.toRadians(30)),
             basketPosition = new Pose2d(-5.5, -42 ,Math.toRadians(315)),
+            Human = new Pose2d(-2, 30, Math.toRadians(270)),
             basketPreload = new Pose2d(-6.5, -43, Math.toRadians(315)),
             Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
             Climb2 = new Pose2d(-56, -2.5, Math.toRadians(272));
@@ -129,7 +131,24 @@ public class CyliisSample extends LinearOpMode {
                 case PLACE_SPECIMEN:
                     if (!drive.isBusy()) {
                         CurrentState.trajRan = false;
-                        CurrentState = States.GOTO_SAMPLE1;
+                        CurrentState = States.HUMAN;
+                    }
+                    break;
+                case HUMAN:
+                    if(!CurrentState.trajRan) {
+                        CurrentState.trajRan = true;
+                        drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                .lineToLinearHeading(Human)
+                                .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
+                                    Extendo.Extend(720);
+                                    IntakeController.gamepad2.right_trigger = (float) dropDownPos;
+                                })
+                                .build());
+                        IntakeController.gamepad2.right_trigger = (float) dropDownPos;
+                    }
+                    if (!drive.isBusy()) {
+                        CurrentState = States.TAKE_SAMPLE;
+                        CurrentState.trajRan = false;
                     }
                     break;
                 case GOTO_SAMPLE1:

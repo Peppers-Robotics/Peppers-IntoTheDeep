@@ -63,7 +63,6 @@ public class Climb {
 
     public static void Update(){
         engagePTO();
-        Raise();
         Elevator.Disable = true;
 
 //        Elevator.motor.setPower(Controls.gamepad2.right_stick_y);

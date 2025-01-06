@@ -50,7 +50,7 @@ public class MainOpModeBlue extends LinearOpMode {
         isClimbing = false;
         Extendo.pidEnable = false;
         IntakeController.ChangeState(IntakeController.IntakeStates.RETRACT_EXTENDO);
-        OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.IDLE);
+        OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.defaultState);
 
         Initialization.Team = Initialization.AllianceColor.BLUE;
         Climb.PutDown();
@@ -106,10 +106,11 @@ public class MainOpModeBlue extends LinearOpMode {
                 Arm.setArmAngle(300);
             }
             if(isClimbing){
-                if(Controls.gamepad2.wasPressed.touchpad){
+                if(Controls.gamepad2.wasPressed.square){
                     Climb.PutDown();
                 }
                 Climb.Update();
+                Arm.update();
                 Controls.Update();
                 Chassis.rBL = 0;
                 Chassis.rBR = 0;
@@ -118,7 +119,6 @@ public class MainOpModeBlue extends LinearOpMode {
                 IntakeController.Update();
                 continue;
             }
-
             Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
                     gamepad1.left_trigger - gamepad1.right_trigger);
 

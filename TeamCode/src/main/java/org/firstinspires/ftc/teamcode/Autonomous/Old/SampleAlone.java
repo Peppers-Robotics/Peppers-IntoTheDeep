@@ -41,12 +41,12 @@ public class SampleAlone extends LinearOpMode {
         public boolean trajRan = false;
     }
     public static States CurrentState = States.PLACE_SPECIMEN;
-    public static int takeSample1Extend = 690, takeSample2Extend = 700, takeSample3Extend = 700;
-    public static double SlowExtendoPower = -0.4, dropDownPos = 0.6;
+    public static int takeSample1Extend = 690, takeSample2Extend = 700, takeSample3Extend = 710;
+    public static double SlowExtendoPower = -0.4, dropDownPos = 0.7;
 
     public static Pose2d putSpecimen = new Pose2d(-36.5, 11, 0),
-            takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -33, Math.toRadians(0)),
-            takeSample2 = new Pose2d(-15, -40.5, Math.toRadians(10)),
+            takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -33, Math.toRadians(355)),
+            takeSample2 = new Pose2d(-15, -40.5, Math.toRadians(5)),
             takeSample3 = new Pose2d(-12, -43, Math.toRadians(30)),
             basketPosition = new Pose2d(-5.5, -42 ,Math.toRadians(315)),
             Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
@@ -94,7 +94,7 @@ public class SampleAlone extends LinearOpMode {
                 .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(20))
                 .splineToConstantHeading(new Vector2d(preTakeSample1.getX(), preTakeSample1.getY()), Math.toRadians(-110))
                 .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
-                    Extendo.Extend(takeSample1Extend - 30);
+                    Extendo.Extend(takeSample1Extend - 20);
                 })
                 .waitSeconds(0.3)
                 .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
@@ -144,7 +144,7 @@ public class SampleAlone extends LinearOpMode {
                         drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(takeSample2)
                                 .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
-                                    Extendo.Extend(takeSample2Extend-200);
+                                    Extendo.Extend(takeSample2Extend-190);
                                 })
                                 .waitSeconds(0.3)
                                 .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
@@ -248,17 +248,15 @@ public class SampleAlone extends LinearOpMode {
                         drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                 .lineToLinearHeading(Climb1)
                                 .addTemporalMarker(() -> {
-                                    OutTakeStateMachine.CurrentState = OutTakeStateMachine.OutTakeStates.AUTO_PARK;
-                                    OutTakeStateMachine.TimeSinceStateStartedRunning.reset();
+                                    OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.AUTO_PARK);
+                                    OutTakeStateMachine.defaultState = OutTakeStateMachine.OutTakeStates.IDLE_WITH_SAMPLE;
                                 })
                                 .lineToLinearHeading(Climb2)
-                                .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
-                                    Climb.Raise();
-                                })
 
                                 .build());
                         CurrentState.trajRan = true;
                     }
+                    if(!drive.isBusy()) requestOpModeStop();
                     break;
             }
 

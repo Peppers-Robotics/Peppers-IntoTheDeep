@@ -26,22 +26,25 @@ public class Controls {
         if(ScoreLevel2) ScoreLevel2 = false;
         if(GrabSpecimen) GrabSpecimen = false;
     }
-    private static boolean ClimbingHelp = false;
+    private static boolean ClimbingHelp = false, imogenHelper = false;
 
 
     public static void Update(){
         if((gamepad1.gamepad.triangle && gamepad1.gamepad.options) ||
            (gamepad2.gamepad.triangle && gamepad2.gamepad.options)){
-            ImogenDriver = !ImogenDriver;
-            if(ImogenDriver){
-                gamepad1.gamepad.setLedColor((double) 0xf8, (double) 0x86, (double) 0x05, (int) 1e10);
-                gamepad2.gamepad.setLedColor((double) 0xf8, (double) 0x86, (double) 0x05, (int) 1e10);
-            } else {
-                gamepad2.gamepad.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
-                gamepad1.gamepad.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+            if(!imogenHelper) {
+                ImogenDriver = !ImogenDriver;
+                if (ImogenDriver) {
+                    gamepad1.gamepad.setLedColor((double) 0xf8, (double) 0x86, (double) 0x05, (int) 1e10);
+                    gamepad2.gamepad.setLedColor((double) 0xf8, (double) 0x86, (double) 0x05, (int) 1e10);
+                } else {
+                    gamepad2.gamepad.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+                    gamepad1.gamepad.setLedColor((double) 0xba, (double) 0x00, (double) 0x71, (int) 1e10);
+                }
+                imogenHelper = true;
             }
             return;
-        }
+        } else imogenHelper = false;
 
         SlowDown = gamepad1.gamepad.left_bumper;
 
@@ -52,13 +55,17 @@ public class Controls {
             if(gamepad1.wasPressed.circle)      Retract      = true;
             if(gamepad1.wasPressed.triangle)    GrabSpecimen = true;
             if(gamepad1.wasPressed.dpad_right)  Throw        = true;
+            if(gamepad1.wasPressed.touchpad){
+                Climbing = true;
+                ClimbingHelp = true;
+            } else ClimbingHelp = false;
             gamepad1.update();
             gamepad2.update();
             return;
         }
 
 
-        if(gamepad1.wasPressed.triangle)    Throw        = true;
+        if(gamepad1.wasPressed.dpad_right || gamepad1.wasPressed.dpad_left)    Throw        = true;
         if(gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
         if(gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
         if(gamepad2.wasPressed.triangle)    GrabSpecimen = true;
