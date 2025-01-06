@@ -11,12 +11,12 @@ import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 
 @Config
 public class OutTakeStateMachine {
-    public static double IdleArmAngle = 0, IdlePivotAngle = 170, IdleElevatorLevel = -100, SafeElevatorLevel = 200;
-    public static double IdleArmAngle_Sample = 190, IdlePivotAngle_Sample = 170;
-    public static double ArmScoreSample = 240, PivotScoreSample = -20, ElevatorScoreSample;
-    public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 170, ElevatorScoreSpecimen = 330, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
-    public static double ArmTakeSpecimen = 320, PivotTakeSpecimen = -20, ElevatorTakeSpecimen = 60; // DONE
-    public static double ElevatorSpecimen1 = 500, ElevatorSpecimen2 = 330, ElevatorSample1 = 400, ElevatorSample2 = 1075;
+    public static double IdleArmAngle = -10, IdlePivotAngle = 170, IdleElevatorLevel = -100, SafeElevatorLevel = 200;
+    public static double IdleArmAngle_Sample = 180, IdlePivotAngle_Sample = 170;
+    public static double ArmScoreSample = 230, PivotScoreSample = -20, ElevatorScoreSample;
+    public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 175, ElevatorScoreSpecimen = 320, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
+    public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = -25, ElevatorTakeSpecimen = 95; // DONE
+    public static double ElevatorSpecimen1 = 490, ElevatorSpecimen2 = 320, ElevatorSample1 = 400, ElevatorSample2 = 1075;
     public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5, d2powerI = 3;
     public static double TransferArm = 60, TransferPivot = 0;
     public static boolean reatched = false;

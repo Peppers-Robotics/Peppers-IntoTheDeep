@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 
 @Config
 public class Arm {
-    public static double s1Offset = 173, s2Offset = 173;
+    public static double s1Offset = 230, s2Offset = 140;
     private static double armPrevPos = 0, pivotPrevPos = 0;
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;
@@ -54,6 +54,8 @@ public class Arm {
 //        servo2.setPower(s1Controller.calculatePower(servo2.getCurrentCorrectedAngle()));
 
         Initialization.telemetry.addData("Arm angle", armProfile.getPosition());
+        Initialization.telemetry.addData("s1_pos", servo1.getPosition());
+        Initialization.telemetry.addData("s2_pos", servo2.getPosition());
         Initialization.telemetry.addData("Pivot angle", pivotProfile.getPosition());
         Initialization.telemetry.addData("deg1", diffy.getRawAngles()[1]);
         Initialization.telemetry.addData("deg0", diffy.getRawAngles()[0]);

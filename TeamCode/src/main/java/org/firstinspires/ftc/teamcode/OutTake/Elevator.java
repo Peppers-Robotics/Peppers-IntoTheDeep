@@ -17,10 +17,11 @@ import org.firstinspires.ftc.teamcode.Initialization;
 public class Elevator {
     public static boolean Disable = false;
     public static CachedMotor motor;
-    public static PIDController controller = new PIDController(0.013, 0, 0.0005);
+    public static PIDController controller = new PIDController(0.009, 0, 0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.01, 0, 0.0003);
-    public static PIDCoefficients normal = new PIDCoefficients(0.009, 0, 0.0003);
+    public static PIDCoefficients normal = new PIDCoefficients(0.009, 0.00005, 0.0003);
     public static double kf = -0.1, kff = 1;
+    public static double aggresiveP = 0.01, aggressiveI = 0.0002, aggressiveD = 0.0003;
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(6000, 7000, 7000);
 
     static {
@@ -85,7 +86,11 @@ public class Elevator {
             if(PowerOnDownToTakeSample){
                 motor.setPower(-1);
             } else {
-                controller.setPidCoefficients(normal);
+                if(controller.getTargetPosition() != OutTakeStateMachine.ElevatorTakeSpecimen) {
+                    controller.setPidCoefficients(normal);
+                } else {
+                    controller.setPidCoefficients(new PIDCoefficients(aggresiveP, aggressiveI, aggressiveD));
+                }
                 if (motor.isMotorEnabled()) {
                     motor.setPower(
                             controller.calculatePower(motor.getCurrentPosition()) * kff
