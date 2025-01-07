@@ -96,6 +96,7 @@ public class Elevator {
                             controller.calculatePower(motor.getCurrentPosition()) * kff
                             + kf
                     );
+					motor.setPower(motor.getPower() * 12 / Initialization.Voltage);
                 } else motor.setPower(0);
             }
         }
