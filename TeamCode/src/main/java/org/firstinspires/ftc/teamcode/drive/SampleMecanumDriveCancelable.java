@@ -135,6 +135,7 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+//        setLocalizer(new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinPoint")));
         imu = hardwareMap.get(IMU.class, "imu");
         imu.resetYaw();
 
