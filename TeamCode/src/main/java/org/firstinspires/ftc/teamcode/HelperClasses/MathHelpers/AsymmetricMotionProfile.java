@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 public class AsymmetricMotionProfile {
-    public double maxVelocity, acceleration, deceleration;
+    public double maxVelocity, acceleration, deceleration, initialVelocity;
     private ElapsedTime time = new ElapsedTime();
     private double accelerationTime, deccelarationTime, constantTime,
             currentPosition, initialPosition, targetPosition, mvUsed,
@@ -15,7 +15,12 @@ public class AsymmetricMotionProfile {
         this.acceleration = acceleration;
         this.deceleration = deceleration;
     }
+    public void startMotion(double initialPosition, double targetPosition, double initialVelocity){
+        this.initialVelocity = initialVelocity;
+        startMotion(initialPosition, targetPosition);
+    }
     public void startMotion(double initialPos, double targetPos){
+        initialVelocity = 0;
         if(initialPos == targetPos) return;
         RobotLog.i("(stub! - handled) Asymmetric Motion can't make a profile for a distance of 0 units");
         double dist = Math.abs(targetPos - initialPos);
@@ -24,7 +29,7 @@ public class AsymmetricMotionProfile {
         targetPosition = targetPos;
         currentPosition = initialPosition;
 
-        accelerationTime = maxVelocity / acceleration;
+        accelerationTime = (maxVelocity - initialVelocity) / acceleration;
         deccelarationTime = maxVelocity / deceleration;
 
         if(dist <= (accelerationTime + deccelarationTime) * maxVelocity / 2){
@@ -56,15 +61,15 @@ public class AsymmetricMotionProfile {
         return 0;
     }
     private double v(double t){
-        if(t <= t0) return t * acceleration;
-        if(t <= t1) return maxVelocity;
-        if(t <= t2) return maxVelocity - deceleration * (t - t1);
+        if(t <= t0) return t * acceleration + initialVelocity;
+        if(t <= t1) return maxVelocity + initialVelocity;
+        if(t <= t2) return maxVelocity + initialVelocity - deceleration * (t - t1);
         return 0;
     }
     private double p(double t){
-        if(t <= t0) return acceleration / 2 * t * t;
-        if(t <= t1) return acceleration / 2 * t0 * t0 + mvUsed * (t - t0);
-        if(t <= t2) return acceleration / 2 * t0 * t0 + mvUsed * (t - t0) - deceleration / 2 * (t - t1) * (t - t1);
+        if(t <= t0) return acceleration / 2 * t * t + t * initialVelocity;
+        if(t <= t1) return acceleration / 2 * t0 * t0 + mvUsed * (t - t0) + initialVelocity * t0;
+        if(t <= t2) return acceleration / 2 * t0 * t0 + mvUsed * (t - t0) - deceleration / 2 * (t - t1) * (t - t1) + initialVelocity * t0;
         return 0;
     }
     public void update(){
