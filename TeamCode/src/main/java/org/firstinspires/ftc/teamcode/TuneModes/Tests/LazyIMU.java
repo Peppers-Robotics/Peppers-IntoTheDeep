@@ -25,6 +25,8 @@ public class LazyIMU extends LinearOpMode {
 
         while (opModeIsActive()){
             telemetry.addData("heading", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+            telemetry.addData("pitch", imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES));
+            telemetry.addData("roll", imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES));
             telemetry.update();
         }
     }

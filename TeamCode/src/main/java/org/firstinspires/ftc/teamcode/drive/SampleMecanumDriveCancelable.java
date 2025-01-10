@@ -28,10 +28,6 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunnerCancelable;
@@ -103,10 +99,10 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
         // TODO: adjust the names of the following hardware devices to match your configuration
 
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "cM3");
+        leftFront = hardwareMap.get(DcMotorEx.class, "eM1");
         leftRear = hardwareMap.get(DcMotorEx.class, "cM2"); // 1
-        rightRear = hardwareMap.get(DcMotorEx.class, "eM2");
-        rightFront = hardwareMap.get(DcMotorEx.class, "eM1"); // 2
+        rightRear = hardwareMap.get(DcMotorEx.class, "eM0");
+        rightFront = hardwareMap.get(DcMotorEx.class, "cM1"); // 2
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -134,8 +130,8 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
         List<Integer> lastTrackingEncVels = new ArrayList<>();
 
         // TODO: if desired, use setLocalizer() to change the localization method
-        setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
-//        setLocalizer(new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinPoint")));
+//        setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+        setLocalizer(new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinpoint")));
         imu = hardwareMap.get(IMU.class, "imu");
         imu.resetYaw();
 

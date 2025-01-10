@@ -14,8 +14,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 @Config
 public class PinPointLocalizer implements Localizer {
     private Pose2d currentPose = new Pose2d(0, 0, 0);
-    public static double X = 20.472440945, Y = 11.811023622;
-    public static PinPoint.EncoderDirection xPod = PinPoint.EncoderDirection.FORWARD, yPod = PinPoint.EncoderDirection.FORWARD;
+    public static double X = 132.5, Y = -0.6;
+    public static PinPoint.EncoderDirection xPod = PinPoint.EncoderDirection.REVERSED, yPod = PinPoint.EncoderDirection.FORWARD;
     private PinPoint pinPoint;
     public PinPointLocalizer(PinPoint devie){
         pinPoint = devie;

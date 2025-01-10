@@ -54,7 +54,8 @@ public class MainOpModeBlue extends LinearOpMode {
 
         Initialization.Team = Initialization.AllianceColor.BLUE;
         Climb.PutDown();
-        Climb.disengagePTO();
+//        Climb.disengagePTO();
+        Climb.initDisengagePTO();
 
         DropDown.GoUp();
         while (opModeInInit()){
@@ -101,6 +102,8 @@ public class MainOpModeBlue extends LinearOpMode {
                 DropDown.GoUp();
                 isClimbing = true;
                 Controls.Climbing = false;
+                Climb.ChangeState(Climb.States.TILT_ROBOT);
+                Chassis.drive(0, 0 ,0);
             }
             if(isClimbing){
 //                Climb.Update();
@@ -111,9 +114,8 @@ public class MainOpModeBlue extends LinearOpMode {
 //                Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
 //                        gamepad1.left_trigger - gamepad1.right_trigger);
 //                IntakeController.Update();
-                Climb.ChangeState(Climb.States.TILT_ROBOT);
+                Extendo.motor.setPower(0.3);
                 Climb.UpdateAuto();
-                Initialization.telemetry.addLine("IS CLIMBING REEE");
                 Initialization.telemetry.update();
                 continue;
             }

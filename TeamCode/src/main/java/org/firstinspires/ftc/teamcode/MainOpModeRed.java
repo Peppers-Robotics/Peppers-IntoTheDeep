@@ -54,7 +54,8 @@ public class MainOpModeRed extends LinearOpMode {
 
         Initialization.Team = Initialization.AllianceColor.RED;
         Climb.PutDown();
-        Climb.disengagePTO();
+//        Climb.disengagePTO();
+        Climb.initDisengagePTO();
 
         DropDown.GoUp();
         while (opModeInInit()){
@@ -100,27 +101,26 @@ public class MainOpModeRed extends LinearOpMode {
                 ActiveIntake.powerOff();
                 DropDown.GoUp();
                 isClimbing = true;
-                Climb.engagePTO();
-                Climb.Raise();
                 Controls.Climbing = false;
-                Arm.setArmAngle(300);
+                Climb.ChangeState(Climb.States.TILT_ROBOT);
+                Chassis.drive(0, 0 ,0);
             }
             if(isClimbing){
-                if(Controls.gamepad2.wasPressed.square){
-                    Climb.PutDown();
-                }
-                Climb.Update();
-                Arm.update();
-                Controls.Update();
-                Chassis.rBL = 0;
-                Chassis.rBR = 0;
-                Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
-                        gamepad1.left_trigger - gamepad1.right_trigger);
-                IntakeController.Update();
+//                Climb.Update();
+//                Arm.update();
+//                Controls.Update();
+//                Chassis.rBL = 0;
+//                Chassis.rBR = 0;
+//                Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
+//                        gamepad1.left_trigger - gamepad1.right_trigger);
+//                IntakeController.Update();
+                Extendo.motor.setPower(0.3);
+                Climb.UpdateAuto();
+                Initialization.telemetry.update();
                 continue;
             }
             Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
-                        gamepad1.left_trigger - gamepad1.right_trigger);
+                    gamepad1.left_trigger - gamepad1.right_trigger);
 
             Controls.Update();
             OutTakeController.Update();

@@ -91,10 +91,10 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "cM3");
+        leftFront = hardwareMap.get(DcMotorEx.class, "eM1");
         leftRear = hardwareMap.get(DcMotorEx.class, "cM2");
-        rightRear = hardwareMap.get(DcMotorEx.class, "eM2");
-        rightFront = hardwareMap.get(DcMotorEx.class, "eM1");
+        rightRear = hardwareMap.get(DcMotorEx.class, "eM0");
+        rightFront = hardwareMap.get(DcMotorEx.class, "cM1");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -123,6 +123,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
          setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+         setLocalizer(new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinpoint")));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(
                 follower, HEADING_PID, batteryVoltageSensor,

@@ -15,7 +15,7 @@ public class OutTakeStateMachine {
     public static double IdleArmAngle_Sample = 180, IdlePivotAngle_Sample = 170;
     public static double ArmScoreSample = 230, PivotScoreSample = -20, ElevatorScoreSample;
     public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 175, ElevatorScoreSpecimen = 320, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
-    public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = -25, ElevatorTakeSpecimen = 85; // DONE
+    public static double ArmTakeSpecimen = 305, PivotTakeSpecimen = -30, ElevatorTakeSpecimen = 65; // DONE
     public static double ElevatorSpecimen1 = 490, ElevatorSpecimen2 = 320, ElevatorSample1 = 450, ElevatorSample2 = 1125;
     public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5, d2powerI = 3;
     public static double TransferArm = 60, TransferPivot = 0;
@@ -225,7 +225,10 @@ public class OutTakeStateMachine {
                 if(Claw.HasElementInIt() && !inAuto){
                     Claw.close();
                     if(TimeSinceStateStartedRunning.seconds() >= 0.2) CurrentAction = OutTakeActions.SCORE;
-                } else TimeSinceStateStartedRunning.reset();
+                } else {
+                    TimeSinceStateStartedRunning.reset();
+                    Claw.open();
+                }
                 switch (CurrentAction){
                     case RETRACT:
                         ChangeStateTo(OutTakeStates.RETRACT_ARM);
