@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 
 @Config
 public class DropDown {
-    public static ServoPlus DropDownLeft, DropDownRight;
+    public static ServoPlus DropDownLeft;
     public static AsymmetricMotionProfile profile = new AsymmetricMotionProfile(5000, 50000, 50000);
     public static double UpPosition = 275, MiddlePosition = 173, DownPosition = 130;
     public static double instantPosition = UpPosition, step = 15;
@@ -41,7 +41,6 @@ public class DropDown {
     }
     public synchronized static void Update(){
         DropDownLeft.setAngle(profile.getPosition());
-        DropDownRight.setAngle(profile.getPosition());
         profile.update();
     }
 }

@@ -54,12 +54,11 @@ public class Initialization {
     }
     public static void initializeExtendo(){
         try {
-            Extendo.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "cM1"));
+            Extendo.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "cM0"));
 
             Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            DropDown.DropDownRight = hardwareMap.get(ServoPlus.class, "eS2");
-            DropDown.DropDownLeft = hardwareMap.get(ServoPlus.class, "eS4");
+            DropDown.DropDownLeft = hardwareMap.get(ServoPlus.class, "eS0");
         } catch (Exception e){
             RobotLog.e("Extendo motor and servos not found");
         }
@@ -76,7 +75,7 @@ public class Initialization {
     }
     public static void initializeElevator(){
         try {
-            Elevator.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM0"));
+            Elevator.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM3"));
 //        Elevator.motor = new CachedMotor(eM, 0);
             Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } catch (Exception e){
@@ -85,8 +84,8 @@ public class Initialization {
     }
     public static void initializeOuttake(@NonNull HardwareMap hm){
         try {
-            Claw.clawServo = hm.get(ServoPlus.class, "cS2");
-            Arm.servo1 = hm.get(ServoPlus.class, "eS3");
+            Claw.clawServo = hm.get(ServoPlus.class, "cS5");
+            Arm.servo1 = hm.get(ServoPlus.class, "eS2");
             Arm.servo2 = hm.get(ServoPlus.class, "eS5");
             Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");
         } catch (Exception e){
@@ -95,10 +94,10 @@ public class Initialization {
     }
     public static void initializeIntake(){
         try {
-            ActiveIntake.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM3"));
+            ActiveIntake.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM2"));
 //        ActiveIntake.motor = new CachedMotor(eM, 3);
             ActiveIntake.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            ActiveIntake.Blocker = hardwareMap.get(ServoPlus.class, "cS0");
+            ActiveIntake.Blocker = hardwareMap.get(ServoPlus.class, "eS0");
         } catch (Exception e){
             RobotLog.e("Intake servos and motors not found");
         }
@@ -124,10 +123,9 @@ public class Initialization {
 //        Climb.W1 = new ServoPlus(eS, 1);
 //        Climb.W2 = new ServoPlus(eS, 0);
         try {
-            Climb.PTO = hardwareMap.get(ServoPlus.class, "cS4");
+            Climb.PTO = hardwareMap.get(ServoPlus.class, "eS3");
             Climb.W1 = hardwareMap.get(ServoPlus.class, "eS1");
-            Climb.W2 = hardwareMap.get(ServoPlus.class, "eS0");
-            Climb.PTO2 = hardwareMap.get(ServoPlus.class, "cS1");
+            Climb.W2 = hardwareMap.get(ServoPlus.class, "eS4");
         } catch (Exception e){
             RobotLog.e("Climb servos not found");
         }
@@ -167,10 +165,10 @@ public class Initialization {
     }
     public static void initializeChassis(){
         try {
+            Chassis.FR = new CachedMotor(hardwareMap.get(DcMotor.class, "cM1"));
+            Chassis.FL = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
+            Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM0"));
             Chassis.BL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM2"));
-            Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM2"));
-            Chassis.FL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM3"));
-            Chassis.FR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
             Chassis.localizer = new StandardTrackingWheelLocalizer(hardwareMap, new ArrayList<>(), new ArrayList<>());
             Chassis.imu = hardwareMap.get(IMU.class, "imu");
 

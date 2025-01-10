@@ -50,13 +50,13 @@ public class IntakeController extends GenericController {
                 if(!DropDown.isUp()) break;
 
                 if(!wasReseted) {
-                    Extendo.motor.setPower(0.5);
+                    Extendo.motor.setPower(-0.5);
                     if(TimeSinceStateStartedRunning.seconds() < 0.2) break;
                     Extendo.motor.setPower(0);
                     if(TimeSinceStateStartedRunning.seconds() < 0.1 + 0.2) break;
                     Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    Extendo.motor.setPower(1);
+                    Extendo.motor.setPower(-1);
                     wasReseted = true;
                 }
                 if(Arm.getCurrentArmAngle() == OutTakeStateMachine.IdleArmAngle) {
@@ -107,8 +107,8 @@ public class IntakeController extends GenericController {
                 if(DropDown.isUp() && Storage.hasAlliancePice()){
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
                 }
-                Extendo.motor.setPower(1);
-                if(Extendo.motor.getCurrentPosition() > -20 && optimization) {
+                Extendo.motor.setPower(-1);
+                if(-Extendo.motor.getCurrentPosition() > -20 && optimization) {
                     Extendo.motor.setMotorDisable();
                 }
                 else {
@@ -116,7 +116,7 @@ public class IntakeController extends GenericController {
                 }
                 if(Math.abs(gamepad1.right_stick_y) >= 0.01){
                     Extendo.motor.setMotorEnable();
-                    Extendo.motor.setPower(gamepad1.right_stick_y * (Controls.SlowDown ? 0.8 : 1));
+                    Extendo.motor.setPower(-gamepad1.right_stick_y * (Controls.SlowDown ? 0.8 : 1));
                     ChangeState(IntakeStates.IDLE_EXTENDED);
                     wasReseted = false;
                 }
@@ -150,9 +150,9 @@ public class IntakeController extends GenericController {
                     }
                 }
                 if(!Extendo.pidEnable) {
-                    Extendo.motor.setPower(gamepad1.right_stick_y);
+                    Extendo.motor.setPower(-gamepad1.right_stick_y);
                 }
-                if(Extendo.motor.getCurrentPosition() > -10 && gamepad1.right_stick_y > 0) {
+                if(-Extendo.motor.getCurrentPosition() > -10 && gamepad1.right_stick_y > 0) {
                     ChangeState(IntakeStates.RETRACT_EXTENDO);
                     wasReseted = false;
                 }

@@ -100,23 +100,21 @@ public class MainOpModeBlue extends LinearOpMode {
                 ActiveIntake.powerOff();
                 DropDown.GoUp();
                 isClimbing = true;
-                Climb.engagePTO();
-                Climb.Raise();
                 Controls.Climbing = false;
-                Arm.setArmAngle(300);
             }
             if(isClimbing){
-                if(Controls.gamepad2.wasPressed.square){
-                    Climb.PutDown();
-                }
-                Climb.Update();
-                Arm.update();
-                Controls.Update();
-                Chassis.rBL = 0;
-                Chassis.rBR = 0;
-                Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
-                        gamepad1.left_trigger - gamepad1.right_trigger);
-                IntakeController.Update();
+//                Climb.Update();
+//                Arm.update();
+//                Controls.Update();
+//                Chassis.rBL = 0;
+//                Chassis.rBR = 0;
+//                Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
+//                        gamepad1.left_trigger - gamepad1.right_trigger);
+//                IntakeController.Update();
+                Climb.ChangeState(Climb.States.TILT_ROBOT);
+                Climb.UpdateAuto();
+                Initialization.telemetry.addLine("IS CLIMBING REEE");
+                Initialization.telemetry.update();
                 continue;
             }
             Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
