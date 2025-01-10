@@ -57,10 +57,10 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDriveCancelable extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2.5,1.5, 1);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(3, 0.2, 0.4);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2.5,1.5, -0.3);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(3, 0.2, 0.5);
 
-    public static double LATERAL_MULTIPLIER = 2.45;
+    public static double LATERAL_MULTIPLIER = 1.5;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -99,10 +99,10 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
         // TODO: adjust the names of the following hardware devices to match your configuration
 
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "eM1");
-        leftRear = hardwareMap.get(DcMotorEx.class, "cM2"); // 1
-        rightRear = hardwareMap.get(DcMotorEx.class, "eM0");
-        rightFront = hardwareMap.get(DcMotorEx.class, "cM1"); // 2
+        rightRear = hardwareMap.get(DcMotorEx.class, "eM1");
+        rightFront = hardwareMap.get(DcMotorEx.class, "cM2"); // 1
+        leftFront = hardwareMap.get(DcMotorEx.class, "eM0");
+        leftRear = hardwareMap.get(DcMotorEx.class, "cM1"); // 2
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -123,8 +123,10 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+//        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+//        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         List<Integer> lastTrackingEncPositions = new ArrayList<>();
         List<Integer> lastTrackingEncVels = new ArrayList<>();

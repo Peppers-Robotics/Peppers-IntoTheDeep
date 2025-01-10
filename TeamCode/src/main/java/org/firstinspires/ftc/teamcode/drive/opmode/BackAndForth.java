@@ -36,11 +36,13 @@ public class BackAndForth extends LinearOpMode {
         SampleMecanumDriveCancelable drive = new SampleMecanumDriveCancelable(hardwareMap);
 
         Trajectory trajectoryForward = drive.trajectoryBuilder(new Pose2d())
-                .forward(DISTANCE)
+                .lineToLinearHeading(new Pose2d(DISTANCE, 0, Math.PI / 2))
+//                .forward(DISTANCE)
                 .build();
 
         Trajectory trajectoryBackward = drive.trajectoryBuilder(trajectoryForward.end())
-                .back(DISTANCE)
+                .lineToLinearHeading(new Pose2d())
+//                .back(DISTANCE)
                 .build();
 
         waitForStart();
