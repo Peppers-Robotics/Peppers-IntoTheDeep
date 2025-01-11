@@ -22,7 +22,7 @@ public class Extendo {
     }
 
     public static double getCurrentPosition(){
-        return -motor.getCurrentPosition();
+        return motor.getCurrentPosition();
     }
 
     public synchronized static void Extend(int position, double afterMs){
@@ -34,7 +34,7 @@ public class Extendo {
     }
     public synchronized static void Extend(int position){
         pidEnable = true;
-        position *= -1;
+        position *= 1;
         if(position == targetPosition) return;
 
         targetPosition = position;

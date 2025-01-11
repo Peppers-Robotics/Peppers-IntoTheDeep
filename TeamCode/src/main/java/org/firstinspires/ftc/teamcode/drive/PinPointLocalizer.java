@@ -51,7 +51,7 @@ public class PinPointLocalizer implements Localizer {
     @Nullable
     @Override
     public Pose2d getPoseVelocity() {
-//        return new Pose2d(pinPoint.getVelX(), pinPoint.getVelY(), pinPoint.getHeadingVelocity());
+//        return new Pose2d(pinPoint.getVelX(), -pinPoint.getVelY(), pinPoint.getHeadingVelocity());
         return velo;
     }
     private ElapsedTime time = new ElapsedTime();

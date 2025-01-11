@@ -47,7 +47,7 @@ public class SampleAlone extends LinearOpMode {
     public static Pose2d putSpecimen = new Pose2d(-36.5, 11, 0),
             takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -33, Math.toRadians(355)),
             takeSample2 = new Pose2d(-15, -40.5, Math.toRadians(5)),
-            takeSample3 = new Pose2d(-12, -43, Math.toRadians(30)),
+            takeSample3 = new Pose2d(-14, -43, Math.toRadians(20)),
             basketPosition = new Pose2d(-5.5, -42 ,Math.toRadians(315)),
             Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
             Climb2 = new Pose2d(-56, -2.5, Math.toRadians(272));
