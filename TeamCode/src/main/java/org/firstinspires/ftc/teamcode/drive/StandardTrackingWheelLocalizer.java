@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
+import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.util.Encoder;
@@ -26,39 +27,37 @@ import java.util.List;
  *
  */
 @Config
-public class StandardTrackingWheelLocalizer extends CustomThreeWheelTracking {
+public class StandardTrackingWheelLocalizer extends TwoTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 2000;
     public static double WHEEL_RADIUS = 0.6229; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 10.4; // in; distance between the left and right wheels
-    public static double FORWARD_OFFSET = 3; // in; offset of the lateral wheel
+    public static double LATERAL_DISTANCE = PinPointLocalizer.X; // in; distance between the left and right wheels
+    public static double FORWARD_OFFSET = PinPointLocalizer.Y; // in; offset of the lateral wheel
 
     public static double X_MULTIPLIER = 1.006993007; // Multiplier in the X direction
     public static double Y_MULTIPLIER = 1.0060488688; // Multiplier in the Y direction
 
-    private Encoder leftEncoder, rightEncoder, frontEncoder;
+    private PinPointLocalizer pinpointL;
 
     private List<Integer> lastEncPositions, lastEncVels;
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(
-                new Pose2d(0, LATERAL_DISTANCE / 2, 0), // left
-                new Pose2d(0, -LATERAL_DISTANCE / 2, 0), // right
+                new Pose2d(0, LATERAL_DISTANCE, 0), // left
                 new Pose2d(FORWARD_OFFSET, 0, Math.toRadians(90)) // front
         ));
 
         lastEncPositions = lastTrackingEncPositions;
         lastEncVels = lastTrackingEncVels;
+        pinpointL = new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinpoint"));
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "eM3"));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "cM3"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "cM0"));
+//        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "eM3"));
+//        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "cM0"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
 //        leftEncoder.setDirection(Encoder.Direction.REVERSE);
 //        rightEncoder.setDirection(Encoder.Direction.REVERSE);
-        frontEncoder.setDirection(Encoder.Direction.REVERSE);
 
     }
 
@@ -69,18 +68,15 @@ public class StandardTrackingWheelLocalizer extends CustomThreeWheelTracking {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
-        int leftPos = leftEncoder.getCurrentPosition();
-        int rightPos = rightEncoder.getCurrentPosition();
-        int frontPos = frontEncoder.getCurrentPosition();
+        int leftPos = -pinpointL.pinPoint.getEncoderX();
+        int frontPos = pinpointL.pinPoint.getEncoderY();
 
         lastEncPositions.clear();
         lastEncPositions.add(leftPos);
-        lastEncPositions.add(rightPos);
         lastEncPositions.add(frontPos);
 
         return Arrays.asList(
                 encoderTicksToInches(leftPos) * X_MULTIPLIER,
-                encoderTicksToInches(rightPos) * X_MULTIPLIER,
                 encoderTicksToInches(frontPos) * Y_MULTIPLIER
         );
     }
@@ -88,19 +84,23 @@ public class StandardTrackingWheelLocalizer extends CustomThreeWheelTracking {
     @NonNull
     @Override
     public List<Double> getWheelVelocities() {
-        int leftVel = (int) leftEncoder.getCorrectedVelocity();
-        int rightVel = (int) rightEncoder.getCorrectedVelocity();
-        int frontVel = (int) frontEncoder.getCorrectedVelocity();
+        double leftVel = pinpointL.pinPoint.getVelX();
+        double frontVel = pinpointL.pinPoint.getVelY();
 
         lastEncVels.clear();
-        lastEncVels.add(leftVel);
-        lastEncVels.add(rightVel);
-        lastEncVels.add(frontVel);
+        lastEncVels.add((int)(leftVel * TICKS_PER_REV / (WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO)));
+        lastEncVels.add((int)(frontVel * TICKS_PER_REV / (WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO)));
 
         return Arrays.asList(
-                encoderTicksToInches(leftVel),
-                encoderTicksToInches(rightVel),
-                encoderTicksToInches(frontVel)
+                leftVel,
+                frontVel
+//                encoderTicksToInches(leftVel),
+//                encoderTicksToInches(frontVel)
         );
+    }
+
+    @Override
+    public double getHeading() {
+        return pinpointL.getPoseEstimate().getHeading();
     }
 }

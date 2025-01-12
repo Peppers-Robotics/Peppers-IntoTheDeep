@@ -18,7 +18,7 @@ public class Elevator {
     public static boolean Disable = false;
     public static CachedMotor motor;
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
-    public static PIDCoefficients climb = new PIDCoefficients(0.02, 0, 0);
+    public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
     public static PIDCoefficients normal = new PIDCoefficients(0.013, 0.00005, -0.0003);
     public static double kf = 0.05, kff = 1;
     public static double aggresiveP = 0.01, aggressiveI = 0.0002, aggressiveD = 0.0003;
@@ -103,6 +103,7 @@ public class Elevator {
         } else {
             if(PowerOnDownToTakeSample){
                 motor.setPower(-1);
+                motor.setMotorEnable();
             } else {
                 if(controller.getTargetPosition() != OutTakeStateMachine.ElevatorTakeSpecimen) {
                     controller.setPidCoefficients(normal);
@@ -114,8 +115,7 @@ public class Elevator {
                             controller.calculatePower(motor.getCurrentPosition(), motor.getVelocity())
                             + kf
                     );
-					motor.setPower(motor.getPower() * 12 / Initialization.Voltage);
-                } else motor.setPower(0);
+                }
             }
         }
         Initialization.telemetry.addData("Elevator pose from profile", motionProfile.getPosition());

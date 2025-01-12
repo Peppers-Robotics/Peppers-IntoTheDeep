@@ -45,13 +45,13 @@ public class CyliisSample extends LinearOpMode {
     public static double SlowExtendoPower = -0.4, dropDownPos = 0.7;
 
     public static Pose2d putSpecimen = new Pose2d(-36.5, 11, 0),
-            takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -33, Math.toRadians(2)),
-            takeSample2 = new Pose2d(-15, -41, Math.toRadians(5)),
-            takeSample3 = new Pose2d(-12, -43, Math.toRadians(30)),
+            takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -30, Math.toRadians(0)),
+            takeSample2 = new Pose2d(-15, -39, Math.toRadians(5)),
+            takeSample3 = new Pose2d(-13, -41, Math.toRadians(20)),
             basketPosition = new Pose2d(-5.5, -42 ,Math.toRadians(315)),
             basketPreload = new Pose2d(-6.5, -43, Math.toRadians(315)),
             Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
-            Climb2 = new Pose2d(-56, -2.5, Math.toRadians(272));
+            Climb2 = new Pose2d(-56, -1.5, Math.toRadians(272));
     public static int samplesScored = 0;
     public static ElapsedTime time = new ElapsedTime();
     public static boolean failSafe = false;
@@ -78,7 +78,7 @@ public class CyliisSample extends LinearOpMode {
         IntakeController.autoIntake = true;
 
         Initialization.Team = Initialization.AllianceColor.RED;
-        drive.setPoseEstimate(new Pose2d(0, -24, 0));
+//        drive.setPoseEstimate(new Pose2d(0, -24, 0));
 
         TrajectorySequence putSpecimenT = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {

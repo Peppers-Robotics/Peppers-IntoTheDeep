@@ -11,12 +11,12 @@ import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 
 @Config
 public class OutTakeStateMachine {
-    public static double IdleArmAngle = -20, IdlePivotAngle = 170, IdleElevatorLevel = -100, SafeElevatorLevel = 200;
+    public static double IdleArmAngle = -15, IdlePivotAngle = 170, IdleElevatorLevel = -100, SafeElevatorLevel = 200;
     public static double IdleArmAngle_Sample = 180, IdlePivotAngle_Sample = 170;
     public static double ArmScoreSample = 230, PivotScoreSample = -20, ElevatorScoreSample;
-    public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 175, ElevatorScoreSpecimen = 290, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
-    public static double ArmTakeSpecimen = 300, PivotTakeSpecimen = -32, ElevatorTakeSpecimen = 65; // DONE
-    public static double ElevatorSpecimen1 = 490, ElevatorSpecimen2 = 290, ElevatorSample1 = 450, ElevatorSample2 = 1125;
+    public static double ArmScoreSpecimen = 100, PivotScoreSpecimen = 160, ElevatorScoreSpecimen = 325, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
+    public static double ArmTakeSpecimen = 315, PivotTakeSpecimen = -32, ElevatorTakeSpecimen = 120; // DONE
+    public static double ElevatorSpecimen1 = 490, ElevatorSpecimen2 = 325, ElevatorSample1 = 450, ElevatorSample2 = 1125;
     public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5, d2powerI = 3;
     public static double TransferArm = 60, TransferPivot = 0;
     public static boolean reatched = false;
@@ -157,10 +157,12 @@ public class OutTakeStateMachine {
                 }
                 break;
             case ARM_TO_SAMPLE_SCORE:
-                Arm.setPivotAngle(PivotScoreSample);
+                Arm.setArmAngle(IdleArmAngle_Sample);
                 switch (CurrentAction){
                     case NEXT:
-                        if(Arm.getPrecentOfArmMotionCompleted() < 90) break;
+                        if(Arm.getCurrentArmAngle() > 100) break;
+                        Arm.setPivotAngle(PivotScoreSample);
+                        Arm.setArmAngle(ArmScoreSample);
                         ChangeStateTo(OutTakeStates.IDLE_WHILE_SAMPLE_SCORE);
                         break;
                     case RETRACT:

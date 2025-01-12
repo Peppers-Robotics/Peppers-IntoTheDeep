@@ -114,7 +114,6 @@ public class MainOpModeRed extends LinearOpMode {
 //                Chassis.drive(gamepad1.left_stick_x, -gamepad1.left_stick_y,
 //                        gamepad1.left_trigger - gamepad1.right_trigger);
 //                IntakeController.Update();
-                Extendo.motor.setPower(0.3);
                 Climb.UpdateAuto();
                 Initialization.telemetry.update();
                 continue;

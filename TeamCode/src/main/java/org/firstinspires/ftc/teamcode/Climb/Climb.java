@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Climb;
 
+import android.text.format.Time;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -16,7 +18,6 @@ import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
 
 import java.security.interfaces.ECKey;
-import java.sql.Time;
 
 @Config
 public class Climb {
@@ -83,6 +84,7 @@ public class Climb {
     }
 
     public static void UpdateAuto(){
+        Extendo.motor.setPower(-0.4);
         switch (State){
             case TILT_ROBOT:
                 Raise();
@@ -97,7 +99,7 @@ public class Climb {
                 if(TimeSinceLastStateChange.seconds() < 0.5 + 0.2) break;
                 engagePTO();
                 Elevator.setTargetPosition(-50);
-                if(Elevator.getCurrentPosition() < 0){
+                if(Elevator.getCurrentPosition() < 3 || TimeSinceLastStateChange.seconds() > 0.5 + 0.2 + 3){
                     Elevator.setTargetPosition(0);
                     PutDown();
                     Arm.setArmAngle(OutTakeStateMachine.IdleArmAngle);
@@ -119,7 +121,7 @@ public class Climb {
                 Elevator.setTargetPosition(BAR2 - 100);
                 if(Initialization.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES) > -84) Elevator.Disable = true;
                 else Elevator.Disable = false;
-                if(TimeSinceLastStateChange.seconds() < 1 && Elevator.getCurrentPosition() > BAR2 - 80) break;
+                if(TimeSinceLastStateChange.seconds() < 1 && Elevator.getCurrentPosition() > BAR2 - 40) break;
                 ChangeState(States.IDLE_WHILE_UP);
                 break;
             case IDLE_WHILE_UP:

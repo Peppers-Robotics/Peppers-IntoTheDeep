@@ -91,7 +91,7 @@ public class Initialization {
     }
     public static void initializeOuttake(@NonNull HardwareMap hm){
         try {
-            Claw.clawServo = hm.get(ServoPlus.class, "cS5");
+            Claw.clawServo = hm.get(ServoPlus.class, "cS1");
             Arm.servo1 = hm.get(ServoPlus.class, "eS2");
             Arm.servo2 = hm.get(ServoPlus.class, "eS5");
             Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");

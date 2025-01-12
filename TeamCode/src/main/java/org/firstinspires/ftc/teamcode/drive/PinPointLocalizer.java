@@ -16,9 +16,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 public class PinPointLocalizer implements Localizer {
     private Pose2d currentPose = new Pose2d(0, 0, 0);
     public static double X = 132.5, Y = -0.6;
+    private static Pose2d off = new Pose2d(0, 0, 0);
     private Pose2d lastPos = new Pose2d(), velo = new Pose2d();
     public static PinPoint.EncoderDirection xPod = PinPoint.EncoderDirection.REVERSED, yPod = PinPoint.EncoderDirection.FORWARD;
-    private PinPoint pinPoint;
+    public PinPoint pinPoint;
     public static boolean reset = false;
     public PinPointLocalizer(PinPoint devie){
         pinPoint = devie;
@@ -37,7 +38,7 @@ public class PinPointLocalizer implements Localizer {
         double h = pinPoint.getHeading();
         while(h > Math.PI * 2) h -= Math.PI * 2;
         while(h < 0) h += Math.PI * 2;
-        return new Pose2d(pinPoint.getPosX(), pinPoint.getPosY(), pinPoint.getHeading());
+        return new Pose2d(pinPoint.getPosX() + off.getX(), pinPoint.getPosY() + off.getY(), pinPoint.getHeading() + off.getHeading());
     }
 
     @Override
@@ -45,12 +46,13 @@ public class PinPointLocalizer implements Localizer {
         double h = pose2d.getHeading();
         while(h < -Math.PI) h += 2 * Math.PI;
         while(h > Math.PI) h -= 2 * Math.PI;
-        pinPoint.setPosition(new Pose2D(DistanceUnit.INCH, pose2d.getX(), pose2d.getY(), AngleUnit.RADIANS, pose2d.getHeading()));
+        off = pose2d;
     }
 
     @Nullable
     @Override
     public Pose2d getPoseVelocity() {
+
 //        return new Pose2d(pinPoint.getVelX(), -pinPoint.getVelY(), pinPoint.getHeadingVelocity());
         return velo;
     }
