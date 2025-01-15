@@ -60,7 +60,7 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2.5,1.5, -0.3);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(3, 0.2, 0.5);
 
-    public static double LATERAL_MULTIPLIER = 1.5;
+    public static double LATERAL_MULTIPLIER = 2.3;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -71,7 +71,7 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
 
-    private TrajectoryFollower follower;
+    public TrajectoryFollower follower;
 
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
@@ -86,15 +86,11 @@ public class SampleMecanumDriveCancelable extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.1, 0.1, Math.toRadians(1.0)), 0.5);
+                new Pose2d(0.1, 0.1, Math.toRadians(4.0)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
-
-        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
 

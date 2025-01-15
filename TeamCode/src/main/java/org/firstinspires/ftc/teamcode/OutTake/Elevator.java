@@ -19,9 +19,9 @@ public class Elevator {
     public static CachedMotor motor;
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
-    public static PIDCoefficients normal = new PIDCoefficients(0.013, 0.00005, -0.0003);
-    public static double kf = 0.05, kff = 1;
-    public static double aggresiveP = 0.01, aggressiveI = 0.0002, aggressiveD = 0.0003;
+    public static PIDCoefficients normal = new PIDCoefficients(0.1, 1, -0.008);
+    public static double kf = 1.2, kff = 1;
+//    public static double aggresiveP = 0.01, aggressiveI = 0.0002, aggressiveD = 0.0003;
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(6000, 7000, 7000);
 
     static {
@@ -31,6 +31,7 @@ public class Elevator {
 
     private static double targetPos = 0;
     public static boolean PowerOnDownToTakeSample = false;
+    public static double power = 1;
 
     synchronized public static void setTargetPosition(double pos){
         pos *= 1;
@@ -66,10 +67,10 @@ public class Elevator {
         }
 
         if(RESET){
-            if(motor.getCurrent(CurrentUnit.AMPS) > 5.5 || was){
+            if(motor.getCurrent(CurrentUnit.AMPS) > 6.5 || was){
                 was = true;
                 motor.setPower(0);
-                if(time.seconds() > 0.2){
+                if(time.seconds() > 0.5){
                     motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     RESET = false;
@@ -89,6 +90,7 @@ public class Elevator {
         }
 
         motionProfile.update();
+//        controller.setTargetPosition(motionProfile.getPosition());
         controller.setTargetPosition(targetPos);
         if(Climb.isPTOEngaged()){
             motor.setMotorDisable();
@@ -102,19 +104,22 @@ public class Elevator {
 
         } else {
             if(PowerOnDownToTakeSample){
-                motor.setPower(-1);
+                motor.setPower(-power);
                 motor.setMotorEnable();
             } else {
-                if(controller.getTargetPosition() != OutTakeStateMachine.ElevatorTakeSpecimen) {
-                    controller.setPidCoefficients(normal);
-                } else {
-                    controller.setPidCoefficients(new PIDCoefficients(aggresiveP, aggressiveI, aggressiveD));
-                }
+                controller.setPidCoefficients(normal);
+//                if(controller.getTargetPosition() != OutTakeStateMachine.ElevatorTakeSpecimen) {
+//                } else {
+//                    controller.setPidCoefficients(new PIDCoefficients(aggresiveP, aggressiveI, aggressiveD));
+//                }
                 if (motor.isMotorEnabled()) {
-                    motor.setPower(
-                            controller.calculatePower(motor.getCurrentPosition(), motor.getVelocity())
-                            + kf
-                    );
+                    double volts = controller.calculatePower(motor.getCurrentPosition(), motor.getVelocity()) + kf;
+                    volts /= Initialization.Voltage;
+                    motor.setPower(volts);
+//                    motor.setPower(
+//                            controller.calculatePower(motor.getCurrentPosition(), motor.getVelocity())
+//                            + kf
+//                    );
                 }
             }
         }

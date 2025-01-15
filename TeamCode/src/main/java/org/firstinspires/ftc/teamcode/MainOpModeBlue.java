@@ -19,6 +19,8 @@ import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
+import org.firstinspires.ftc.teamcode.drive.PinPoint;
+import org.firstinspires.ftc.teamcode.drive.PinPointLocalizer;
 
 @TeleOp(name = ".pipersBLUE \uD83C\uDF36", group = ".mainOp")
 public class MainOpModeBlue extends LinearOpMode {
@@ -31,8 +33,8 @@ public class MainOpModeBlue extends LinearOpMode {
         Initialization.telemetry = telemetry;
         Initialization.initializeRobot(hardwareMap);
         Controls.Initialize(gamepad1, gamepad2);
-        ActiveIntake.UnblockIntake();
         OutTakeStateMachine.autoTakingSamples = false;
+        Initialization.localizer = new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinpoint"));
 
         IntakeController.Initialize(gamepad1, gamepad2);
 
@@ -75,6 +77,7 @@ public class MainOpModeBlue extends LinearOpMode {
         while (opModeIsActive()){
 
             Initialization.updateCacheing();
+            Initialization.localizer.update();
 
             if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE){
                 switch (Storage.getStorageStatus()) {
@@ -134,6 +137,7 @@ public class MainOpModeBlue extends LinearOpMode {
             telemetry.addData("storage state", Storage.getStorageStatus().toString());
             telemetry.addData("Outtake state", OutTakeStateMachine.CurrentState.toString());
             telemetry.addData("intake state", IntakeController.CurrentState.toString());
+            telemetry.addData("Position", Initialization.localizer.getPoseEstimate());
             time.reset();
             telemetry.update();
         }

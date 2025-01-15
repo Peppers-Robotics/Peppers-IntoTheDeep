@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Tasks;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Chassis;
 import org.firstinspires.ftc.teamcode.HelperClasses.Pose2D;
 
 import java.util.LinkedList;
@@ -28,6 +29,15 @@ public class Scheduler {
 
     public Scheduler addTask(Task t){
         tasks.add(t);
+        return this;
+    }
+    public Scheduler waitForStill(){
+        tasks.addLast(new Task() {
+            @Override
+            public boolean Run() {
+                return Chassis.DistanceToTarget() < 0.5;
+            }
+        });
         return this;
     }
     public boolean done(){

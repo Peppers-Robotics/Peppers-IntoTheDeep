@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Initialization;
+import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeController;
@@ -22,11 +23,12 @@ import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Config
-@Autonomous
+@Autonomous(name = "1 + 3 (sample)")
 public class SampleAlone extends LinearOpMode {
 
     public enum States{
@@ -44,11 +46,11 @@ public class SampleAlone extends LinearOpMode {
     public static int takeSample1Extend = 690, takeSample2Extend = 700, takeSample3Extend = 710;
     public static double SlowExtendoPower = -0.4, dropDownPos = 0.7;
 
-    public static Pose2d putSpecimen = new Pose2d(-36.5, 11, 0),
+    public static Pose2d putSpecimen = new Pose2d(-36, 11, 0),
             takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -33, Math.toRadians(355)),
             takeSample2 = new Pose2d(-15, -40.5, Math.toRadians(5)),
             takeSample3 = new Pose2d(-14, -43, Math.toRadians(20)),
-            basketPosition = new Pose2d(-5.5, -42 ,Math.toRadians(315)),
+            basketPosition = new Pose2d(-3, -42 ,Math.toRadians(315)),
             Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
             Climb2 = new Pose2d(-56, -2.5, Math.toRadians(272));
     public static int samplesScored = 0;
@@ -91,8 +93,12 @@ public class SampleAlone extends LinearOpMode {
         TrajectorySequence goToSample1 = drive.trajectorySequenceBuilder(putSpecimenT.end())
 //                .lineToSplineHeading(takeSample1)
 //                .lineToLinearHeading(preTakeSample1)
-                .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(20))
+                .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(60))
+                .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(30, Math.PI * 2, DriveConstants.TRACK_WIDTH))
                 .splineToConstantHeading(new Vector2d(preTakeSample1.getX(), preTakeSample1.getY()), Math.toRadians(-110))
+                .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
+                    IntakeController.gamepad2.right_trigger = (float) dropDownPos;
+                })
                 .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
                     Extendo.Extend(takeSample1Extend - 20);
                 })
@@ -120,7 +126,9 @@ public class SampleAlone extends LinearOpMode {
 
             switch (CurrentState) {
                 case PLACE_SPECIMEN:
-                    if (!drive.isBusy()) {
+                    if (drive.getPoseEstimate().getX() < -30) {
+                        drive.breakFollowing();
+                        OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
                         CurrentState.trajRan = false;
                         CurrentState = States.GOTO_SAMPLE1;
                     }
@@ -129,7 +137,7 @@ public class SampleAlone extends LinearOpMode {
                     if (!CurrentState.trajRan) {
                         CurrentState.trajRan = true;
                         drive.followTrajectorySequenceAsync(goToSample1);
-                        IntakeController.gamepad2.right_trigger = (float) dropDownPos;
+//                        IntakeController.gamepad2.right_trigger = (float) dropDownPos;
                     }
                     if (!drive.isBusy()) {
 //                        Extendo.Extend(takeSample1Extend, 20);
@@ -193,7 +201,7 @@ public class SampleAlone extends LinearOpMode {
                     if (!CurrentState.trajRan) {
                         if(samplesScored == 0){
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToLinearHeading(new Pose2d(basketPosition.getX() - 1, basketPosition.getY(), basketPosition.getHeading()))
+                                    .lineToLinearHeading(new Pose2d(basketPosition.getX(), basketPosition.getY(), basketPosition.getHeading()))
                                     .build()
                             );
                         } else {
@@ -221,10 +229,10 @@ public class SampleAlone extends LinearOpMode {
                         OutTakeStateMachine.ElevatorScoreSample = OutTakeStateMachine.ElevatorSample2;
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SAMPLE);
                     }
-                    if(!drive.isBusy() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SAMPLE_SCORE){
+                    if(!drive.isBusy() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SAMPLE_SCORE && Elevator.getCurrentPosition() > Elevator.getTargetPosition() - 50){
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
-                    }
-                    if (OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ELEVATOR) {
+//                    }
+//                    if (OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ARM) {
                         switch (samplesScored) {
                             case 0:
                                 samplesScored++;
@@ -266,7 +274,6 @@ public class SampleAlone extends LinearOpMode {
             Arm.update();
             IntakeController.Update(true);
             OutTakeController.Update();
-            if(IntakeController.gamepad2.right_trigger <= 0.01) DropDown.setInstantPosition(0);
             DropDown.Update();
             Initialization.telemetry.addData("AUTO state", CurrentState.toString());
             Initialization.telemetry.addData("Extendo to targetpos", Extendo.ReachedTargetPosition(10));

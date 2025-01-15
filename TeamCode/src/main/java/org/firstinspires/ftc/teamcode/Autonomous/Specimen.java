@@ -1,32 +1,29 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Pose2D;
-import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.TunablePose2d;
 import org.firstinspires.ftc.teamcode.Initialization;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeController;
+import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeController;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeStateMachine;
-import org.firstinspires.ftc.teamcode.Tasks.GoToPoint;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Autonomous
 @Config
 @Disabled
-public class RedSpecimen extends LinearOpMode {
+public class Specimen extends LinearOpMode {
     public static int Extendo1 = 0, Extendo2 = 10, Extendo3 = 20,
                          ExtendoRev1 = 10, ExtendoRev2 = 20, ExtendoRev3 = 10;
     public static double dropDown = 0.6;
@@ -67,7 +64,6 @@ public class RedSpecimen extends LinearOpMode {
                     }
                 })
                 .goTo(scoreSpecimen)
-                .waitSeconds(0.1)
                 .addTask(new Task() { // score specimen 1
                     @Override
                     public boolean Run() {
@@ -80,21 +76,19 @@ public class RedSpecimen extends LinearOpMode {
                 .addTask(new Task() { // take sample
                     @Override
                     public boolean Run() {
-                        Extendo.Extend(Extendo1, 0.3);
+                        Extendo.Extend(Extendo1, 30);
                         DropDown.setInstantPosition(dropDown);
-                        ActiveIntake.BlockIntake();
                         ActiveIntake.powerOn();
                         return true;
                     }
                 })
-                .goTo(sample1)
-                .addTask(new Task() { // wait for extendo to reach targetposition
+                .goToWithoutBlock(sample1)
+                .addTask(new Task() { // wait for sample
                     @Override
                     public boolean Run() {
-                        return Extendo.ReachedTargetPosition();
+                        return !Storage.isStorageEmpty();
                     }
                 })
-                .waitSeconds(0.2)
                 .addTask(new Task() { // prepare reverse
                     @Override
                     public boolean Run() {
@@ -114,6 +108,30 @@ public class RedSpecimen extends LinearOpMode {
                 })
                 .waitSeconds(0.2)
 
+                .goTo(sample2)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Extendo.Extend(Extendo2);
+                        ActiveIntake.powerOn();
+                        DropDown.setInstantPosition(dropDown);
+                        return !Storage.isStorageEmpty();
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        return false;
+                    }
+                })
+                .goTo(human2)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        return true;
+                    }
+                })
+
         ;
 
 
@@ -129,6 +147,7 @@ public class RedSpecimen extends LinearOpMode {
         while (isStarted()){
 
 
+            OutTakeStateMachine.Update(null);
             Elevator.update();
             Arm.update();
             Claw.close();

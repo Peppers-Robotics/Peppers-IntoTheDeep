@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.DevicePropertie
 import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.CutOffResolution;
+import org.firstinspires.ftc.teamcode.Initialization;
 
 
 @ServoType(flavor = ServoFlavor.CUSTOM)
@@ -35,6 +36,7 @@ public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
     }
     private double thisAngle = 0;
     synchronized public void setAngle(double angle){
+//        if(!Initialization.hubs.get(0).isEngaged()) return;
         thisAngle = angle;
         double toSetPos = CutOffResolution.GetResolution(angle / MaxAngle, 2);
         setPosition(toSetPos);

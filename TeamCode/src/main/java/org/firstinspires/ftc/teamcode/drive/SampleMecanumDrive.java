@@ -123,7 +123,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         List<Integer> lastTrackingEncVels = new ArrayList<>();
 
         // TODO: if desired, use setLocalizer() to change the localization method
-         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+//         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
          setLocalizer(new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinpoint")));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(

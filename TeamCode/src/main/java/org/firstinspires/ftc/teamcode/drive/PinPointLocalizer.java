@@ -32,13 +32,18 @@ public class PinPointLocalizer implements Localizer {
         pinPoint.setEncoderDirections(xPod, yPod);
         pinPoint.setOffsets(X, Y);
     }
+
+    public void reset(){
+        off = new Pose2d(getPoseEstimate().getX() + off.getX(), getPoseEstimate().getY() + off.getY(), getPoseEstimate().getHeading() + off.getHeading());
+    }
+
     @NonNull
     @Override
     public Pose2d getPoseEstimate() {
         double h = pinPoint.getHeading();
         while(h > Math.PI * 2) h -= Math.PI * 2;
         while(h < 0) h += Math.PI * 2;
-        return new Pose2d(pinPoint.getPosX() + off.getX(), pinPoint.getPosY() + off.getY(), pinPoint.getHeading() + off.getHeading());
+        return new Pose2d(pinPoint.getPosX() - off.getX(), pinPoint.getPosY() - off.getY(), pinPoint.getHeading() - off.getHeading());
     }
 
     @Override
@@ -46,14 +51,15 @@ public class PinPointLocalizer implements Localizer {
         double h = pose2d.getHeading();
         while(h < -Math.PI) h += 2 * Math.PI;
         while(h > Math.PI) h -= 2 * Math.PI;
-        off = pose2d;
+        reset();
+        off = new Pose2d(off.getX() + pose2d.getX(), off.getY() + pose2d.getY(), off.getHeading() + pose2d.getHeading());
     }
 
     @Nullable
     @Override
     public Pose2d getPoseVelocity() {
 
-//        return new Pose2d(pinPoint.getVelX(), -pinPoint.getVelY(), pinPoint.getHeadingVelocity());
+//        return new Pose2d(pinPoint.getVelX(), pinPoint.getVelY(), pinPoint.getHeadingVelocity());
         return velo;
     }
     private ElapsedTime time = new ElapsedTime();
@@ -61,8 +67,10 @@ public class PinPointLocalizer implements Localizer {
     public void update() {
         pinPoint.update(DistanceUnit.INCH);
 
-        velo = new Pose2d(currentPose.getX() - lastPos.getX(), -currentPose.getY() + lastPos.getY(), currentPose.getHeading() - lastPos.getHeading());
+//        velo = new Pose2d(currentPose.getX() - lastPos.getX(), currentPose.getY() - lastPos.getY(), currentPose.getHeading() - lastPos.getHeading());
+        velo = new Pose2d(getPoseEstimate().getX() - lastPos.getX(), getPoseEstimate().getY() - lastPos.getY(), getPoseEstimate().getHeading() - lastPos.getHeading());
         velo.div(time.seconds());
+        lastPos = getPoseEstimate();
         time.reset();
     }
 }

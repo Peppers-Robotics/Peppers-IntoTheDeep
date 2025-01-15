@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -25,6 +27,8 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
+import org.firstinspires.ftc.teamcode.drive.PinPoint;
+import org.firstinspires.ftc.teamcode.drive.PinPointLocalizer;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 
 import java.util.ArrayList;
@@ -41,6 +45,7 @@ public class Initialization {
     public static double Voltage = 12;
     public static HardwareMap hardwareMap;
     public static IMU imu;
+    public static PinPointLocalizer localizer;
     public static void initializeHubCacheing(@NonNull HardwareMap hm){
         hardwareMap = hm;
 
@@ -85,6 +90,7 @@ public class Initialization {
             Elevator.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM3"));
 //        Elevator.motor = new CachedMotor(eM, 0);
             Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            Elevator.controller.setMaxActuatorOutput(Voltage);
         } catch (Exception e){
             RobotLog.e("Elevator motor not found");
         }
@@ -92,9 +98,9 @@ public class Initialization {
     public static void initializeOuttake(@NonNull HardwareMap hm){
         try {
             Claw.clawServo = hm.get(ServoPlus.class, "cS1");
-            Arm.servo1 = hm.get(ServoPlus.class, "eS2");
-            Arm.servo2 = hm.get(ServoPlus.class, "eS5");
-            Claw.clawSensor = hm.get(FastColorRangeSensor.class, "Claw");
+            Arm.servo2 = hm.get(ServoPlus.class, "eS2");
+            Arm.servo1 = hm.get(ServoPlus.class, "eS5");
+            Claw.clawSensor = hm.get(Rev2mDistanceSensor.class, "Claw");
         } catch (Exception e){
             RobotLog.e("Outtake servos not found");
         }
@@ -112,9 +118,14 @@ public class Initialization {
         // PTO - cS4
     }
     public static void initializeRobot(@NonNull HardwareMap hm){
+        initializeRobot(hm, true);
+    }
+    public static void initializeRobot(@NonNull HardwareMap hm, boolean disableInit){
         initializeHubCacheing(hm);
-        Initialization.hubs.get(0).disengage();
-        Initialization.hubs.get(1).disengage();
+        if(disableInit) {
+            Initialization.hubs.get(0).disengage();
+            Initialization.hubs.get(1).disengage();
+        }
         initializeIntake();
         initializeElevator();
         initializeExtendo();
@@ -123,7 +134,6 @@ public class Initialization {
         initializeChassis();
         initializeClimb();
 
-        Claw.clawSensor.setLowPassFilterCoefficient(0.9);
     }
     public static void initializeClimb(){
 //        Climb.PTO = new ServoPlus(cS, 4);
@@ -131,6 +141,7 @@ public class Initialization {
 //        Climb.W2 = new ServoPlus(eS, 0);
         try {
             Climb.PTO = hardwareMap.get(ServoPlus.class, "eS3");
+            Climb.PTO2 = hardwareMap.get(ServoPlus.class, "cS0");
             Climb.W1 = hardwareMap.get(ServoPlus.class, "eS1");
             Climb.W2 = hardwareMap.get(ServoPlus.class, "eS4");
         } catch (Exception e){
@@ -176,7 +187,7 @@ public class Initialization {
             Chassis.FL = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
             Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM0"));
             Chassis.BL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM2"));
-            Chassis.localizer = new StandardTrackingWheelLocalizer(hardwareMap, new ArrayList<>(), new ArrayList<>());
+            Chassis.localizer = new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinpoint"));
             Chassis.imu = hardwareMap.get(IMU.class, "imu");
 
             Chassis.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

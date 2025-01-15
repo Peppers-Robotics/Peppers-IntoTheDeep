@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Intake.IntakeController;
 
 @Config
 public class Arm {
-    public static double s1Offset = 230, s2Offset = 140;
+    public static double s1Offset = 173, s2Offset = 173;
     private static double armPrevPos = 0, pivotPrevPos = 0;
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;
@@ -36,8 +36,12 @@ public class Arm {
     }
 
     public static void update(){
-        if(Extendo.getCurrentPosition() > 600){
-            if(Arm.getCurrentArmAngle() > 210) Arm.setArmAngle(200);
+        try {
+            if (Extendo.getCurrentPosition() > 600) {
+                if (Arm.getCurrentArmAngle() > 210) Arm.setArmAngle(200);
+            }
+        } catch (Exception ignored){
+
         }
         armProfile.update();
         pivotProfile.update();

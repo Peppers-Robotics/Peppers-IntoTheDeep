@@ -45,24 +45,19 @@ public class PIDController {
         if(d != null){
             D = d;
         }
-        Isum += P * dtime * clamp;
+        Isum += error * dtime * clamp;
         double r = pidCoefficients.p * P + pidCoefficients.i * Isum + pidCoefficients.d * D;
+//        double r = pidCoefficients.p * P + pidCoefficients.d * D;
 
-        double ret = r;
-
-//        if(Math.abs(r) > maxActuatorOutput && error * r > 0){ // Integral Clamping for anti-windup
-//            ret = maxActuatorOutput;
-//        }
-//        if(Math.abs(error) <= 80){
-//            ret -= Isum * pidCoefficients.i;
-//        }
-
+        if(Math.abs(r) >= maxActuatorOutput && error * r > 0){
+            clamp = 0;
+        } else clamp = 1;
 
         et.reset();
 
         lastError = error;
-        lastReturn = ret;
-        return ret;
+        lastReturn = r;
+        return r;
     }
     public void setTargetPosition(double pos, boolean resetIsum){
         targetPosition = pos;

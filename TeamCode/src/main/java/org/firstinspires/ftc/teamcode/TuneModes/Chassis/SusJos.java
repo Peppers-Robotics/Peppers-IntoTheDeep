@@ -20,6 +20,7 @@ public class SusJos extends LinearOpMode {
         Initialization.initializeChassis();
         Initialization.initializeExtendo();
 
+
         Scheduler s = new Scheduler();
         s.goTo(new Pose2D(distance, 0, 0)).waitSeconds(1).goTo(new Pose2D(0, 0, 0)).waitSeconds(1);
 

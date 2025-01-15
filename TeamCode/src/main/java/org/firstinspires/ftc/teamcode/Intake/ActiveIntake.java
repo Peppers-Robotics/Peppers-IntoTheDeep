@@ -28,10 +28,10 @@ public class ActiveIntake {
     }
 
     public static void powerOn(){
-        powerOn(false);
+        powerOn((float)1);
     }
-    synchronized public static void powerOn(boolean driver){
-        motor.setPower(-1);
+    synchronized public static void powerOn(float pow){
+        motor.setPower(-pow);
     }
     synchronized public static void powerOff(){
         motor.setPower(0);

@@ -38,7 +38,8 @@ public class OutTakeController extends GenericController {
         }
         if(Controls.Retract){
 //            action = OutTakeStateMachine.OutTakeActions.RETRACT;
-            OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.RETRACT_ARM);
+            if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ELEVATOR) action = OutTakeStateMachine.OutTakeActions.RETRACT;
+            else OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.RETRACT_ARM);
             Controls.Retract = false;
         }
         if(Controls.Grab || Controls.DunkToScore){
