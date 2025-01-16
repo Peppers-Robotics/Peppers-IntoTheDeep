@@ -38,8 +38,8 @@ public class SpecimenAutonomous extends LinearOpMode {
 
 
     public static double[] specimenX = {-38, -38, -38, -38, -38}, specimenY = {-10, -11.5, -13.5, -16, -18}, specimenH = {0, 0, 0, 0, 0};
-    public static double[] sampleX = {-19, -19, -19}, sampleY = {20, 20, 34}, sampleH = {325, 333, 315};
-    public static double[] getSpecimenX = {4, 1, 1, 1}, getSpecimenY = {17, 18, 18, 18}, getSpecimenH = {0, 0, 0, 0};
+    public static double[] sampleX = {-19, -17, -19}, sampleY = {20, 30, 34}, sampleH = {324, 330, 315};
+    public static double[] getSpecimenX = {4, 1, 1, 1}, getSpecimenY = {18, 18, 18, 18}, getSpecimenH = {0, 0, 0, 0};
     public static double[] ReverseToHumanX = {-19, -19, -19}, ReverseToHumanY = {19.1, 18, 26.1}, ReverseToHumanH = {220, 210, 210};
     public static double parkX = 0, parkY = 22, parkH = 0;
     public static int[] ExtendoPose = {690, 760, 720}, ExtendoPoseHuman = {600, 500, 200};
@@ -70,8 +70,8 @@ public class SpecimenAutonomous extends LinearOpMode {
 
                 .splineToLinearHeading(new Pose2d(specimenX[specimensScored] + 10, specimenY[specimensScored], Math.toRadians(specimenH[specimensScored])), Math.toRadians(180))
 
-                .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(20, Math.PI*2, DriveConstants.TRACK_WIDTH))
-                .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(40))
+                .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(40, Math.PI*2, DriveConstants.TRACK_WIDTH))
+                .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(60))
 
                 .splineToConstantHeading(new Vector2d(specimenX[specimensScored], specimenY[specimensScored]), Math.toRadians(180))
 
@@ -94,15 +94,29 @@ public class SpecimenAutonomous extends LinearOpMode {
                     .addTemporalMarker(() -> samplesTook ++)
                     .build();
         }
-        double tw = DriveConstants.TRACK_WIDTH;
+        if(samplesTook == 8){
+            return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                    .addTemporalMarker(() -> {
+                        Extendo.Extend(20);
+                        DropDown.setInstantPosition(0);
+                    })
+//                    .lineToLinearHeading(new Pose2d(sampleX[samplesTook], sampleY[samplesTook], Math.toRadians(sampleH[samplesTook])))
+                    .turn(Math.toRadians(ReverseToHumanH[samplesTook - 1]) - sampleH[samplesTook - 1])
+                    .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
+                        Extendo.Extend(ExtendoPose[samplesTook]);
+                        DropDown.setInstantPosition(dropDownPose);
+                    })
+                    .addTemporalMarker(() -> samplesTook ++)
+                    .resetConstraints()
+                    .build();
+        }
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .addTemporalMarker(() -> {
                     Extendo.Extend(20);
                     DropDown.setInstantPosition(0);
                 })
-                .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(DriveConstants.MAX_VEL, Math.PI * 2, tw))
                 .lineToLinearHeading(new Pose2d(sampleX[samplesTook], sampleY[samplesTook], Math.toRadians(sampleH[samplesTook])))
-                .UNSTABLE_addTemporalMarkerOffset(-0.05, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(-0.15, () -> {
                     Extendo.Extend(ExtendoPose[samplesTook]);
                     DropDown.setInstantPosition(dropDownPose);
                 })
@@ -267,7 +281,7 @@ public class SpecimenAutonomous extends LinearOpMode {
                 case GO_TO_HUMAN:
                     if(!drive.isBusy() && !trajRan){
                         drive.followTrajectorySequenceAsync(GoToHuman());
-                        ActiveIntake.power = 0.85;
+                        ActiveIntake.power = 0.7;
                         trajRan = true;
                         driveIsFree = false;
                     }

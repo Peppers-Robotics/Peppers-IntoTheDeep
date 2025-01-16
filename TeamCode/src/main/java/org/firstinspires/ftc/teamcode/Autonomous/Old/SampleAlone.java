@@ -50,7 +50,7 @@ public class SampleAlone extends LinearOpMode {
             takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -33, Math.toRadians(355)),
             takeSample2 = new Pose2d(-15, -40.5, Math.toRadians(5)),
             takeSample3 = new Pose2d(-14, -43, Math.toRadians(20)),
-            basketPosition = new Pose2d(-3, -42 ,Math.toRadians(315)),
+            basketPosition = new Pose2d(-3, -43.5 ,Math.toRadians(315)),
             Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
             Climb2 = new Pose2d(-56, -2.5, Math.toRadians(272));
     public static int samplesScored = 0;
@@ -126,7 +126,7 @@ public class SampleAlone extends LinearOpMode {
 
             switch (CurrentState) {
                 case PLACE_SPECIMEN:
-                    if (drive.getPoseEstimate().getX() < -30) {
+                    if (drive.getPoseEstimate().getX() < -33) {
                         drive.breakFollowing();
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
                         CurrentState.trajRan = false;
@@ -230,9 +230,10 @@ public class SampleAlone extends LinearOpMode {
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SAMPLE);
                     }
                     if(!drive.isBusy() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SAMPLE_SCORE && Elevator.getCurrentPosition() > Elevator.getTargetPosition() - 50){
+                        OutTakeStateMachine.inAuto = true;
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
-//                    }
-//                    if (OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ARM) {
+                    }
+                    if (OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ARM) {
                         switch (samplesScored) {
                             case 0:
                                 samplesScored++;
@@ -249,7 +250,7 @@ public class SampleAlone extends LinearOpMode {
                                 CurrentState.trajRan = false;
                                 break;
                         }
-                    }
+                    } else time.reset();
                     break;
                 case IDLE:
                     if(!CurrentState.trajRan){
@@ -259,6 +260,7 @@ public class SampleAlone extends LinearOpMode {
                                     OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.AUTO_PARK);
                                     OutTakeStateMachine.defaultState = OutTakeStateMachine.OutTakeStates.IDLE_WITH_SAMPLE;
                                 })
+                                .waitSeconds(1)
                                 .lineToLinearHeading(Climb2)
 
                                 .build());

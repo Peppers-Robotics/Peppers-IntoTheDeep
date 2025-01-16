@@ -49,8 +49,8 @@ public class CyliisSample extends LinearOpMode {
     public static Pose2d putSpecimen = new Pose2d(-36, 11, 0),
             takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -33, Math.toRadians(355)),
             takeSample2 = new Pose2d(-15, -40.5, Math.toRadians(5)),
-            takeSample3 = new Pose2d(-14, -43, Math.toRadians(20)),
-            basketPosition = new Pose2d(-1, -42 ,Math.toRadians(315)),
+            takeSample3 = new Pose2d(-14, -43, Math.toRadians(25)),
+            basketPosition = new Pose2d(-0.5, -43 ,Math.toRadians(315)),
             Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
             Climb2 = new Pose2d(-56, -2.5, Math.toRadians(272));
     public static int samplesScored = 0;
@@ -180,8 +180,8 @@ public class CyliisSample extends LinearOpMode {
                         time.reset();
                         failSafe = false;
                     }
-                    if (Storage.hasAlliancePice() || time.seconds() >= 1.5) {
-                        if(time.seconds() >= 1.5) failSafe = true;
+                    if (Storage.hasAlliancePice() || time.seconds() >= 0.8) {
+                        if(time.seconds() >= 0.8) failSafe = true;
                         Extendo.pidEnable = false;
                         IntakeController.gamepad1.right_stick_y = 1;
                         CurrentState = States.GOTO_BASKET_AND_SCORE;
@@ -194,8 +194,8 @@ public class CyliisSample extends LinearOpMode {
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                     .setReversed(true)
                                     .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(80))
-                                    .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {
-
+                                    .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {
+                                        OutTakeStateMachine.ArmScoreSample = tmp - 15;
                                         OutTakeStateMachine.ElevatorScoreSample = OutTakeStateMachine.ElevatorSample2;
                                     })
                                     .splineToLinearHeading(basketPosition, Math.toRadians(-45))
@@ -203,6 +203,9 @@ public class CyliisSample extends LinearOpMode {
                             );
                         } else {
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                        .addTemporalMarker(() -> {
+                                            OutTakeStateMachine.ArmScoreSample = tmp;
+                                        })
 //                                    .lineToLinearHeading(basketPosition)
                                             .lineToLinearHeading(new Pose2d(basketPosition.getX(), basketPosition.getY(), basketPosition.getHeading()))
                                             .build()
@@ -227,10 +230,10 @@ public class CyliisSample extends LinearOpMode {
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SAMPLE);
                     }
                     if(Arm.getCurrentArmAngle() < OutTakeStateMachine.ArmScoreSample - 10) time.reset();
-                    if(!drive.isBusy() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SAMPLE_SCORE && time.seconds() > 0.1){
+                    if(!drive.isBusy() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SAMPLE_SCORE && time.seconds() > 0.2){
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
-//                    }
-//                    if (OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ARM) {
+                    }
+                    if (OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ARM) {
                         switch (samplesScored) {
                             case 0:
                                 samplesScored++;
@@ -262,6 +265,7 @@ public class CyliisSample extends LinearOpMode {
                                     OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.AUTO_PARK);
                                     OutTakeStateMachine.defaultState = OutTakeStateMachine.OutTakeStates.IDLE_WITH_SAMPLE;
                                 })
+                                .waitSeconds(1)
                                 .lineToLinearHeading(Climb2)
 
                                 .build());
