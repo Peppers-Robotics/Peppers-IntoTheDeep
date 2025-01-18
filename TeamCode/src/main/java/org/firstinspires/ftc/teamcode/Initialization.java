@@ -70,7 +70,7 @@ public class Initialization {
 
             Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            DropDown.DropDownLeft = hardwareMap.get(ServoPlus.class, "eS0");
+            DropDown.DropDownLeft = hardwareMap.get(ServoPlus.class, "eS5");
         } catch (Exception e){
             RobotLog.e("Extendo motor and servos not found");
         }
@@ -90,7 +90,7 @@ public class Initialization {
             Elevator.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM3"));
 //        Elevator.motor = new CachedMotor(eM, 0);
             Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            Elevator.controller.setMaxActuatorOutput(Voltage);
+            Elevator.controller.setMaxActuatorOutput(12.5);
         } catch (Exception e){
             RobotLog.e("Elevator motor not found");
         }
@@ -99,7 +99,7 @@ public class Initialization {
         try {
             Claw.clawServo = hm.get(ServoPlus.class, "cS1");
             Arm.servo2 = hm.get(ServoPlus.class, "eS2");
-            Arm.servo1 = hm.get(ServoPlus.class, "eS5");
+            Arm.servo1 = hm.get(ServoPlus.class, "eS1");
             Claw.clawSensor = hm.get(Rev2mDistanceSensor.class, "Claw");
         } catch (Exception e){
             RobotLog.e("Outtake servos not found");
@@ -107,7 +107,7 @@ public class Initialization {
     }
     public static void initializeIntake(){
         try {
-            ActiveIntake.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM2"));
+            ActiveIntake.motor = new CachedMotor(hardwareMap.get(DcMotor.class, "eM0"));
 //        ActiveIntake.motor = new CachedMotor(eM, 3);
             ActiveIntake.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             ActiveIntake.Blocker = hardwareMap.get(ServoPlus.class, "eS0");
@@ -142,7 +142,7 @@ public class Initialization {
         try {
             Climb.PTO = hardwareMap.get(ServoPlus.class, "eS3");
             Climb.PTO2 = hardwareMap.get(ServoPlus.class, "cS0");
-            Climb.W1 = hardwareMap.get(ServoPlus.class, "eS1");
+            Climb.W1 = hardwareMap.get(ServoPlus.class, "eS0");
             Climb.W2 = hardwareMap.get(ServoPlus.class, "eS4");
         } catch (Exception e){
             RobotLog.e("Climb servos not found");
@@ -185,7 +185,7 @@ public class Initialization {
         try {
             Chassis.FR = new CachedMotor(hardwareMap.get(DcMotor.class, "cM1"));
             Chassis.FL = new CachedMotor(hardwareMap.get(DcMotor.class, "eM1"));
-            Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM0"));
+            Chassis.BR = new CachedMotor(hardwareMap.get(DcMotor.class, "eM2"));
             Chassis.BL = new CachedMotor(hardwareMap.get(DcMotor.class, "cM2"));
             Chassis.localizer = new PinPointLocalizer(hardwareMap.get(PinPoint.class, "pinpoint"));
             Chassis.imu = hardwareMap.get(IMU.class, "imu");

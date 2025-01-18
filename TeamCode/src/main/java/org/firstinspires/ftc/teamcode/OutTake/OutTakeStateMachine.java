@@ -16,9 +16,9 @@ public class OutTakeStateMachine {
     public static double IdleArmAngle = -35, IdlePivotAngle = 190, IdleElevatorLevel = -100, SafeElevatorLevel = 100;
     public static double IdleArmAngle_Sample = 180, IdlePivotAngle_Sample = 170;
     public static double ArmScoreSample = 210, PivotScoreSample = -20, ElevatorScoreSample;
-    public static double ArmScoreSpecimen = 125, PivotScoreSpecimen = 180, ElevatorScoreSpecimen = 200, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
-    public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = -30, ElevatorTakeSpecimen = 120; // DONE
-    public static double ElevatorSpecimen1 = 490, ElevatorSpecimen2 = 200, ElevatorSample1 = 450, ElevatorSample2 = 980;
+    public static double ArmScoreSpecimen = 125, PivotScoreSpecimen = 185, ElevatorScoreSpecimen = 185, ArmPushSpecimen = 10, ElevatorPushSpecimen = 300;
+    public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = -25, ElevatorTakeSpecimen = 120; // DONE
+    public static double ElevatorSpecimen1 = 490, ElevatorSpecimen2 = 185, ElevatorSample1 = 450, ElevatorSample2 = 980;
     public static double ArmThrow = 300, ArmTrowRelease = 300, d2power = 5, d2powerI = 3;
     public static double TransferArm = 60, TransferPivot = 0;
     public static boolean reatched = false;
@@ -99,9 +99,9 @@ public class OutTakeStateMachine {
                 if(TimeSinceStateStartedRunning.seconds() < 0.2 + 0.12) break;
                 IntakeController.optimization = true;
                 Elevator.PowerOnDownToTakeSample = false;
-                Elevator.setTargetPosition(SafeElevatorLevel);
+                Elevator.setTargetPosition(SafeElevatorLevel + 200);
                 ActiveIntake.powerOff();
-                //if(Elevator.getCurrentPosition() < SafeElevatorLevel - 10) break;
+                if(Elevator.getCurrentPosition() < SafeElevatorLevel && Math.abs(Elevator.motor.getVelocity()) > 10) break;
 
                 ChangeStateTo(OutTakeStates.IDLE_WITH_SAMPLE);
                 break;
@@ -110,10 +110,10 @@ public class OutTakeStateMachine {
                 Claw.close();
                 Arm.setArmAngle(IdleArmAngle_Sample);
                 Arm.setPivotAngle(IdlePivotAngle_Sample);
-                if(Arm.getCurrentArmAngle() < 90){
-                    break;
+                if(Arm.getCurrentArmAngle() > 90){
+                    Elevator.setTargetPosition(SafeElevatorLevel);
                 }
-                Elevator.setTargetPosition(SafeElevatorLevel);
+
 
                 switch (CurrentAction){
                     case NULL:
@@ -190,6 +190,7 @@ public class OutTakeStateMachine {
 //                Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * d2power);
                 Elevator.setTargetPosition(ElevatorScoreSpecimen);
                 Arm.setArmAngle(ArmScoreSpecimen);
+                if(Arm.getCurrentArmAngle() > 270) break;
                 Arm.setPivotAngle(PivotScoreSpecimen);
                 if(!Elevator.ReachedTargetPosition() && !reatched){
                     break;
@@ -212,7 +213,7 @@ public class OutTakeStateMachine {
             case IDLE_WHILE_SAMPLE_SCORE:
                 Elevator.setTargetPosition(ElevatorScoreSample);
 
-                if(Elevator.getCurrentPosition() < ElevatorScoreSample - 200 || Math.abs(Elevator.motor.getVelocity()) > 20) break;
+                if(Elevator.getCurrentPosition() < ElevatorScoreSample - 30 && Math.abs(Elevator.motor.getVelocity()) > 10) break;
 
                 Arm.setArmAngle(ArmScoreSample);
                 Arm.setPivotAngle(PivotScoreSample);
@@ -295,10 +296,12 @@ public class OutTakeStateMachine {
                 if(!Arm.motionCompleted()) break;
                 if(!inAuto) {
                     if (retractFromSample && (
-                            !(Initialization.localizer.getPoseEstimate().getX() < -4 ||
+                            !(Math.abs(Initialization.localizer.getPoseEstimate().getX()) > 4 ||
                                     Math.abs(Initialization.localizer.getPoseEstimate().getY()) > 4) || action == OutTakeActions.RETRACT)) {
                         break;
                     }
+                } else {
+                    if(TimeSinceStateStartedRunning.seconds() < 0.5) break;
                 }
                 retractFromSample = false;
                 Elevator.setTargetPosition(IdleElevatorLevel);

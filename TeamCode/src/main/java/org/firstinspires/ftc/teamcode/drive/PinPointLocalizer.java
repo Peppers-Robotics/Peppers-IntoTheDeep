@@ -65,7 +65,11 @@ public class PinPointLocalizer implements Localizer {
     private ElapsedTime time = new ElapsedTime();
     @Override
     public void update() {
-        pinPoint.update(DistanceUnit.INCH);
+        try {
+            pinPoint.update(DistanceUnit.INCH);
+        } catch (Exception ignored){
+
+        }
 
 //        velo = new Pose2d(currentPose.getX() - lastPos.getX(), currentPose.getY() - lastPos.getY(), currentPose.getHeading() - lastPos.getHeading());
         velo = new Pose2d(getPoseEstimate().getX() - lastPos.getX(), getPoseEstimate().getY() - lastPos.getY(), getPoseEstimate().getHeading() - lastPos.getHeading());

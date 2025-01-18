@@ -38,8 +38,9 @@ public class SpecimenAutonomous extends LinearOpMode {
 
 
     public static double[] specimenX = {-38, -38, -38, -38, -38}, specimenY = {-10, -11.5, -13.5, -16, -18}, specimenH = {0, 0, 0, 0, 0};
-    public static double[] sampleX = {-19, -17, -19}, sampleY = {20, 30, 34}, sampleH = {324, 330, 315};
-    public static double[] getSpecimenX = {4, 1, 1, 1}, getSpecimenY = {18, 18, 18, 18}, getSpecimenH = {0, 0, 0, 0};
+    public static double[] specimenBreak = {-30, -29.5, -29, -29, -29};
+    public static double[] sampleX = {-19, -17, -19}, sampleY = {20, 30, 34}, sampleH = {323, 330, 320};
+    public static double[] getSpecimenX = {3, 1, 1, 1}, getSpecimenY = {18, 17, 16, 17}, getSpecimenH = {0, 0, 0, 0};
     public static double[] ReverseToHumanX = {-19, -19, -19}, ReverseToHumanY = {19.1, 18, 26.1}, ReverseToHumanH = {220, 210, 210};
     public static double parkX = 0, parkY = 22, parkH = 0;
     public static int[] ExtendoPose = {690, 760, 720}, ExtendoPoseHuman = {600, 500, 200};
@@ -71,11 +72,11 @@ public class SpecimenAutonomous extends LinearOpMode {
                 .splineToLinearHeading(new Pose2d(specimenX[specimensScored] + 10, specimenY[specimensScored], Math.toRadians(specimenH[specimensScored])), Math.toRadians(180))
 
                 .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(40, Math.PI*2, DriveConstants.TRACK_WIDTH))
-                .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(60))
+                .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(30))
 
                 .splineToConstantHeading(new Vector2d(specimenX[specimensScored], specimenY[specimensScored]), Math.toRadians(180))
 
-                .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(-0.05, () -> {
                     driveIsFree = true;
                 })
                 .setReversed(false)
@@ -160,8 +161,8 @@ public class SpecimenAutonomous extends LinearOpMode {
                     .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(30))
 //                    .lineToLinearHeading(new Pose2d(getSpecimenX[specimensScored - 1], getSpecimenY[specimensScored - 1], Math.toRadians(0)))
                     .splineToConstantHeading(new Vector2d(getSpecimenX[specimensScored - 1], getSpecimenY[specimensScored - 1]), Math.toRadians(0))
-                    .waitSeconds(0.05)
-                    .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
+                    .waitSeconds(0.1)
+                    .UNSTABLE_addTemporalMarkerOffset(-0.07, () -> {
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
                     })
                     .build();
@@ -236,7 +237,7 @@ public class SpecimenAutonomous extends LinearOpMode {
                         trajRan = true;
                         driveIsFree = false;
                     }
-                    if(drive.getPoseEstimate().getX() < -33 && trajRan){
+                    if((drive.getPoseEstimate().getX() < -30.5 && trajRan) || (!drive.isBusy())){
                         drive.breakFollowing();
                         specimensScored ++;
                         if(OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SPECIMEN_SCORE) {

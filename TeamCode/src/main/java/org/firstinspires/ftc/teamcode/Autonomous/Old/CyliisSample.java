@@ -47,10 +47,10 @@ public class CyliisSample extends LinearOpMode {
     public static double SlowExtendoPower = -0.4, dropDownPos = 0.7;
 
     public static Pose2d putSpecimen = new Pose2d(-36, 11, 0),
-            takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -33, Math.toRadians(355)),
-            takeSample2 = new Pose2d(-15, -40.5, Math.toRadians(5)),
+            takeSample1 = new Pose2d(-10, 0, Math.toRadians(50)), preTakeSample1 = new Pose2d(-12, -30, Math.toRadians(355)),
+            takeSample2 = new Pose2d(-15, -40, Math.toRadians(5)),
             takeSample3 = new Pose2d(-14, -43, Math.toRadians(25)),
-            basketPosition = new Pose2d(-0.5, -43 ,Math.toRadians(315)),
+            basketPosition = new Pose2d(-5, -41 ,Math.toRadians(315)),
             Climb1 = new Pose2d(-46, -27, Math.toRadians(295)),
             Climb2 = new Pose2d(-56, -2.5, Math.toRadians(272));
     public static int samplesScored = 0;
@@ -193,12 +193,13 @@ public class CyliisSample extends LinearOpMode {
                         if(samplesScored == 0){
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                     .setReversed(true)
-                                    .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(80))
+                                    .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(40))
+                                    .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(50, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
                                     .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {
-                                        OutTakeStateMachine.ArmScoreSample = tmp - 15;
+                                        OutTakeStateMachine.ArmScoreSample = tmp;
                                         OutTakeStateMachine.ElevatorScoreSample = OutTakeStateMachine.ElevatorSample2;
                                     })
-                                    .splineToLinearHeading(basketPosition, Math.toRadians(-45))
+                                    .splineToLinearHeading(new Pose2d(-1, basketPosition.getY() - 3, basketPosition.getHeading()), Math.toRadians(-45))
                                     .build()
                             );
                         } else {
@@ -207,7 +208,7 @@ public class CyliisSample extends LinearOpMode {
                                             OutTakeStateMachine.ArmScoreSample = tmp;
                                         })
 //                                    .lineToLinearHeading(basketPosition)
-                                            .lineToLinearHeading(new Pose2d(basketPosition.getX(), basketPosition.getY(), basketPosition.getHeading()))
+                                            .lineToLinearHeading(new Pose2d(basketPosition.getX(), basketPosition.getY() - 2, basketPosition.getHeading()))
                                             .build()
                             );
                         }
@@ -230,7 +231,7 @@ public class CyliisSample extends LinearOpMode {
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SAMPLE);
                     }
                     if(Arm.getCurrentArmAngle() < OutTakeStateMachine.ArmScoreSample - 10) time.reset();
-                    if(!drive.isBusy() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SAMPLE_SCORE && time.seconds() > 0.2){
+                    if(!drive.isBusy() && OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.IDLE_WHILE_SAMPLE_SCORE && time.seconds() > 0.4){
                         OutTakeStateMachine.Update(OutTakeStateMachine.OutTakeActions.SCORE);
                     }
                     if (OutTakeStateMachine.CurrentState == OutTakeStateMachine.OutTakeStates.RETRACT_ARM) {
@@ -260,12 +261,11 @@ public class CyliisSample extends LinearOpMode {
                 case IDLE:
                     if(!CurrentState.trajRan){
                         drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToLinearHeading(Climb1)
-                                .addTemporalMarker(() -> {
+                                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                                     OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.AUTO_PARK);
                                     OutTakeStateMachine.defaultState = OutTakeStateMachine.OutTakeStates.IDLE_WITH_SAMPLE;
                                 })
-                                .waitSeconds(1)
+                                .lineToLinearHeading(Climb1)
                                 .lineToLinearHeading(Climb2)
 
                                 .build());

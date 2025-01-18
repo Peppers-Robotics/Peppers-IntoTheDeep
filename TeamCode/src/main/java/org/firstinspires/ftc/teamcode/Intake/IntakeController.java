@@ -80,6 +80,7 @@ public class IntakeController extends GenericController {
                         if (gamepad2.gamepad.right_bumper) {
                             DropDown.GoMiddle();
                         } else if (gamepad2.right_trigger >= 0.05) {
+
                             DropDown.setInstantPosition(gamepad2.right_trigger);
                         } else if(gamepad2.left_trigger >= 0.12){
                             DropDown.GoUp();

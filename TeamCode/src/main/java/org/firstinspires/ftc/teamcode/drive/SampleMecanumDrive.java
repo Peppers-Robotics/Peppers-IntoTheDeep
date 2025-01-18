@@ -91,10 +91,9 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-
         rightRear = hardwareMap.get(DcMotorEx.class, "eM1");
         rightFront = hardwareMap.get(DcMotorEx.class, "cM2"); // 1
-        leftFront = hardwareMap.get(DcMotorEx.class, "eM0");
+        leftFront = hardwareMap.get(DcMotorEx.class, "eM2");
         leftRear = hardwareMap.get(DcMotorEx.class, "cM1"); // 2
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);

@@ -69,6 +69,8 @@ public class SampleAlone extends LinearOpMode {
         OutTakeStateMachine.ElevatorScoreSpecimen = 0;
         samplesScored = 0;
         CurrentState = States.PLACE_SPECIMEN;
+        double tmp = OutTakeStateMachine.ArmScoreSpecimen;
+        OutTakeStateMachine.ArmScoreSpecimen = 90;
         CurrentState.trajRan = false;
         DropDown.GoUp();
 
@@ -81,6 +83,7 @@ public class SampleAlone extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     Elevator.setTargetPosition(OutTakeStateMachine.ElevatorSpecimen2);
                     OutTakeStateMachine.ElevatorScoreSpecimen = OutTakeStateMachine.ElevatorSpecimen2;
+                    OutTakeStateMachine.ArmScoreSpecimen = tmp;
                 })
 //                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(50, Math.PI * 2, DriveConstants.TRACK_WIDTH))
                 .lineToLinearHeading(putSpecimen)
@@ -93,8 +96,8 @@ public class SampleAlone extends LinearOpMode {
         TrajectorySequence goToSample1 = drive.trajectorySequenceBuilder(putSpecimenT.end())
 //                .lineToSplineHeading(takeSample1)
 //                .lineToLinearHeading(preTakeSample1)
-                .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(60))
-                .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(30, Math.PI * 2, DriveConstants.TRACK_WIDTH))
+                .setAccelConstraint(SampleMecanumDriveCancelable.getAccelerationConstraint(50))
+                .setVelConstraint(SampleMecanumDriveCancelable.getVelocityConstraint(40, Math.PI * 2, DriveConstants.TRACK_WIDTH))
                 .splineToConstantHeading(new Vector2d(preTakeSample1.getX(), preTakeSample1.getY()), Math.toRadians(-110))
                 .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> {
                     IntakeController.gamepad2.right_trigger = (float) dropDownPos;
@@ -216,7 +219,7 @@ public class SampleAlone extends LinearOpMode {
                     if (IntakeController.CurrentState == IntakeController.IntakeStates.RETRACT_EXTENDO) {
                         IntakeController.gamepad1.right_stick_y = 0;
                         IntakeController.gamepad2.right_trigger = 0;
-                        if(failSafe) OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.TRANSFER_ARM);
+                        OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.TRANSFER_ARM);
 //                        IntakeController.gamepad1.update();
 //                        IntakeController.gamepad2.update();
                     }
@@ -283,5 +286,6 @@ public class SampleAlone extends LinearOpMode {
             Initialization.telemetry.update();
         }
         IntakeController.autoIntake = false;
+        OutTakeStateMachine.ArmScoreSpecimen = tmp;
     }
 }

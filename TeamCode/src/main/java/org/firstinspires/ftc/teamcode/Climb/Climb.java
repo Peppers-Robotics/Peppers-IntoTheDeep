@@ -22,7 +22,7 @@ import java.security.interfaces.ECKey;
 @Config
 public class Climb {
     public static ServoPlus W1, W2, PTO, PTO2;
-    public static double down1 = 195, down2 = 245, raise1 = 305, raise2 = 115;
+    public static double down1 = 195, down2 = 245, raise1 = 305, raise2 = 135;
     public static double Kp = 0.02;
     public static double PTOEngage = 130, PTOdisengage = 180;
     public static double PTO2Engage = 200, PTO2Disengage = 170;
@@ -66,7 +66,7 @@ public class Climb {
     public static States State;
     static {
     }
-    public static double BAR1 = 550, BAR2 = 900;
+    public static double BAR1 = 550, BAR2 = 910;
     public static int action = 0;
     public static ElapsedTime TimeSinceLastStateChange = new ElapsedTime();
     public static long last_update = 0;
@@ -102,14 +102,15 @@ public class Climb {
                 if(TimeSinceLastStateChange.seconds() < 0.5 + 0.2) break;
                 engagePTO();
                 Elevator.setTargetPosition(-50);
-                if(Elevator.getCurrentPosition() < 3 || TimeSinceLastStateChange.seconds() > 0.5 + 0.2 + 3){
+                if((Elevator.getCurrentPosition() < 8 || Math.abs(Elevator.motor.getVelocity()) < 1) && TimeSinceLastStateChange.seconds() > 0.5 + 0.2 + 1){
                     Elevator.setTargetPosition(0);
                     PutDown();
-                    disengagePTO();
+//                    disengagePTO();
                     Arm.setArmAngle(OutTakeStateMachine.IdleArmAngle);
-                    Chassis.BL.setPower(0);
-                    Chassis.BR.setPower(0);
+//                    Chassis.BL.setPower(0);
+//                    Chassis.BR.setPower(0);
                     ChangeState(States.EXTEND_EXTENDO_TO_MAX_AND_ETC2);
+                    climbOv = false;
                 }
                 break;
             case EXTEND_EXTENDO_TO_MAX_AND_ETC2:
@@ -122,15 +123,26 @@ public class Climb {
                     Arm.setArmAngle(OutTakeStateMachine.ArmTakeSpecimen + 40);
                     engagePTO();
                     ChangeState(States.PULL_ELEVATOR_A_BIT);
+                    Enabled = false;
                 }
                 break;
             case PULL_ELEVATOR_A_BIT:
+                if(Controls.gamepad2.wasPressed.square){
+                    climbOv = true;
+                }
                 if(TimeSinceLastStateChange.seconds() < 0.5) {  break;}
                 Elevator.setTargetPosition(BAR2 - 150);
                 engagePTO();
-                if(Initialization.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES) > -80) Elevator.Disable = true;
-                else Elevator.Disable = false;
-                if(TimeSinceLastStateChange.seconds() < 1 && Elevator.getCurrentPosition() > BAR2 - 40) break;
+                if(!climbOv) {
+                    if (Initialization.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES) > -84 && !Enabled) {
+                        Elevator.Disable = true;
+                    }
+                    else {
+                        Elevator.Disable = false;
+                        Enabled = true;
+                    }
+                } else Elevator.Disable = false;
+                if(TimeSinceLastStateChange.seconds() < 1 || Elevator.getCurrentPosition() > BAR2 - 40) break;
                 ChangeState(States.IDLE_WHILE_UP);
                 break;
             case IDLE_WHILE_UP:
@@ -141,9 +153,11 @@ public class Climb {
         Elevator.update();
         IntakeController.Update();
         Arm.update();
+        Controls.gamepad2.update();
         Initialization.telemetry.addData("Climb State: ", Climb.State.toString());
         Initialization.telemetry.addData("Time", System.currentTimeMillis());
         Initialization.telemetry.addData("Time2", TimeSinceLastStateChange.seconds());
         Initialization.telemetry.addData("Pitch", Initialization.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES));
     }
+    public static boolean climbOv = false, Enabled = true;
 }

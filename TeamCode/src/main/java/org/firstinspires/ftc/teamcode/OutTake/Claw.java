@@ -32,12 +32,12 @@ public class Claw {
     }
     private static long time = 0;
     private static double distance = 20;
-    public static boolean HasElementInIt(){
-        if(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - time) >= 1.f / 20){
+    public static boolean HasElementInIt() {
+        if (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - time) >= 1.f / 20) {
             time = System.currentTimeMillis();
-            distance = clawSensor.getDistance(DistanceUnit.MM);
+//            distance = clawSensor.getDistance(DistanceUnit.MM);
         }
-        Initialization.telemetry.addData("sensor distance", distance);
-        return distance <= mmClose;
+//        Initialization.telemetry.addData("sensor distance", distance);
+        return false;
     }
 }

@@ -71,6 +71,7 @@ public class MainOpModeBlue extends LinearOpMode {
 
         Initialization.hubs.get(0).engage();
         Initialization.hubs.get(1).engage();
+        ActiveIntake.power = 0.8;
 
         ElapsedTime time = new ElapsedTime();
         Claw.open();

@@ -74,6 +74,7 @@ public class MainOpModeRed extends LinearOpMode {
         Initialization.hubs.get(1).engage();
 
         ElapsedTime time = new ElapsedTime();
+        ActiveIntake.power = 0.8;
         Claw.open();
         while (opModeIsActive()){
 
