@@ -61,6 +61,10 @@ public class OutTakeController extends GenericController {
             }
             Controls.Throw = false;
         }
+        if(Controls.BlockTransfer){
+            OutTakeStateMachine.ChangeStateTo(OutTakeStateMachine.OutTakeStates.BLOCK);
+            Controls.BlockTransfer = false;
+        }
         OutTakeStateMachine.Update(action);
     }
 }

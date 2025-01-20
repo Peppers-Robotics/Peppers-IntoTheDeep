@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autonomous.Old;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -28,8 +28,8 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Config
-@Autonomous(name = "0 + 4 (sample)")
-public class CyliisSample extends LinearOpMode {
+@Autonomous(name = "0 + 5 (sample)")
+public class CyliisRegio extends LinearOpMode {
 
     public enum States{
         PLACE_SPECIMEN,
@@ -37,6 +37,7 @@ public class CyliisSample extends LinearOpMode {
         GOTO_SAMPLE2,
         GOTO_SAMPLE3,
         TAKE_SAMPLE,
+
         GOTO_BASKET_AND_SCORE,
         SCORE,
         IDLE;
@@ -204,9 +205,9 @@ public class CyliisSample extends LinearOpMode {
                             );
                         } else {
                             drive.followTrajectorySequenceAsync(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                        .addTemporalMarker(() -> {
-                                            OutTakeStateMachine.ArmScoreSample = tmp;
-                                        })
+                                            .addTemporalMarker(() -> {
+                                                OutTakeStateMachine.ArmScoreSample = tmp;
+                                            })
 //                                    .lineToLinearHeading(basketPosition)
                                             .lineToLinearHeading(new Pose2d(basketPosition.getX(), basketPosition.getY() - 2, basketPosition.getHeading()))
                                             .build()

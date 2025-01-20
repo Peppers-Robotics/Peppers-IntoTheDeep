@@ -13,7 +13,7 @@ public class Controls {
     public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen, Climbing,
             Grab,
             Retract,
-                            DunkToScore, IdleWithSample, Throw, SlowDown, ImogenDriver;
+                            DunkToScore, IdleWithSample, Throw, SlowDown, ImogenDriver, BlockTransfer;
 
     public static void Initialize(Gamepad gamepadD1, Gamepad gamepadD2){
         gamepad1 = new AutoGamepad(gamepadD1);
@@ -77,6 +77,7 @@ public class Controls {
             Climbing = true;
             ClimbingHelp = true;
         } else ClimbingHelp = false;
+        if(gamepad1.wasPressed.triangle)    BlockTransfer = true;
 
         if(gamepad1.wasPressed.ps){
             if(Storage.sensor.isLightOn()) Storage.sensor.enableLed(false);

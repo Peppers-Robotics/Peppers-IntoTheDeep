@@ -42,6 +42,7 @@ public class OutTakeStateMachine {
         SCORE_SPECIMEN_ARM,
         SCORE_SPECIMEN_ELEVATOR,
         THROW,
+        BLOCK,
         TAKE_SPECIMEN,
         AUTO_PARK
     }
@@ -69,6 +70,11 @@ public class OutTakeStateMachine {
             CurrentAction = action;
         else CurrentAction = OutTakeActions.NEXT;
         switch (CurrentState){
+            case BLOCK:
+                Arm.setArmAngle(IdleArmAngle_Sample);
+                if(!Arm.motionCompleted()) break;
+                if(action == OutTakeActions.RETRACT) ChangeStateTo(OutTakeStates.RETRACT_ELEVATOR);
+                break;
             case IDLE:
                 IDLEElevatorToPos1 = false;
                 Arm.setArmAngle(IdleArmAngle);
@@ -133,6 +139,7 @@ public class OutTakeStateMachine {
                 break;
             case ELEVATOR_TO_SAMPLE_SCORE:
                 Elevator.setTargetPosition(ElevatorScoreSample);
+                Arm.setPivotAngle(PivotScoreSample);
                 if(Elevator.getCurrentPosition() < SafeElevatorLevel) break;
                 switch (CurrentAction){
                     case NULL:
@@ -148,7 +155,7 @@ public class OutTakeStateMachine {
                 }
                 break;
             case ELEVATOR_TO_SPECIMEN_TAKE:
-                Claw.open();
+//                Claw.open();
                 Elevator.setTargetPosition(SafeElevatorLevel + 100);
                 if(Elevator.getCurrentPosition() < SafeElevatorLevel - 40 && Math.abs(Elevator.motor.getVelocity()) > 4) break;
                 switch (CurrentAction){
@@ -161,8 +168,8 @@ public class OutTakeStateMachine {
                 }
                 break;
             case ARM_TO_SAMPLE_SCORE:
-                Arm.setPivotAngle(IdlePivotAngle_Sample);
-                Arm.setArmAngle(IdleArmAngle_Sample);
+//                Arm.setPivotAngle(IdlePivotAngle_Sample);
+//                Arm.setArmAngle(IdleArmAngle_Sample);
                 switch (CurrentAction){
                     case NEXT:
                         ChangeStateTo(OutTakeStates.IDLE_WHILE_SAMPLE_SCORE);
@@ -212,8 +219,13 @@ public class OutTakeStateMachine {
                 break;
             case IDLE_WHILE_SAMPLE_SCORE:
                 Elevator.setTargetPosition(ElevatorScoreSample);
+                if(inAuto) {
+                    if (Elevator.getCurrentPosition() < ElevatorScoreSample - 100 || Math.abs(Elevator.motor.getVelocity()) > 5)
+                        break;
+                } else {
+                    if(Elevator.getCurrentPosition() < ElevatorScoreSample - 30) break;
+                }
 
-                if(Elevator.getCurrentPosition() < ElevatorScoreSample - 30 && Math.abs(Elevator.motor.getVelocity()) > 10) break;
 
                 Arm.setArmAngle(ArmScoreSample);
                 Arm.setPivotAngle(PivotScoreSample);
@@ -234,7 +246,9 @@ public class OutTakeStateMachine {
                 break;
             case IDLE_WHILE_SPECIMEN_TAKE:
                 Elevator.PowerOnDownToTakeSample = true;
-                Elevator.power = 0.8;
+                if(Arm.getCurrentArmAngle() > 270) {
+                    Elevator.power = 0.8;
+                }
                 if(!Arm.motionCompleted() && !inAuto) break;
                 Elevator.setTargetPosition(Elevator.getTargetPosition() - d2power * Controls.gamepad2.right_stick_y);
 //                if(Elevator.getCurrentPosition() - Elevator.getTargetPosition() > 10 && !inAuto) break;
@@ -358,9 +372,9 @@ public class OutTakeStateMachine {
             case THROW:
                 Arm.setArmAngle(ArmThrow);
                 if(Arm.getCurrentArmAngle() >= ArmTrowRelease){
-                    if(TimeSinceStateStartedRunning.seconds() >= 0.04) {
+                    if(TimeSinceStateStartedRunning.seconds() >= 0.12) {
                         Claw.open();
-                        if(TimeSinceStateStartedRunning.seconds() >= 0.04 + 0.08) {
+                        if(TimeSinceStateStartedRunning.seconds() >= 0.12 + 0.08) {
                             ChangeStateTo(OutTakeStates.RETRACT_ELEVATOR);
                         }
                     }

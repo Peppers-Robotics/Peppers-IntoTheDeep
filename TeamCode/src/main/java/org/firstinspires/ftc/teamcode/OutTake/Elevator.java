@@ -83,7 +83,7 @@ public class Elevator {
             return;
         }
 
-        if(controller.getTargetPosition() <= 0 && getCurrentPosition() <= 25 && !PowerOnDownToTakeSample || Climb.isPTOEngaged()){
+        if(controller.getTargetPosition() <= 0 && getCurrentPosition() <= 35 && !PowerOnDownToTakeSample || Climb.isPTOEngaged()){
             motor.setMotorDisable();
         } else {
             motor.setMotorEnable();
