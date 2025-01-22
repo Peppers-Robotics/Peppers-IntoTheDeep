@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Intake;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
-import org.firstinspires.ftc.teamcode.Initialization;
 
 @SuppressWarnings("unused")
 public class Storage {
@@ -16,21 +15,6 @@ public class Storage {
 
     public static boolean isStorageEmpty(){
         return getStorageStatus() == SpecimenType.NONE;
-    }
-
-    public static boolean hasAlliancePice(){
-        if(getStorageStatus() == SpecimenType.NONE) return false;
-        switch (Initialization.Team){
-            case RED:
-                return getStorageStatus() != SpecimenType.BLUE;
-            case BLUE:
-                return getStorageStatus() != SpecimenType.RED;
-        }
-        return false;
-    }
-    public static boolean wrongPice(){
-        if(getStorageStatus() == SpecimenType.NONE) return false;
-        return !hasAlliancePice();
     }
 
     public static SpecimenType getStorageStatus(){

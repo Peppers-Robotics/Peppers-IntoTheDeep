@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.DevicePropertie
 import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.CutOffResolution;
-import org.firstinspires.ftc.teamcode.Initialization;
 
 
 @ServoType(flavor = ServoFlavor.CUSTOM)

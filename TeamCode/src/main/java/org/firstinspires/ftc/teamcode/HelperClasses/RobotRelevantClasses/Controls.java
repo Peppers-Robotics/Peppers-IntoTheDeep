@@ -13,7 +13,7 @@ public class Controls {
     public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen, Climbing,
             Grab,
             Retract,
-                            DunkToScore, IdleWithSample, Throw, SlowDown, ImogenDriver, BlockTransfer;
+                            DunkToScore, Transfer, Throw, SlowDown, ImogenDriver, BlockTransfer;
 
     public static void Initialize(Gamepad gamepadD1, Gamepad gamepadD2){
         gamepad1 = new AutoGamepad(gamepadD1);
@@ -71,6 +71,7 @@ public class Controls {
         if(gamepad2.wasPressed.triangle)    GrabSpecimen = true;
         if(gamepad2.wasPressed.square || gamepad1.wasPressed.square)      Grab         = true;
         if(gamepad2.wasPressed.circle)      Retract      = true;
+        if(gamepad2.wasPressed.cross)       RetractExtendo = true;
         if(gamepad2.wasPressed.dpad_right)  DunkToScore  = true;
         if((gamepad2.gamepad.left_stick_button || gamepad2.gamepad.right_stick_button) &&
                 (gamepad1.gamepad.left_stick_button || gamepad1.gamepad.right_stick_button) && !ClimbingHelp) {

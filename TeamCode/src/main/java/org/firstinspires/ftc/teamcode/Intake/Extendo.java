@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
-import org.firstinspires.ftc.teamcode.Initialization;
 
 @SuppressWarnings("unused")
 @Config
@@ -33,26 +32,31 @@ public class Extendo {
         }).start();
     }
     public synchronized static void Extend(int position){
-        pidEnable = true;
-        position *= 1;
         if(position == targetPosition) return;
 
         targetPosition = position;
         pidController.setTargetPosition(position);
     }
-    public static boolean pidEnable = false;
+    public static boolean DISABLE = true;
+    public static boolean PowerOnToTransfer = false;
     public static ElapsedTime retractTime = new ElapsedTime(), waitToCloseClaw = new ElapsedTime();
     public static void update(){
-
-       if(pidEnable){
-           motor.setPower(pidController.calculatePower(motor.getCurrentPosition()));
-       }
-       Initialization.telemetry.addData("currentPosition", motor.getCurrentPosition());
-       Initialization.telemetry.addData("targetPos", targetPosition);
+        if(DISABLE){
+            return;
+        }
+        if(PowerOnToTransfer) {
+            motor.setPower(-1);
+        } else {
+            motor.setPower(pidController.calculatePower(motor.getCurrentPosition()));
+        }
     }
 
 
     public static boolean isMaxExtended() {
         return getCurrentPosition() >= MaxExtendoExtension;
+    }
+
+    public static double getMaxPosition() {
+        return MaxExtendoExtension;
     }
 }
