@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Climb;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
@@ -17,9 +18,10 @@ public class Climb {
     public static final Scheduler climb = new Scheduler();
     public static Scheduler run = new Scheduler();
     public static ServoPlus W1, W2, PTO1, PTO2;
-    public static double BAR1 = 350, BAR2 = 850;
-    public static double EngagePTO1 = 10, EngagePTO2 = 20, DisengagePTO1 = 20, DisengagePTO2 = 100,
-                         EngageWheelie1 = 20, DisengageWheelie1 = 100, EngageWheelie2 = 10, DisengageWheelie2 = 0, climbArmIntertia = 310;
+    public static double BAR1 = 450, BAR2 = 950;
+    public static double pitch = 0;
+    public static double EngagePTO1 = 130, EngagePTO2 = 200, DisengagePTO1 = 180, DisengagePTO2 = 170,
+                         EngageWheelie1 = 295, DisengageWheelie1 = 195, EngageWheelie2 = 125, DisengageWheelie2 = 245, climbArmIntertia = 310;
 
     public static void EngagePTO(){
         PTO1.setAngle(EngagePTO1);
@@ -31,7 +33,7 @@ public class Climb {
     }
     public static void ActivateWheelie(){
         W1.setAngle(EngageWheelie1);
-        W1.setAngle(EngageWheelie2);
+        W2.setAngle(EngageWheelie2);
     }
     public static void DeactivateWheelie(){
         W1.setAngle(DisengageWheelie1);
@@ -53,7 +55,32 @@ public class Climb {
                     @Override
                     public boolean Run() {
                         ActivateWheelie();
+                        DisengagePTO();
                         Extendo.motor.setPower(-0.4);
+                        return true;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Elevator.setTargetPosition(BAR1);
+                        return Elevator.getCurrentPosition() > BAR1;
+                    }
+                })
+                .waitSeconds(0.1)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Elevator.setTargetPosition(BAR1 - 100);
+                        return Elevator.getCurrentPosition() > BAR1 - 50;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        EngagePTO();
+                        Chassis.FL.setPower(0);
+                        Chassis.FR.setPower(0);
                         return true;
                     }
                 })
@@ -61,45 +88,30 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.setTargetPosition(BAR1);
-                        return Elevator.ReachedTargetPosition();
+                        Elevator.setTargetPosition(0);
+                        return Elevator.getCurrentPosition() < 8;
                     }
                 })
-                .waitSeconds(0.1)
+                .waitSeconds(0.05)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        EngagePTO();
-                        Chassis.BL.setPower(0);
-                        Chassis.BR.setPower(0);
-                        return true;
-                    }
-                })
-                .waitSeconds(0.2)
-                .addTask(new Task() {
-                    @Override
-                    public boolean Run() {
-                        Elevator.setTargetPosition(-20);
-                        return Elevator.getCurrentPosition() < 4 || (Elevator.getCurrentPosition() < 100 && Math.abs(Elevator.motor.getVelocity()) < 1);
-                    }
-                })
-                .addTask(new Task() {
-                    @Override
-                    public boolean Run() {
+                        Elevator.Disable = true;
                         Elevator.setTargetPosition(0);
                         DeactivateWheelie();
                         DisengagePTO();
-                        Chassis.BL.setPower(0);
-                        Chassis.BR.setPower(0);
+//                        Chassis.BL.setPower(0);
+//                        Chassis.BR.setPower(0);
                         return true;
                     }
                 })
-                .waitSeconds(0.2)
+                .waitSeconds(0.1)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.setTargetPosition(BAR2);
-                        return Elevator.ReachedTargetPosition();
+                        Elevator.Disable = false;
+                        Elevator.setTargetPosition(BAR2 + 200);
+                        return Elevator.getCurrentPosition() > BAR2 - 30;
                     }
                 })
                 .addTask(new Task() {
@@ -111,19 +123,20 @@ public class Climb {
                         return true;
                     }
                 })
-                .waitSeconds(0.1)
+                .waitSeconds(0.05)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
                         Arm.setArmAngle(climbArmIntertia);
-                        return Arm.motionCompleted();
+                        return true;
                     }
                 })
+                .waitSeconds(0.08)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(Robot.imu.getRobotYawPitchRollAngles().getPitch() < -83){
-                            Elevator.setTargetPosition(-50);
+                        if(pitch > -3){
+                            Elevator.setTargetPosition(-100);
                             return true;
                         }
                         return false;
@@ -132,20 +145,23 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(Elevator.getCurrentPosition() < 20) {
+                        if(Elevator.getCurrentPosition() < 0) {
                             Elevator.setTargetPosition(0);
                             return true;
                         }
                         return false;
                     }
                 })
-
         ;
     }
     public static void Update(){
+        pitch = Robot.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES);
         run.update();
+
         Elevator.update();
         Arm.update();
+
         Robot.telemetry.addData("tasks", run + "/14");
+        Robot.telemetry.addData("pitch", pitch);
     }
 }

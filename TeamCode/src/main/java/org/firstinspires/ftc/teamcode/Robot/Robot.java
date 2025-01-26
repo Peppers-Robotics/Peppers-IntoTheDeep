@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
+import com.qualcomm.hardware.adafruit.AdafruitBNO055IMUNew;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.AccelerationSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,13 +16,20 @@ import com.qualcomm.robotcore.hardware.LynxModuleImuType;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoController;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcOpModeRegister;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.android.AndroidAccelerometer;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.PinPoint;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
+import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
@@ -29,19 +41,48 @@ public class Robot {
     public static List<LynxModule> hubs;
     public static Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     public static IMU imu;
-    public static DcMotorControllerEx ControlHubMotors, ExpansionHubMotors;
+    public static DcMotorController ControlHubMotors, ExpansionHubMotors;
     public static ServoController ControlHubServos, ExpansionHubServos;
     public static double VOLTAGE = 12;
+    public static void disable(){
+        for(LynxModule l : hubs){
+            l.disengage();
+        }
+    }
+    public static void enable(){
+        for(LynxModule l : hubs){
+            l.engage();
+        }
+    }
     public static void InitializeHubs(HardwareMap hm){
         hubs = hm.getAll(LynxModule.class);
         boolean s = hubs.get(0).getImuType() == LynxModuleImuType.BHI260;
-        ControlHubMotors = hm.getAll(DcMotorControllerEx.class).get(0);
-        ControlHubMotors = hm.getAll(DcMotorControllerEx.class).get(1);
 
-        ControlHubServos = hm.getAll(ServoController.class).get(0);
-        ControlHubServos = hm.getAll(ServoController.class).get(1);
+        ControlHubMotors = hm.get(DcMotorController.class, "Control Hub");
+        ExpansionHubMotors = hm.get(DcMotorController.class, "Expansion Hub 2");
 
-        imu = hm.get(IMU.class, "imu");
+        ControlHubServos = hm.get(ServoController.class, "Control Hub");
+        ExpansionHubServos = hm.get(ServoController.class, "Expansion Hub 2");
+        MotorConfigurationType mct;
+
+        for(int i = 0; i < 4; i++){
+            mct = ControlHubMotors.getMotorType(i);
+            mct.setAchieveableMaxRPMFraction(1);
+
+            ControlHubMotors.setMotorType(i, mct);
+
+            mct = ExpansionHubMotors.getMotorType(i);
+            mct.setAchieveableMaxRPMFraction(1);
+
+            ExpansionHubMotors.setMotorType(i, mct);
+        }
+
+
+        imu = hm.get(IMU.class, "imuProst");
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
+        )));
         VOLTAGE = hm.getAll(VoltageSensor.class).get(0).getVoltage();
 
         for(LynxModule l : hubs){
@@ -56,14 +97,39 @@ public class Robot {
     }
     public static void InitializeFull(HardwareMap hm){
         InitializeHubs(hm);
+        disable();
+        InitializeElevator();
+        InitializeExtendo();
+        InitializeDropDown();
+        InitializeClimb();
+        InitializeClaw();
+        InitializeArm();
+        InitializeChassis();
+        InitializeActiveIntake();
+        InitializeStorage(hm);
     }
-
+    public static void InitializeChassis(){
+        Chassis.FL = new CachedMotor(ExpansionHubMotors, 2, DcMotorSimple.Direction.FORWARD);
+        Chassis.FR = new CachedMotor(ControlHubMotors, 2, DcMotorSimple.Direction.FORWARD);
+        Chassis.BL = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
+        Chassis.BR = new CachedMotor(ExpansionHubMotors, 1, DcMotorSimple.Direction.FORWARD);
+    }
+    public static void InitializeLocalizer(HardwareMap hm){
+        Localizer.pinPoint = hm.get(PinPoint.class, "pinpoint");
+    }
+    public static void InitializeStorage(HardwareMap hm){
+        Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
+    }
     public static void InitializeExtendo(){
         Extendo.motor = new CachedMotor(ControlHubMotors, 0, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void InitializeDropDown(){
         DropDown.servo = new ServoPlus(ExpansionHubServos, 5, Servo.Direction.FORWARD);
+    }
+    public static void InitializeActiveIntake(){
+        ActiveIntake.motor = new CachedMotor(ExpansionHubMotors, 0, DcMotorSimple.Direction.FORWARD);
+        ActiveIntake.blocker = new ServoPlus(ControlHubServos, 1, Servo.Direction.FORWARD); // TODO: portul bun
     }
     public static void InitializeElevator(){
         Elevator.motor = new CachedMotor(ExpansionHubMotors, 3, DcMotorSimple.Direction.FORWARD);

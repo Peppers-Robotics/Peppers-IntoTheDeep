@@ -11,10 +11,28 @@ public class Storage {
         YELLOW,
         NONE
     }
+    public enum Team {
+        RED,
+        BLUE
+    }
+    public static Team team = Team.RED;
     public static FastColorRangeSensor sensor;
 
     public static boolean isStorageEmpty(){
         return getStorageStatus() == SpecimenType.NONE;
+    }
+
+    public static boolean hasWrongPice(){
+        switch (team){
+            case RED:
+                return getStorageStatus() == SpecimenType.BLUE || isStorageEmpty();
+            case BLUE:
+                return isStorageEmpty() || getStorageStatus() == SpecimenType.RED;
+        }
+        return false;
+    }
+    public static boolean hasTeamPice(){
+        return !hasWrongPice();
     }
 
     public static SpecimenType getStorageStatus(){

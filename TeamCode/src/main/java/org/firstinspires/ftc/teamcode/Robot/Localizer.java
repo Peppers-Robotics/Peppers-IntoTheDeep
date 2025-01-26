@@ -29,6 +29,12 @@ public class Localizer {
         pinPoint.setEncoderDirections(xPod, yPod);
         pinPoint.resetPosAndIMU();
     }
+    public static double getDistanceFromTwoPoints(DistanceUnit unit, Pose2D p1, Pose2D p2){
+        return unit.fromMm(Math.sqrt(
+                (p1.getX(DistanceUnit.MM) - p2.getX(DistanceUnit.MM)) * (p1.getX(DistanceUnit.MM) - p2.getX(DistanceUnit.MM)) +
+                (p1.getY(DistanceUnit.MM) - p2.getY(DistanceUnit.MM)) * (p1.getY(DistanceUnit.MM) - p2.getY(DistanceUnit.MM))
+        ));
+    }
 
     public static void Update(){
         pinPoint.update();

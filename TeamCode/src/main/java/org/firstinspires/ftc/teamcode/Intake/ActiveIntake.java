@@ -8,6 +8,18 @@ import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 @Config
 public class ActiveIntake {
     public static CachedMotor motor;
+    public static ServoPlus blocker;
+    public static double block, unblock;
+
+    public static void Block(){
+        blocker.setAngle(block);
+    }
+    public static void Unblock(){
+        blocker.setAngle(unblock);
+    }
+    public static boolean isBlocked(){
+        return blocker.isEqualToAngle(block);
+    }
 
     public static void powerOn(){
         powerOn(1);

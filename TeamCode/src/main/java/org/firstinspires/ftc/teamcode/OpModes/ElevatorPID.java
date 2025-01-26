@@ -20,11 +20,11 @@ public class ElevatorPID extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()){
-            Robot.clearCache();
 
             Elevator.setTargetPosition(TargetPosition);
             Elevator.controller.setFreq(freq);
             Elevator.update();
+            Robot.clearCache();
         }
     }
 }

@@ -13,6 +13,7 @@ import java.nio.channels.FileChannel;
 @Config
 public class Chassis {
     public static CachedMotor FL, FR, BL, BR;
+    public static int FLd = 1, FRd = -1, BLd = 1, BRd = -1;
     public static void drive(double x, double y, double r){
         double d = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
         double fl = (y + x + r) / d;
@@ -20,10 +21,10 @@ public class Chassis {
         double fr = (y - x - r) / d;
         double br = (y + x - r) / d;
 
-        FL.setPower(fl);
-        FR.setPower(fr);
-        BL.setPower(bl);
-        BR.setPower(br);
+        FL.setPower(fl * FLd);
+        FR.setPower(fr * FRd);
+        BL.setPower(bl * BLd);
+        BR.setPower(br * BRd);
     }
     public static void driveFiledCentric(double x, double y, double r){
         double xP = x * Math.cos(-Localizer.getCurrentPosition().getHeading(AngleUnit.RADIANS)) - y * Math.sin(-Localizer.getCurrentPosition().getHeading(AngleUnit.RADIANS));
@@ -50,12 +51,17 @@ public class Chassis {
         double directionalVelocity = Math.sqrt(Localizer.getVelocity().getX(DistanceUnit.MM) * Localizer.getVelocity().getX(DistanceUnit.MM) +
                                      Localizer.getVelocity().getY(DistanceUnit.MM) * Localizer.getVelocity().getY(DistanceUnit.MM));
         double pow = Translational.calculatePower(error, directionalVelocity);
+        double xError = Localizer.getCurrentPosition().getX(DistanceUnit.MM) - targetPosition.getX(DistanceUnit.MM);
+        double yError = Localizer.getCurrentPosition().getY(DistanceUnit.MM) - targetPosition.getY(DistanceUnit.MM);
 
         double Herror = Localizer.getCurrentPosition().getHeading(AngleUnit.DEGREES) - targetPosition.getHeading(AngleUnit.DEGREES);
+        while(Herror > Math.PI) Herror -= Math.PI * 2;
+        while(Herror < -Math.PI) Herror += Math.PI * 2;
         double hP = Heading.calculatePower(Herror, Localizer.getVelocity().getHeading(AngleUnit.DEGREES));
-        double xP = pow * Math.sin(Herror);
-        double yP = pow * Math.cos(Herror);
+        double alpha = Math.atan2(xError, yError);
+        double xP = pow * Math.cos(alpha);
+        double yP = pow * Math.sin(alpha);
 
-        drive(xP, yP, hP);
+        driveFiledCentric(xP, yP, hP);
     }
 }

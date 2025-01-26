@@ -11,15 +11,15 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
 public class Arm {
-    public static double s1Offset = 173, s2Offset = 173;
+    public static double s1Offset = 350, s2Offset = 0;
     private static double armPrevPos = 0, pivotPrevPos = 0;
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;
     private static final DifferentialHelper diffy;
 
     static {
-        armProfile = new AsymmetricMotionProfile(4e3, 7e3, 7e4);
-        pivotProfile = new AsymmetricMotionProfile(6e3, 6e3, 5e4);
+        armProfile = new AsymmetricMotionProfile(7500, 4500, 2000);
+        pivotProfile = new AsymmetricMotionProfile(3000, 4500, 2000);
         diffy = new DifferentialHelper(1/2.f);
     }
 

@@ -15,11 +15,12 @@ public class DropDownTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Robot.InitializeHubs(hardwareMap);
         Robot.InitializeExtendo();
+        Robot.InitializeDropDown();
         waitForStart();
 
         while (opModeIsActive()){
+            DropDown.setDown(precent);
             Robot.clearCache();
-            DropDown.setDown(0);
         }
     }
 }

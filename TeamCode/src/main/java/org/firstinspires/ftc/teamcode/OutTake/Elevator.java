@@ -19,8 +19,8 @@ public class Elevator {
     public static CachedMotor motor;
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
-    public static PIDCoefficients normal = new PIDCoefficients(0.15, 0.01, -0.008);
-    public static double kf = 0.1, kff = 1;
+    public static PIDCoefficients normal = new PIDCoefficients(0.015, 0, -0.0004);
+    public static double kfUp = 0.22, kfDown = 0.04, elevatorMin = 400, elevatorMax = 1080;
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(6000, 7000, 7000);
 
     static {
@@ -58,16 +58,19 @@ public class Elevator {
     public static void update() {
         if (Disable) {
             motor.setPower(0);
+            Chassis.FL.setPower(0);
+            Chassis.FR.setPower(0);
             return;
         }
         Robot.telemetry.addData("Elevator Current Position", motor.getCurrentPosition());
         Robot.telemetry.addData("Elevator enabled", motor.isMotorEnabled());
+        Robot.telemetry.addData("TargetPosition", targetPos);
 
         if (RESET) {
             if (motor.getCurrent(CurrentUnit.AMPS) > 6.5 || was) {
                 was = true;
                 motor.setPower(0);
-                if (time.seconds() > 0.5) {
+                if (time.seconds() > 0.2) {
                     motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     RESET = false;
@@ -86,13 +89,14 @@ public class Elevator {
             controller.setPidCoefficients(climb);
             motor.setMotorDisable();
             double pp = -controller.calculatePower(motor.getCurrentPosition());
-            Chassis.BL.setPower(pp);
-            Chassis.BR.setPower(pp);
+            Chassis.FL.setPower(pp);
+            Chassis.FR.setPower(pp);
             return;
         }
-        if(getTargetPosition() < 0 && getCurrentPosition() < 100 && Math.abs(motor.getVelocity()) < 2){
+        if(getTargetPosition() <= 0 && getCurrentPosition() < 10 && !PowerOnDownToTakeSample){
             motor.setMotorDisable();
-        } else if(getTargetPosition() > 0){
+        }
+        if(getTargetPosition() >= 0 || PowerOnDownToTakeSample){
             motor.setMotorEnable();
         }
 
@@ -103,7 +107,11 @@ public class Elevator {
         } else {
             controller.setPidCoefficients(normal);
             if (motor.isMotorEnabled()) {
-                double p = controller.calculatePower(motor.getCurrentPosition(), motor.getVelocity()) + kf;
+                double p = controller.calculatePower(motor.getCurrentPosition(), motor.getVelocity());
+                if(Elevator.getCurrentPosition() > 400){
+                    double kf = (kfUp - kfDown) / (elevatorMax - elevatorMin) * Elevator.getCurrentPosition() + 0;
+                    p += kf;
+                }
                 motor.setPower(p);
             }
         }
