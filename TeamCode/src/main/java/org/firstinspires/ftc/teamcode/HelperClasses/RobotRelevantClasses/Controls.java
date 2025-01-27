@@ -68,7 +68,7 @@ public class Controls {
         if(gamepad1.wasPressed.dpad_right || gamepad1.wasPressed.dpad_left)    Throw        = true;
         if(gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
         if(gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
-        if(gamepad2.wasPressed.triangle)    GrabSpecimen = true;
+        if(gamepad2.wasPressed.triangle || gamepad1.wasPressed.triangle)    GrabSpecimen = true;
         if(gamepad2.wasPressed.square || gamepad1.wasPressed.square)      Grab         = true;
         if(gamepad2.wasPressed.circle)      Retract      = true;
         if(gamepad2.wasPressed.cross)       RetractExtendo = true;
@@ -78,7 +78,6 @@ public class Controls {
             Climbing = true;
             ClimbingHelp = true;
         } else ClimbingHelp = false;
-        if(gamepad1.wasPressed.triangle)    BlockTransfer = true;
 
         if(gamepad1.wasPressed.ps){
             if(Storage.sensor.isLightOn()) Storage.sensor.enableLed(false);

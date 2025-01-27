@@ -44,6 +44,7 @@ public class Localizer {
            getCurrentPosition().getHeading(AngleUnit.DEGREES) - lastPose.getHeading(AngleUnit.DEGREES));
         Div(velocity, time.seconds());
         time.reset();
+        Robot.telemetry.addData("position", "(" + getCurrentPosition().getX(DistanceUnit.INCH) + ", " + getCurrentPosition().getY(DistanceUnit.INCH) + ", " + getCurrentPosition().getHeading(AngleUnit.DEGREES) + " deg)");
     }
     public static void Reset(){
         pinPoint.recalibrateIMU();

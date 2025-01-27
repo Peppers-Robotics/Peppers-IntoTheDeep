@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 public class Climb {
     public static final Scheduler climb = new Scheduler();
     public static Scheduler run = new Scheduler();
-    public static ServoPlus W1, W2, PTO1, PTO2;
+    public static ServoPlus W1, W2, PTO1;
     public static double BAR1 = 450, BAR2 = 950;
     public static double pitch = 0;
     public static double EngagePTO1 = 130, EngagePTO2 = 200, DisengagePTO1 = 180, DisengagePTO2 = 170,
@@ -25,11 +25,11 @@ public class Climb {
 
     public static void EngagePTO(){
         PTO1.setAngle(EngagePTO1);
-        PTO2.setAngle(EngagePTO2);
+//        PTO2.setAngle(EngagePTO2);
     }
     public static void DisengagePTO(){
         PTO1.setAngle(DisengagePTO1);
-        PTO2.setAngle(DisengagePTO2);
+//        PTO2.setAngle(DisengagePTO2);
     }
     public static void ActivateWheelie(){
         W1.setAngle(EngageWheelie1);

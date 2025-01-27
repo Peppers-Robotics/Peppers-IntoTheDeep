@@ -17,10 +17,10 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample, ElevatorScoreSample1 = 500, ElevatorScoreSample2 = 980;
+    public static double ElevatorScoreSample, ElevatorScoreSample1 = 500, ElevatorScoreSample2 = 930;
     public static double ElevatorScoreSpecimen = 600;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
-    public static double ArmScoreSample = 270, PivotScoreSample = 0;
+    public static double ArmScoreSample = 260, PivotScoreSample = 0;
     public static double ArmTakeSpecimen = 350, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0;
     public static double ArmIdle = 25, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 20;
@@ -76,7 +76,7 @@ public class OutTakeLogic {
                         Controls.GrabSpecimen = false;
                         CurrentState = States.IDLE_TAKE_SPECIMEN;
                     }
-                    if (Storage.getStorageStatus() == Storage.SpecimenType.YELLOW && Controls.Transfer) {
+                    if (Storage.hasTeamPice() && Controls.Transfer) {
 
                         currentTask = new Scheduler();
                         {
@@ -122,13 +122,6 @@ public class OutTakeLogic {
                                         return Arm.getCurrentArmAngle() >= 100;
                                     }
                                 })
-                                .addTask(new Task() {
-                                    @Override
-                                    public boolean Run() {
-                                        Elevator.setTargetPosition(0);
-                                        return true;
-                                    }
-                                })
                         ;
                     }
 
@@ -170,7 +163,7 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Elevator.setTargetPosition(ElevatorScoreSample);
-                                        return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 120;
+                                        return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 300;
                                     }
                                 })
                                 .addTask(new Task() {
@@ -195,6 +188,7 @@ public class OutTakeLogic {
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
+                                            Localizer.Update();
                                             scoredSample = Localizer.getCurrentPosition();
                                             Claw.open();
                                             return true;
@@ -204,13 +198,15 @@ public class OutTakeLogic {
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
+                                            Localizer.Update();
+                                            Arm.setArmAngle(ArmTransfer);
                                             return Localizer.getDistanceFromTwoPoints(DistanceUnit.INCH, Localizer.getCurrentPosition(), scoredSample) > 3;
                                         }
                                     })
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
-                                            Arm.setArmAngle(ArmTransfer);
+//                                            Arm.setArmAngle(ArmTransfer);
                                             Elevator.setTargetPosition(ElevatorUp);
                                             return Arm.motionCompleted();
                                         }
@@ -316,14 +312,17 @@ public class OutTakeLogic {
                                         @Override
                                         public boolean Run() {
                                             Claw.open();
+                                            Localizer.Update();
                                             scoredSpecimen = Localizer.getCurrentPosition();
                                             return true;
                                         }
                                     })
+                                    .waitSeconds(0.2)
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
-                                            return Localizer.getDistanceFromTwoPoints(DistanceUnit.INCH, Localizer.getCurrentPosition(), scoredSpecimen) > 2;
+                                            Localizer.Update();
+                                            return Localizer.getDistanceFromTwoPoints(DistanceUnit.INCH, Localizer.getCurrentPosition(), scoredSpecimen) > 3;
                                         }
                                     })
                                     .addTask(new Task() {

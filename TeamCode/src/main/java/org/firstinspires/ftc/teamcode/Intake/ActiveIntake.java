@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 public class ActiveIntake {
     public static CachedMotor motor;
     public static ServoPlus blocker;
-    public static double block, unblock;
+    public static double block = 160, unblock = 285;
 
     public static void Block(){
         blocker.setAngle(block);

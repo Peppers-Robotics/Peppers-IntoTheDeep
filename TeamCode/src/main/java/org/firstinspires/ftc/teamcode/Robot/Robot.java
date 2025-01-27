@@ -106,6 +106,7 @@ public class Robot {
         InitializeArm();
         InitializeChassis();
         InitializeActiveIntake();
+        InitializeLocalizer(hm);
         InitializeStorage(hm);
     }
     public static void InitializeChassis(){
@@ -113,6 +114,11 @@ public class Robot {
         Chassis.FR = new CachedMotor(ControlHubMotors, 2, DcMotorSimple.Direction.FORWARD);
         Chassis.BL = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
         Chassis.BR = new CachedMotor(ExpansionHubMotors, 1, DcMotorSimple.Direction.FORWARD);
+
+        Chassis.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Chassis.FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Chassis.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Chassis.BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void InitializeLocalizer(HardwareMap hm){
         Localizer.pinPoint = hm.get(PinPoint.class, "pinpoint");
@@ -129,7 +135,7 @@ public class Robot {
     }
     public static void InitializeActiveIntake(){
         ActiveIntake.motor = new CachedMotor(ExpansionHubMotors, 0, DcMotorSimple.Direction.FORWARD);
-        ActiveIntake.blocker = new ServoPlus(ControlHubServos, 1, Servo.Direction.FORWARD); // TODO: portul bun
+        ActiveIntake.blocker = new ServoPlus(ControlHubServos, 0, Servo.Direction.FORWARD); // TODO: portul bun
     }
     public static void InitializeElevator(){
         Elevator.motor = new CachedMotor(ExpansionHubMotors, 3, DcMotorSimple.Direction.FORWARD);
@@ -146,7 +152,7 @@ public class Robot {
         Climb.W1 = new ServoPlus(ExpansionHubServos, 0, Servo.Direction.FORWARD);
         Climb.W2 = new ServoPlus(ExpansionHubServos, 4, Servo.Direction.FORWARD);
         Climb.PTO1 = new ServoPlus(ExpansionHubServos, 3, Servo.Direction.FORWARD);
-        Climb.PTO2 = new ServoPlus(ControlHubServos, 0, Servo.Direction.FORWARD);
+//        Climb.PTO2 = new ServoPlus(ControlHubServos, 0, Servo.Direction.FORWARD);
         Climb.run = Climb.climb;
     }
 }

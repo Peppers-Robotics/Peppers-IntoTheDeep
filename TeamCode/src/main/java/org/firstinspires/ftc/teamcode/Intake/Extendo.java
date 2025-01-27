@@ -15,7 +15,7 @@ public class Extendo {
     public static CachedMotor motor;
     public static PIDController pidController = new PIDController(0.01, 0, -0.0004);
     public static int MaxExtendoExtension = 850;
-    private static volatile double targetPosition = 0;
+    private static double targetPosition = 0;
     public static boolean ReachedTargetPosition(){
         return Math.abs(targetPosition - getCurrentPosition()) <= 5;
     }
@@ -35,15 +35,16 @@ public class Extendo {
         }).start();
     }
     public static void Extend(int position){
+        if(position < 0) position = 0;
+        if(position > MaxExtendoExtension) position = MaxExtendoExtension;
         if(position == targetPosition) return;
 
         targetPosition = position;
         pidController.setTargetPosition(position);
     }
-    public static boolean DISABLE = false, RESET = true, was = false;
+    public static boolean DISABLE = false, was = false;
     private static ElapsedTime time = new ElapsedTime();
     public static boolean PowerOnToTransfer = false;
-    public static ElapsedTime retractTime = new ElapsedTime(), waitToCloseClaw = new ElapsedTime();
     public static int getTargetPosition(){
         return (int) targetPosition;
     }
@@ -69,6 +70,7 @@ public class Extendo {
 //        }
 
         if(PowerOnToTransfer) {
+            motor.setMotorEnable();
             motor.setPower(-1);
         } else {
             motor.setPower(12.f / Robot.VOLTAGE * pidController.calculatePower(motor.getCurrentPosition(), motor.getVelocity()));
