@@ -57,20 +57,27 @@ public class Scheduler implements Cloneable {
         }
         if(result)
             tasks.removeLast();
-        else
-            if(t.needsReset) t.reset();
     }
 
     public Scheduler lineTo(SparkFunOTOS.Pose2D pose){
         addTask(new LineTo(pose));
         return this;
     }
-    public Scheduler LineToContinuous(SparkFunOTOS.Pose2D pose){
+    public Scheduler lineToAsync(SparkFunOTOS.Pose2D pose){
         addTask(new Task() {
             @Override
             public boolean Run() {
-                Chassis.setTargetPosition(pose);
+                Chassis.profiledFollow(pose);
                 return true;
+            }
+        });
+        return this;
+    }
+    public Scheduler waitForSync(){
+        addTask(new Task() {
+            @Override
+            public boolean Run() {
+                return Chassis.asyncFollow;
             }
         });
         return this;
@@ -91,7 +98,8 @@ public class Scheduler implements Cloneable {
         try {
             Scheduler clone = (Scheduler) super.clone();
             // TODO: copy mutable state here, so the clone can't change the internals of the original
-            clone.tasks = (LinkedList<Task>) tasks.clone();
+            clone.tasks = new LinkedList<>();
+            clone.tasks.addAll(tasks);
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

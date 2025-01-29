@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 
 
@@ -26,6 +27,8 @@ public class Chassis {
 
     // Autonomous implementation
 
+
+
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
     public static PIDController Strafe = new PIDController(0.005, 0, 0.04),
                                 Forward = new PIDController(-0.005, 0, -0.025),
@@ -47,7 +50,28 @@ public class Chassis {
         return targetPosition;
     }
 
+
+    public static AsymmetricMotionProfile xProfile = new AsymmetricMotionProfile(1270, 1000, 2500),
+            yProfile = new AsymmetricMotionProfile(1270, 1000, 2500),
+            hProfile = new AsymmetricMotionProfile(Math.PI * 2, Math.PI, Math.PI);
+    public static boolean asyncFollow = false;
+
+    public static void profiledFollow(SparkFunOTOS.Pose2D pose){
+        xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x);
+        yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y);
+        hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h);
+        asyncFollow = true;
+    }
+
     public static void Update(){
+        if(asyncFollow){
+            xProfile.update();
+            yProfile.update();
+            hProfile.update();
+            setTargetPosition(new SparkFunOTOS.Pose2D(xProfile.getPosition(), yProfile.getPosition(), hProfile.getPosition()));
+            if(xProfile.motionEnded() && yProfile.motionEnded() && hProfile.motionEnded()) asyncFollow = false;
+        }
+
 
         SparkFunOTOS.Pose2D normal = new SparkFunOTOS.Pose2D(
                 getTargetPosition().x - Localizer.getCurrentPosition().x,

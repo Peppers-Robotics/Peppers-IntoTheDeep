@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
-@TeleOp(name=".pippersBLUE ")
+@TeleOp(name=".pippersBLUE \uD83D\uDD35")
 public class BLUE extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

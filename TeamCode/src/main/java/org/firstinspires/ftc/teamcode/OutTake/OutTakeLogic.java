@@ -133,7 +133,6 @@ public class OutTakeLogic {
                         CurrentState = States.IDLE_WITH_SAMPLE;
                         Controls.Transfer = false;
                     }
-                    break;
                 case IDLE_WITH_SAMPLE:
                     if (Controls.ScoreLevel1) {
 

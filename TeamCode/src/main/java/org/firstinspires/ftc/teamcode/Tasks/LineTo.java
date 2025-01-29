@@ -19,6 +19,7 @@ public class LineTo extends Task {
         yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y);
         hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h);
     }
+
     @Override
     public boolean Run() {
         xProfile.update();

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Robot;
 
 import android.net.IpSecManager;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -40,7 +41,7 @@ public class Localizer {
         lastPose = getCurrentPosition();
         Div(velocity, time.seconds());
 
-        Robot.telemetry.addData("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + getCurrentPosition().h + "deg)");
+        Robot.telemetry.addData("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toRadians(getCurrentPosition().h) + "deg)");
         time.reset();
     }
     public static void Reset(){
