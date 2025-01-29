@@ -2,7 +2,13 @@ package org.firstinspires.ftc.teamcode.Tasks;
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.Robot.Chassis;
+import org.firstinspires.ftc.teamcode.Robot.Localizer;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -55,6 +61,31 @@ public class Scheduler implements Cloneable {
             if(t.needsReset) t.reset();
     }
 
+    public Scheduler lineTo(SparkFunOTOS.Pose2D pose){
+        addTask(new LineTo(pose));
+        return this;
+    }
+    public Scheduler LineToContinuous(SparkFunOTOS.Pose2D pose){
+        addTask(new Task() {
+            @Override
+            public boolean Run() {
+                Chassis.setTargetPosition(pose);
+                return true;
+            }
+        });
+        return this;
+    }
+    public Scheduler waitForStill(){
+        addTask(new Task() {
+            @Override
+            public boolean Run() {
+                return Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), Chassis.getTargetPosition()) < 0.5;
+            }
+        });
+        return this;
+    }
+
+    @NonNull
     @Override
     public Scheduler clone() {
         try {

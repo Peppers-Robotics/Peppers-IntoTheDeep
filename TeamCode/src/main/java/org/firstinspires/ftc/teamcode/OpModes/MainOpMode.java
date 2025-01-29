@@ -20,10 +20,16 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 
 @TeleOp(name = ".mainopMode")
+@Disabled
 public class MainOpMode extends LinearOpMode {
     public static boolean isClimbing = false;
     public static final double tSlow = 0.5, rotSlow = 0.4;
     public double rotSpeed = 0.8, tSpeed = 0.6;
+
+    public static double getSquaredSigned(double h){
+        return Math.signum(h) * (h * h);
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         Robot.InitializeFull(hardwareMap);
@@ -58,7 +64,8 @@ public class MainOpMode extends LinearOpMode {
                 tSpeed = tSlow;
                 rotSpeed = rotSlow;
             }
-            Chassis.drive(gamepad1.left_stick_x * tSpeed, -gamepad1.left_stick_y * tSpeed, (gamepad1.right_trigger - gamepad1.left_trigger) * rotSpeed);
+//            Chassis.drive(gamepad1.left_stick_x * tSpeed, -gamepad1.left_stick_y * tSpeed, (gamepad1.right_trigger - gamepad1.left_trigger) * rotSpeed);
+            Chassis.drive(getSquaredSigned(gamepad1.left_stick_x), -getSquaredSigned(gamepad1.left_stick_y), getSquaredSigned(gamepad1.right_trigger - gamepad1.left_trigger));
             OutTakeLogic.update();
             IntakeLogic.update();
             Arm.update();

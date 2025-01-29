@@ -17,7 +17,7 @@ public class Wait extends Task {
     public void reset(){ time.reset(); needsReset = false;}
     @Override
     public boolean Run() {
-//        Robot.telemetry.addData("time", time.seconds());
+        Robot.telemetry.addData("time", time.seconds());
         if(time.seconds() >= s){
             needsReset = true;
             return true;

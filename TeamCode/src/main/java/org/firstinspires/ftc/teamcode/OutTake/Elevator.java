@@ -93,10 +93,9 @@ public class Elevator {
             Chassis.FR.setPower(pp);
             return;
         }
-        if(getTargetPosition() <= 0 && getCurrentPosition() < 10 && !PowerOnDownToTakeSample){
+        if(getTargetPosition() <= 0 && getCurrentPosition() < 30 && !PowerOnDownToTakeSample){
             motor.setMotorDisable();
-        }
-        if(getTargetPosition() >= 0 || PowerOnDownToTakeSample){
+        } else if(getTargetPosition() > 0 || PowerOnDownToTakeSample){
             motor.setMotorEnable();
         }
 

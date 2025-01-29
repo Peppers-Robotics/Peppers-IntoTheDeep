@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
@@ -23,7 +21,7 @@ public class Extendo {
         return Math.abs(targetPosition - getCurrentPosition()) <= t;
     }
 
-    public static double getCurrentPosition(){
+    public static int getCurrentPosition(){
         return motor.getCurrentPosition();
     }
 

@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 @Config
 public class DropDown {
     public static ServoPlus servo;
-    public static double Up = 270;
+    public static double Up = 280;
     public static double retractedDown = 180, extendedDown = 205;
 
     public static void setDown(double precent){

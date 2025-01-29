@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 
-import java.nio.channels.FileChannel;
 
 @Config
 public class Chassis {
@@ -26,42 +23,52 @@ public class Chassis {
         BL.setPower(bl * BLd);
         BR.setPower(br * BRd);
     }
-    public static void driveFiledCentric(double x, double y, double r){
-        double xP = x * Math.cos(-Localizer.getCurrentPosition().getHeading(AngleUnit.RADIANS)) - y * Math.sin(-Localizer.getCurrentPosition().getHeading(AngleUnit.RADIANS));
-        double yP = y * Math.cos(-Localizer.getCurrentPosition().getHeading(AngleUnit.RADIANS)) + x * Math.sin(-Localizer.getCurrentPosition().getHeading(AngleUnit.RADIANS));
-        drive(xP, yP, r);
-    }
 
     // Autonomous implementation
 
-    private static Pose2D targetPosition;
-    public static PIDController Translational = new PIDController(0, 0, 0),
-                                Heading       = new PIDController(0, 0, 0);
+    private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
+    public static PIDController Strafe = new PIDController(0.005, 0, 0.04),
+                                Forward = new PIDController(-0.005, 0, -0.025),
+                                Heading       = new PIDController(1.5, 0, -0.001);
 
-    public static void setTargetPosition(Pose2D pose){
+    public static void setTargetPosition(SparkFunOTOS.Pose2D pose){
+        Strafe.setTargetPosition(0);
+        Forward.setTargetPosition(0);
+        Heading.setTargetPosition(0);
         targetPosition = pose;
     }
-    private static double getDistance(Pose2D A, Pose2D B){
-        return Math.sqrt(
-                (A.getX(DistanceUnit.MM) - B.getX(DistanceUnit.MM)) * (A.getX(DistanceUnit.MM) - B.getX(DistanceUnit.MM)) +
-                (A.getY(DistanceUnit.MM) - B.getY(DistanceUnit.MM)) * (A.getY(DistanceUnit.MM) - B.getY(DistanceUnit.MM)) );
+    static{
+        Strafe.setFreq(500);
+        Forward.setFreq(500);
+        Heading.setFreq(500);
     }
+
+    public static SparkFunOTOS.Pose2D getTargetPosition(){
+        return targetPosition;
+    }
+
     public static void Update(){
-        double error = getDistance(Localizer.getCurrentPosition(), targetPosition);
-        double directionalVelocity = Math.sqrt(Localizer.getVelocity().getX(DistanceUnit.MM) * Localizer.getVelocity().getX(DistanceUnit.MM) +
-                                     Localizer.getVelocity().getY(DistanceUnit.MM) * Localizer.getVelocity().getY(DistanceUnit.MM));
-        double pow = Translational.calculatePower(error, directionalVelocity);
-        double xError = Localizer.getCurrentPosition().getX(DistanceUnit.MM) - targetPosition.getX(DistanceUnit.MM);
-        double yError = Localizer.getCurrentPosition().getY(DistanceUnit.MM) - targetPosition.getY(DistanceUnit.MM);
 
-        double Herror = Localizer.getCurrentPosition().getHeading(AngleUnit.DEGREES) - targetPosition.getHeading(AngleUnit.DEGREES);
-        while(Herror > Math.PI) Herror -= Math.PI * 2;
+        SparkFunOTOS.Pose2D normal = new SparkFunOTOS.Pose2D(
+                getTargetPosition().x - Localizer.getCurrentPosition().x,
+                getTargetPosition().y - Localizer.getCurrentPosition().y,
+                getTargetPosition().h - Localizer.getCurrentPosition().h);
+
+        double Herror = normal.h;
         while(Herror < -Math.PI) Herror += Math.PI * 2;
-        double hP = Heading.calculatePower(Herror, Localizer.getVelocity().getHeading(AngleUnit.DEGREES));
-        double alpha = Math.atan2(xError, yError);
-        double xP = pow * Math.cos(alpha);
-        double yP = pow * Math.sin(alpha);
+        while(Herror >  Math.PI) Herror -= Math.PI * 2;
+        SparkFunOTOS.Pose2D error = new SparkFunOTOS.Pose2D(
+                Math.cos(Localizer.getCurrentPosition().h) * normal.x + Math.sin(Localizer.getCurrentPosition().h) * normal.y,
+                Math.sin(Localizer.getCurrentPosition().h) * normal.x - Math.cos(Localizer.getCurrentPosition().h) * normal.y,
+                Herror
+        );
 
-        driveFiledCentric(xP, yP, hP);
+        double xP = Strafe.calculatePower(error.x, Localizer.getVelocity().x);
+        double yP = Forward.calculatePower(error.y, Localizer.getVelocity().y);
+        double hP = Heading.calculatePower(error.h, Localizer.getVelocity().h);
+        Robot.telemetry.addData("xError", error.x);
+        Robot.telemetry.addData("yError", error.y);
+        Robot.telemetry.addData("hError", error.h);
+        drive(yP, xP, hP);
     }
 }
