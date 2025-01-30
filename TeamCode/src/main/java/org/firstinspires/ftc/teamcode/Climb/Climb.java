@@ -18,7 +18,7 @@ public class Climb {
     public static final Scheduler climb = new Scheduler();
     public static Scheduler run = new Scheduler();
     public static ServoPlus W1, W2, PTO1;
-    public static double BAR1 = 450, BAR2 = 950;
+    public static double BAR1 = 400, BAR2 = 950;
     public static double pitch = 0;
     public static double EngagePTO1 = 130, EngagePTO2 = 200, DisengagePTO1 = 180, DisengagePTO2 = 170,
                          EngageWheelie1 = 295, DisengageWheelie1 = 195, EngageWheelie2 = 125, DisengageWheelie2 = 245, climbArmIntertia = 310;
@@ -63,16 +63,16 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.setTargetPosition(BAR1);
-                        return Elevator.getCurrentPosition() > BAR1;
+                        Elevator.setTargetPosition(BAR1 + 50);
+                        return Elevator.getCurrentPosition() > BAR1 - 50;
                     }
                 })
                 .waitSeconds(0.1)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.setTargetPosition(BAR1 - 100);
-                        return Elevator.getCurrentPosition() > BAR1 - 50;
+                        Elevator.setTargetPosition(200);
+                        return Elevator.getCurrentPosition() < 300;
                     }
                 })
                 .addTask(new Task() {
@@ -88,20 +88,26 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.setTargetPosition(0);
+                        Elevator.setTargetPosition(-20);
                         return Elevator.getCurrentPosition() < 8;
                     }
                 })
-                .waitSeconds(0.05)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
                         Elevator.Disable = true;
+                        return true;
+                    }
+                })
+                .waitSeconds(0.2)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
                         Elevator.setTargetPosition(0);
                         DeactivateWheelie();
                         DisengagePTO();
-//                        Chassis.BL.setPower(0);
-//                        Chassis.BR.setPower(0);
+                        Chassis.BL.setPower(0.07);
+                        Chassis.BR.setPower(0.07);
                         return true;
                     }
                 })
@@ -110,10 +116,28 @@ public class Climb {
                     @Override
                     public boolean Run() {
                         Elevator.Disable = false;
-                        Elevator.setTargetPosition(BAR2 + 200);
-                        return Elevator.getCurrentPosition() > BAR2 - 30;
+                        Elevator.setTargetPosition(BAR2 + 50);
+                        return Elevator.getCurrentPosition() >= BAR2;
                     }
                 })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Arm.setArmAngle(climbArmIntertia);
+                        return true;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        if(pitch > -2){
+                            Elevator.setTargetPosition(BAR2 - 300);
+                            return true;
+                        }
+                        return false;
+                    }
+                })
+                .waitSeconds(0.1)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -123,29 +147,18 @@ public class Climb {
                         return true;
                     }
                 })
-                .waitSeconds(0.05)
-                .addTask(new Task() {
-                    @Override
-                    public boolean Run() {
-                        Arm.setArmAngle(climbArmIntertia);
-                        return true;
-                    }
-                })
                 .waitSeconds(0.08)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(pitch > -3){
-                            Elevator.setTargetPosition(-100);
-                            return true;
-                        }
-                        return false;
+                        Elevator.setTargetPosition(-100);
+                        return true;
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(Elevator.getCurrentPosition() < 0) {
+                        if(Elevator.getCurrentPosition() < 10) {
                             Elevator.setTargetPosition(0);
                             return true;
                         }

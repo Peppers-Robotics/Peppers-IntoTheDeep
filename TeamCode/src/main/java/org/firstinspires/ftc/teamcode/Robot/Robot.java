@@ -121,7 +121,7 @@ public class Robot {
         Chassis.BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void InitializeLocalizer(HardwareMap hm){
-        Localizer.pinPoint = hm.get(PinPoint.class, "pinpoint");
+        Localizer.Initialize(hm);
     }
     public static void InitializeStorage(HardwareMap hm){
         Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");

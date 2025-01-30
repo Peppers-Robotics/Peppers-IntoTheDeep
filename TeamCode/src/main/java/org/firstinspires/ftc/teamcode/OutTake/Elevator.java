@@ -19,7 +19,7 @@ public class Elevator {
     public static CachedMotor motor;
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
-    public static PIDCoefficients normal = new PIDCoefficients(0.015, 0, -0.0004);
+    public static PIDCoefficients normal = new PIDCoefficients(0.008, 0, -0.0002);
     public static double kfUp = 0.22, kfDown = 0.04, elevatorMin = 400, elevatorMax = 1080;
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(6000, 7000, 7000);
 
@@ -58,8 +58,10 @@ public class Elevator {
     public static void update() {
         if (Disable) {
             motor.setPower(0);
-            Chassis.FL.setPower(0);
-            Chassis.FR.setPower(0);
+            if(Climb.PTOActivated()) {
+                Chassis.FL.setPower(0);
+                Chassis.FR.setPower(0);
+            }
             return;
         }
         Robot.telemetry.addData("Elevator Current Position", motor.getCurrentPosition());

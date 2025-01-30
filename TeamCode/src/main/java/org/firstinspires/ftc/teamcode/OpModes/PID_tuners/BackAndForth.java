@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 @TeleOp(group = "Chassis")
 @Config
 public class BackAndForth extends LinearOpMode {
-    public static double DISTANCE = -1500;
+    public static double DISTANCE = 1500;
 
     @Override
     public void runOpMode() throws InterruptedException {

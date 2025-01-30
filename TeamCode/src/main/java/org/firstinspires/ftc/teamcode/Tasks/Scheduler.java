@@ -77,7 +77,7 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
-                return Chassis.asyncFollow;
+                return !Chassis.asyncFollow;
             }
         });
         return this;

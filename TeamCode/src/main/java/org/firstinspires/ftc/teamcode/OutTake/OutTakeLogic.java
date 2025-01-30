@@ -24,7 +24,7 @@ public class OutTakeLogic {
     public static double ArmScoreSample = 260, PivotScoreSample = 0;
     public static double ArmTakeSpecimen = 350, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0;
-    public static double ArmIdle = 18, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 18;
+    public static double ArmIdle = 18, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0.2, ArmTransfer = 18;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
@@ -15,6 +16,7 @@ public class BLUE extends LinearOpMode {
 
         waitForStart();
         Robot.enable();
+        DropDown.setDown(0);
 
         while (opModeIsActive()){
             opmode.update();

@@ -30,9 +30,10 @@ public class Chassis {
 
 
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
-    public static PIDController Strafe = new PIDController(0.005, 0, 0.04),
-                                Forward = new PIDController(-0.005, 0, -0.025),
-                                Heading       = new PIDController(1.5, 0, -0.001);
+    public static double angleStrafe = 0, angleForward = 10;
+    public static PIDController Strafe = new PIDController(0.002, 0.001, 0.01),
+                                Forward = new PIDController(-0.007, -0.005, 0.03),
+                                Heading       = new PIDController(2, 0, -0.1);
 
     public static void setTargetPosition(SparkFunOTOS.Pose2D pose){
         Strafe.setTargetPosition(0);
@@ -51,8 +52,8 @@ public class Chassis {
     }
 
 
-    public static AsymmetricMotionProfile xProfile = new AsymmetricMotionProfile(1270, 1000, 2500),
-            yProfile = new AsymmetricMotionProfile(1270, 1000, 2500),
+    public static AsymmetricMotionProfile xProfile = new AsymmetricMotionProfile(3000, 4000, 2500),
+            yProfile = new AsymmetricMotionProfile(3000, 4000, 1000),
             hProfile = new AsymmetricMotionProfile(Math.PI * 2, Math.PI, Math.PI);
     public static boolean asyncFollow = false;
 
@@ -93,6 +94,6 @@ public class Chassis {
         Robot.telemetry.addData("xError", error.x);
         Robot.telemetry.addData("yError", error.y);
         Robot.telemetry.addData("hError", error.h);
-        drive(yP, xP, hP);
+        drive(yP, -(Math.cos(angleStrafe) * xP + Math.sin(angleStrafe) * yP), hP);
     }
 }

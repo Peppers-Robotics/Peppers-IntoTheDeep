@@ -29,6 +29,8 @@ public class Localizer {
         pinPoint.resetPosAndIMU();
     }
     public static double getDistanceFromTwoPoints(SparkFunOTOS.Pose2D p1, SparkFunOTOS.Pose2D p2){
+        if(p1 == null) p1 = new SparkFunOTOS.Pose2D();
+        if(p2 == null) p2 = new SparkFunOTOS.Pose2D();
         return Math.sqrt(
                 (p1.x - p2.x) * (p1.x - p2.x) +
                 (p1.y - p2.y) * (p1.y - p2.y)
@@ -41,7 +43,7 @@ public class Localizer {
         lastPose = getCurrentPosition();
         Div(velocity, time.seconds());
 
-        Robot.telemetry.addData("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toRadians(getCurrentPosition().h) + "deg)");
+        Robot.telemetry.addData("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");
         time.reset();
     }
     public static void Reset(){

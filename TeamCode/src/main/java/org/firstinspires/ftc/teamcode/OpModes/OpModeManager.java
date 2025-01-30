@@ -34,16 +34,24 @@ public class OpModeManager {
 
         Robot.InitializeFull(hardwareMap);
         Controls.Initialize(gamepad1, gamepad2);
+        IntakeLogic.Initialize(gamepad1, gamepad2);
         Extendo.pidController.setFreq(40);
         Elevator.controller.setFreq(40);
 
         Extendo.Extend(0);
-        DropDown.setDown(0);
         ActiveIntake.Block();
         Claw.open();
     }
     public static double getSquaredSigned(double h){
         return Math.signum(h) * (h * h);
+    }
+    public static double getPowerSigned(double h, double p){
+        double sgn = Math.signum(h);
+        h = Math.abs(h);
+        for(int i = 1; i < p; i++){
+            h *= h;
+        }
+        return sgn * h;
     }
     public void update(){
         Robot.clearCache();
@@ -58,7 +66,7 @@ public class OpModeManager {
             return;
         }
 
-        Chassis.drive(getSquaredSigned(gamepad1.left_stick_x), -getSquaredSigned(gamepad1.left_stick_y), getSquaredSigned(gamepad1.right_trigger - gamepad1.left_trigger));
+        Chassis.drive(getPowerSigned(gamepad1.left_stick_x, 3), -getPowerSigned(gamepad1.left_stick_y, 3), getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3));
         OutTakeLogic.update();
         IntakeLogic.update();
         Extendo.update();
