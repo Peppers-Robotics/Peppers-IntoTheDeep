@@ -73,6 +73,16 @@ public class Scheduler implements Cloneable {
         });
         return this;
     }
+    public Scheduler lineToLinearHeadingAsync(SparkFunOTOS.Pose2D pose){
+        addTask(new Task() {
+            @Override
+            public boolean Run() {
+                Chassis.profiledLinearHeading(pose);
+                return true;
+            }
+        });
+        return this;
+    }
     public Scheduler waitForSync(){
         addTask(new Task() {
             @Override

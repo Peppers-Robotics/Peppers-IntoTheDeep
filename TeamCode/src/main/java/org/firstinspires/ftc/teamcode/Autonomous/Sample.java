@@ -41,6 +41,7 @@ public class Sample extends LinearOpMode {
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
+                                ActiveIntake.Block();
                                 ActiveIntake.powerOn();
                                 return true;
                             }
@@ -75,7 +76,7 @@ public class Sample extends LinearOpMode {
                                 Elevator.PowerOnDownToTakeSample = false;
                                 Extendo.PowerOnToTransfer = false;
                                 ActiveIntake.powerOff();
-                                Elevator.setTargetPosition(OutTakeLogic.ElevatorUp);
+                                Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
                                 if (Elevator.getCurrentPosition() > OutTakeLogic.ElevatorUp - 80) {
                                     Arm.setArmAngle(OutTakeLogic.ArmUpSample);
                                     Arm.setPivotAngle(OutTakeLogic.PivotUpSample);
@@ -86,7 +87,6 @@ public class Sample extends LinearOpMode {
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
-                                Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
                                 return Math.abs(Elevator.getCurrentPosition() - OutTakeLogic.ElevatorScoreSample2) < 300;
                             }
                         })
@@ -161,12 +161,12 @@ public class Sample extends LinearOpMode {
                             return Storage.hasTeamPice() || (double) (System.currentTimeMillis() - time) / 1000.f >= 1;
                         }
                     })
-                    .waitSeconds(0.2)
+//                    .waitSeconds(0.2)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            ActiveIntake.Block();
-                            ActiveIntake.powerOn(0.5);
+//                            ActiveIntake.Block();
+                            ActiveIntake.powerOn(1);
                             Extendo.Extend(0);
                             DropDown.setDown(0);
                             return true;
@@ -250,7 +250,7 @@ public class Sample extends LinearOpMode {
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
-                .waitSeconds(0.1)
+                .waitSeconds(0.05)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -258,7 +258,7 @@ public class Sample extends LinearOpMode {
                         return true;
                     }
                 })
-                .waitSeconds(0.05)
+//                .waitSeconds(0.05)
                 .lineToAsync(sample2)
                 .addTask(new Task() {
                     @Override
@@ -272,7 +272,7 @@ public class Sample extends LinearOpMode {
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
-                .waitSeconds(0.15)
+                .waitSeconds(0.05)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -295,7 +295,7 @@ public class Sample extends LinearOpMode {
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
-                .waitSeconds(0.1)
+                .waitSeconds(0.05)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -304,7 +304,8 @@ public class Sample extends LinearOpMode {
                         return true;
                     }
                 })
-                .waitSeconds(0.15)
+                .waitSeconds(0.05)
+//                .lineToAsync(new SparkFunOTOS.Pose2D(park.x, park.y, basketPosition.h))
                 .lineToAsync(park)
                 .waitSeconds(0.4)
                 .addTask(new Retract())

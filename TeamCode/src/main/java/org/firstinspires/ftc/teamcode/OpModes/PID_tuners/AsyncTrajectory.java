@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 
-@TeleOp
+@TeleOp(name = "BackAndForth")
 @Config
 public class AsyncTrajectory extends LinearOpMode {
     public static double DISTANCE = 1500;
@@ -22,12 +22,12 @@ public class AsyncTrajectory extends LinearOpMode {
 
         Scheduler task = new Scheduler(), runner;
         task
-                .lineToAsync(new SparkFunOTOS.Pose2D(DISTANCE, 0, Math.toRadians(90)))
+                .lineToLinearHeadingAsync(new SparkFunOTOS.Pose2D(DISTANCE, 0, Math.toRadians(90)))
                 .waitForSync()
-                .waitSeconds(4)
-                .lineToAsync(new SparkFunOTOS.Pose2D(0, 0, 0))
+                .waitSeconds(2)
+                .lineToLinearHeadingAsync(new SparkFunOTOS.Pose2D(0, 0, 0))
                 .waitForSync()
-                .waitSeconds(4)
+                .waitSeconds(2)
 
                 ;
 

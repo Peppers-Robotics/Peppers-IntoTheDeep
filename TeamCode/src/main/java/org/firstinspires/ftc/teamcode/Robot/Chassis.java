@@ -5,6 +5,7 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 
 
@@ -56,12 +57,23 @@ public class Chassis {
             yProfile = new AsymmetricMotionProfile(3000, 4000, 1000),
             hProfile = new AsymmetricMotionProfile(Math.PI * 2, Math.PI, Math.PI);
     public static boolean asyncFollow = false;
+    public static boolean linearHeading = false;
+    private static LinearFunction headingInterpolation;
+    private static double totalDistanceToTravel = 0;
 
     public static void profiledFollow(SparkFunOTOS.Pose2D pose){
         xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x);
         yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y);
         hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h);
+        totalDistanceToTravel = Math.sqrt((Localizer.getCurrentPosition().x - pose.x) * (Localizer.getCurrentPosition().x - pose.x) +
+                                          (Localizer.getCurrentPosition().y - pose.y) * (Localizer.getCurrentPosition().y - pose.y));
         asyncFollow = true;
+        linearHeading = false;
+    }
+    public static void profiledLinearHeading(SparkFunOTOS.Pose2D pose){
+        headingInterpolation = new LinearFunction(Localizer.getCurrentPosition().h, pose.h);
+        profiledFollow(pose);
+        linearHeading = true;
     }
 
     public static void Update(){
@@ -69,8 +81,14 @@ public class Chassis {
             xProfile.update();
             yProfile.update();
             hProfile.update();
-            setTargetPosition(new SparkFunOTOS.Pose2D(xProfile.getPosition(), yProfile.getPosition(), hProfile.getPosition()));
-            if(xProfile.motionEnded() && yProfile.motionEnded() && hProfile.motionEnded()) asyncFollow = false;
+            double h = hProfile.getPosition();
+            if(linearHeading){
+                double soFar = Math.sqrt((Localizer.getCurrentPosition().x - xProfile.getTargetPosition()) * (Localizer.getCurrentPosition().x - xProfile.getTargetPosition()) +
+                                (Localizer.getCurrentPosition().y - yProfile.getTargetPosition()) * (Localizer.getCurrentPosition().y - yProfile.getTargetPosition()));
+                h = headingInterpolation.getOutput(soFar / totalDistanceToTravel);
+            }
+            setTargetPosition(new SparkFunOTOS.Pose2D(xProfile.getPosition(), yProfile.getPosition(), h));
+            if(xProfile.motionEnded() && yProfile.motionEnded() && (linearHeading || hProfile.motionEnded())) asyncFollow = false;
         }
 
 
@@ -94,8 +112,7 @@ public class Chassis {
         Robot.telemetry.addData("xError", error.x);
         Robot.telemetry.addData("yError", error.y);
         Robot.telemetry.addData("hError", error.h);
-        double p = 13.f / Robot.VOLTAGE;
-        if(Robot.VOLTAGE < 13) p = 1;
+
         drive(yP, -xP, hP);
     }
 }

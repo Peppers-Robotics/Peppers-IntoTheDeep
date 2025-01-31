@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes.PID_tuners;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 
 @TeleOp(group = "Chassis")
 @Config
+@Disabled
 public class BackAndForth extends LinearOpMode {
     public static double DISTANCE = 1500;
 
