@@ -60,7 +60,7 @@ public class Sample extends LinearOpMode {
                                 return true;
                             }
                         })
-                        .waitSeconds(0.1)
+                        .waitSeconds(0.2)
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
@@ -114,7 +114,7 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Extendo.Extend(200);
+                            Extendo.Extend(400);
                             Arm.setArmAngle(OutTakeLogic.ArmIdle);
                             Elevator.PowerOnDownToTakeSample = true;
                             Elevator.setTargetPosition(0);
@@ -161,7 +161,7 @@ public class Sample extends LinearOpMode {
                             return Storage.hasTeamPice() || (double) (System.currentTimeMillis() - time) / 1000.f >= 1;
                         }
                     })
-                    .waitSeconds(0.1)
+                    .waitSeconds(0.2)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -182,8 +182,8 @@ public class Sample extends LinearOpMode {
     }
     public static SparkFunOTOS.Pose2D
             basketPosition = new SparkFunOTOS.Pose2D(514, -147, Math.toRadians(47)),
-            sample1 = new SparkFunOTOS.Pose2D(305, -350, Math.toRadians(85)),
-            sample2 = new SparkFunOTOS.Pose2D(459, -400, Math.toRadians(90)),
+            sample1 = new SparkFunOTOS.Pose2D(280, -345, Math.toRadians(85)),
+            sample2 = new SparkFunOTOS.Pose2D(450, -400, Math.toRadians(95)),
             sample3 = new SparkFunOTOS.Pose2D(459, -400, Math.toRadians(115)),
             park = new SparkFunOTOS.Pose2D(0, 0, 0);
 
@@ -226,7 +226,7 @@ public class Sample extends LinearOpMode {
                     }
                 })
                 .waitForSync()
-                .waitSeconds(0.2)
+                .waitSeconds(0.3)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -234,7 +234,7 @@ public class Sample extends LinearOpMode {
                         return true;
                     }
                 })
-                .waitSeconds(0.1)
+                .waitSeconds(0.05)
                 .lineToAsync(sample1)
 
                 .addTask(new Task() {
@@ -245,8 +245,8 @@ public class Sample extends LinearOpMode {
                 })
 
                 .addTask(new Retract())
-                .addTask(new TakeSample(650))
-//                .waitForSync()
+                .waitForSync()
+                .addTask(new TakeSample(750))
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
@@ -258,9 +258,8 @@ public class Sample extends LinearOpMode {
                         return true;
                     }
                 })
-//                .waitSeconds(0.05)
+                .waitSeconds(0.05)
                 .lineToAsync(sample2)
-                .addTask(new TakeSample(650))
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -268,11 +267,12 @@ public class Sample extends LinearOpMode {
                     }
                 })
                 .addTask(new Retract())
-//                .waitForSync()
+                .waitForSync()
+                .addTask(new TakeSample(650))
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
-                .waitSeconds(0.1)
+                .waitSeconds(0.15)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -280,9 +280,8 @@ public class Sample extends LinearOpMode {
                         return true;
                     }
                 })
-//                .waitSeconds(0.05)
+                .waitSeconds(0.05)
                 .lineToAsync(sample3)
-                .addTask(new TakeSample(650))
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -291,7 +290,8 @@ public class Sample extends LinearOpMode {
                 })
 
                 .addTask(new Retract())
-//                .waitForSync()
+                .waitForSync()
+                .addTask(new TakeSample(650))
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
@@ -304,10 +304,17 @@ public class Sample extends LinearOpMode {
                         return true;
                     }
                 })
-                .waitSeconds(0.1)
+                .waitSeconds(0.15)
                 .lineToAsync(park)
                 .waitSeconds(0.4)
                 .addTask(new Retract())
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Extendo.Extend(0);
+                        return true;
+                    }
+                })
                 ;
 
         while(opModeInInit()){

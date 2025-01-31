@@ -22,7 +22,7 @@ public class OutTakeLogic {
     public static double ElevatorScoreSpecimen = 600;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 260, PivotScoreSample = 0;
-    public static double ArmTakeSpecimen = 350, PivotTakeSpecimen = 0;
+    public static double ArmTakeSpecimen = 370, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0;
     public static double ArmIdle = 18, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0.2, ArmTransfer = 18;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
@@ -240,6 +240,8 @@ public class OutTakeLogic {
 
                         Controls.Grab = false;
                         CurrentState = States.IDLE;
+                        Controls.ScoreLevel2 = false;
+                        Controls.ScoreLevel1 = false;
                     }
                     break;
                 case IDLE_TAKE_SPECIMEN:

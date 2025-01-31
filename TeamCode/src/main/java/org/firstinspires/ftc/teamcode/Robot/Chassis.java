@@ -94,6 +94,8 @@ public class Chassis {
         Robot.telemetry.addData("xError", error.x);
         Robot.telemetry.addData("yError", error.y);
         Robot.telemetry.addData("hError", error.h);
-        drive(yP, -(Math.cos(angleStrafe) * xP + Math.sin(angleStrafe) * yP), hP);
+        double p = 13.f / Robot.VOLTAGE;
+        if(Robot.VOLTAGE < 13) p = 1;
+        drive(yP, -xP, hP);
     }
 }
