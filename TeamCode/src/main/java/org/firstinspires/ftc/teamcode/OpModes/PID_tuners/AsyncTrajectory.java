@@ -5,6 +5,8 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Intake.DropDown;
+import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
@@ -19,6 +21,8 @@ public class AsyncTrajectory extends LinearOpMode {
         Robot.InitializeHubs(hardwareMap);
         Robot.InitializeChassis();
         Robot.InitializeLocalizer(hardwareMap);
+        Robot.InitializeExtendo();
+        Robot.InitializeDropDown();
 
         Scheduler task = new Scheduler(), runner;
         task
@@ -30,7 +34,8 @@ public class AsyncTrajectory extends LinearOpMode {
                 .waitSeconds(2)
 
                 ;
-
+        Extendo.Extend(0);
+        DropDown.setDown(0);
         waitForStart();
         runner = task.clone();
 
@@ -41,6 +46,7 @@ public class AsyncTrajectory extends LinearOpMode {
             runner.update();
             Localizer.Update();
             Chassis.Update();
+            Extendo.update();
         }
     }
 }

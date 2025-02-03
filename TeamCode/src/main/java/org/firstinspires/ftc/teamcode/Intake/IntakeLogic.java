@@ -18,7 +18,7 @@ public class IntakeLogic extends GenericController {
         IDLE
     }
     public static States state = States.RETRACT;
-    public static ElapsedTime time = new ElapsedTime();
+    public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime();
     public static boolean wasDriverActivated = false;
     private static boolean reset = false;
     private static int pos = 0;
@@ -81,10 +81,19 @@ public class IntakeLogic extends GenericController {
             wasDriverActivated = false;
         }
         if(Math.abs(gamepad2.right_trigger) > 0.02 && (ActiveIntake.isOff() || wasDriverActivated)){
-            ActiveIntake.powerOn(1);
-            DropDown.setDown(gamepad2.right_trigger);
+            if(Storage.hasTeamPice()) {
+                if(blocker.seconds() >= 0.15) {
+                    ActiveIntake.Block();
+                    ActiveIntake.Reverse(0.7);
+                    DropDown.setDown(0);
+                }
+            } else {
+                blocker.reset();
+                ActiveIntake.powerOn(1);
+                ActiveIntake.Unblock();
+                DropDown.setDown(gamepad2.right_trigger);
+            }
             //unblock
-            ActiveIntake.Unblock();
             wasDriverActivated = true;
         }
         if(Math.abs(gamepad2.left_trigger) > 0.02 && (ActiveIntake.isOff() || wasDriverActivated)){
