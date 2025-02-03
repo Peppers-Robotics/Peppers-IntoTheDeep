@@ -135,4 +135,9 @@ public class Chassis {
 
         drive(yP * p, -xP * p, hP * p);
     }
+    public static double getPrecentageOfMotionDone(){
+        double soFar = Math.sqrt((xProfile.getPosition() - xProfile.getTargetPosition()) * (xProfile.getPosition() - xProfile.getTargetPosition()) +
+                (yProfile.getPosition() - yProfile.getTargetPosition()) * (yProfile.getPosition() - yProfile.getTargetPosition()));
+        return (1 - soFar / totalDistanceToTravel) * 100.f;
+    }
 }

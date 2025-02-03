@@ -133,59 +133,6 @@ public class OutTakeLogic {
                         CurrentState = States.IDLE_WITH_SAMPLE;
                         Controls.Transfer = false;
                     }
-                case IDLE_WITH_SAMPLE:
-                    if (Controls.ScoreLevel1) {
-
-                        currentTask = new Scheduler();
-                        {
-                            currentTask
-                                    .addTask(new Task() {
-                                        @Override
-                                        public boolean Run() {
-                                            Elevator.setTargetPosition(ElevatorScoreSample);
-                                            return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 120;
-                                        }
-                                    })
-                                    .addTask(new Task() {
-                                        @Override
-                                        public boolean Run() {
-                                            Arm.setArmAngle(ArmScoreSample);
-                                            Arm.setPivotAngle(PivotScoreSample);
-                                            return Arm.motionCompleted();
-                                        }
-                                    });
-                        }
-                        ElevatorScoreSample = ElevatorScoreSample1;
-                        Controls.ScoreLevel1 = false;
-                        Controls.Grab = false;
-                        CurrentState = States.IDLE_SCORE_SAMPLE;
-                    }
-                    if (Controls.ScoreLevel2) {
-
-                        currentTask = new Scheduler();
-                        {
-                        currentTask
-                                .addTask(new Task() {
-                                    @Override
-                                    public boolean Run() {
-                                        Elevator.setTargetPosition(ElevatorScoreSample);
-                                        return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 300;
-                                    }
-                                })
-                                .addTask(new Task() {
-                                    @Override
-                                    public boolean Run() {
-                                        Arm.setArmAngle(ArmScoreSample);
-                                        Arm.setPivotAngle(PivotScoreSample);
-                                        return Arm.motionCompleted();
-                                    }
-                                });
-                    }
-                        ElevatorScoreSample = ElevatorScoreSample2;
-                        Controls.ScoreLevel2 = false;
-                        Controls.Grab = false;
-                        CurrentState = States.IDLE_SCORE_SAMPLE;
-                    }
                     break;
                 case IDLE_SCORE_SAMPLE:
                     if (Controls.Grab) {
@@ -243,7 +190,61 @@ public class OutTakeLogic {
                         Controls.ScoreLevel2 = false;
                         Controls.ScoreLevel1 = false;
                     }
+                case IDLE_WITH_SAMPLE:
+                    if (Controls.ScoreLevel1) {
+
+                        currentTask = new Scheduler();
+                        {
+                            currentTask
+                                    .addTask(new Task() {
+                                        @Override
+                                        public boolean Run() {
+                                            Elevator.setTargetPosition(ElevatorScoreSample);
+                                            return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 120;
+                                        }
+                                    })
+                                    .addTask(new Task() {
+                                        @Override
+                                        public boolean Run() {
+                                            Arm.setArmAngle(ArmScoreSample);
+                                            Arm.setPivotAngle(PivotScoreSample);
+                                            return Arm.motionCompleted();
+                                        }
+                                    });
+                        }
+                        ElevatorScoreSample = ElevatorScoreSample1;
+                        Controls.ScoreLevel1 = false;
+                        Controls.Grab = false;
+                        CurrentState = States.IDLE_SCORE_SAMPLE;
+                    }
+                    if (Controls.ScoreLevel2) {
+
+                        currentTask = new Scheduler();
+                        {
+                        currentTask
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
+                                        Elevator.setTargetPosition(ElevatorScoreSample);
+                                        return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 300;
+                                    }
+                                })
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
+                                        Arm.setArmAngle(ArmScoreSample);
+                                        Arm.setPivotAngle(PivotScoreSample);
+                                        return Arm.motionCompleted();
+                                    }
+                                });
+                    }
+                        ElevatorScoreSample = ElevatorScoreSample2;
+                        Controls.ScoreLevel2 = false;
+                        Controls.Grab = false;
+                        CurrentState = States.IDLE_SCORE_SAMPLE;
+                    }
                     break;
+
                 case IDLE_TAKE_SPECIMEN:
                     if (Controls.Grab) {
                         currentTask = new Scheduler();

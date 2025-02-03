@@ -22,6 +22,7 @@ public class OpModeManager {
     public HardwareMap hardwareMap;
     public Gamepad gamepad1, gamepad2;
     public Telemetry telemetry;
+    public static double tSpeed = 1;
 
     public boolean isClimbing = false;
     public OpModeManager(HardwareMap hm, Gamepad g1, Gamepad g2, Telemetry t, Storage.Team team){
@@ -65,8 +66,10 @@ public class OpModeManager {
             Climb.Update();
             return;
         }
+        if(Elevator.getCurrentPosition() > 500) tSpeed = 0.6;
+        else tSpeed = 1;
 
-        Chassis.drive(getPowerSigned(gamepad1.left_stick_x, 3), -getPowerSigned(gamepad1.left_stick_y, 3), getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3));
+        Chassis.drive(getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed, -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed, getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed);
         OutTakeLogic.update();
         IntakeLogic.update();
         Extendo.update();

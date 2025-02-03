@@ -23,6 +23,10 @@ public class IntakeLogic extends GenericController {
     private static boolean reset = false;
     private static int pos = 0;
     public static void update(){
+        if(Controls.ImogenDriver) {
+            gamepad2.left_trigger = -Math.min(0, gamepad1.right_stick_x);
+            gamepad2.right_trigger = Math.max(0, gamepad1.right_stick_x);
+        }
         if(Controls.RetractExtendo && OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE) {
             state = States.RETRACT;
             Controls.RetractExtendo = false;
@@ -103,7 +107,9 @@ public class IntakeLogic extends GenericController {
             wasDriverActivated = true;
         }
         gamepad1.update();
-        gamepad2.update();
+        if(!Controls.ImogenDriver) {
+            gamepad2.update();
+        }
         Robot.telemetry.addData("Intake State", state.toString());
     }
 }

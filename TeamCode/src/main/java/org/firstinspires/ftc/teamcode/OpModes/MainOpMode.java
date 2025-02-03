@@ -57,15 +57,10 @@ public class MainOpMode extends LinearOpMode {
                 Climb.Update();
                 break;
             }
-            if(gamepad1.cross){
-                tSpeed = 1;
-                rotSpeed = 0.9;
-            } else {
-                tSpeed = tSlow;
-                rotSpeed = rotSlow;
-            }
+            if(Elevator.getCurrentPosition() > 700) tSpeed = 0.5;
+            else tSpeed = 1;
 //            Chassis.drive(gamepad1.left_stick_x * tSpeed, -gamepad1.left_stick_y * tSpeed, (gamepad1.right_trigger - gamepad1.left_trigger) * rotSpeed);
-            Chassis.drive(getSquaredSigned(gamepad1.left_stick_x), -getSquaredSigned(gamepad1.left_stick_y), getSquaredSigned(gamepad1.right_trigger - gamepad1.left_trigger));
+            Chassis.drive(getSquaredSigned(gamepad1.left_stick_x) * tSpeed, -getSquaredSigned(gamepad1.left_stick_y) * tSpeed, getSquaredSigned(gamepad1.right_trigger - gamepad1.left_trigger));
             OutTakeLogic.update();
             IntakeLogic.update();
             Arm.update();

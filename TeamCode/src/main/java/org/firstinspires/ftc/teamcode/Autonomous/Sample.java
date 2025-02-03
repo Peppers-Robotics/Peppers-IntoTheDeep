@@ -35,16 +35,14 @@ public class Sample extends LinearOpMode {
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
-                                ActiveIntake.powerOn();
                                 return Extendo.getCurrentPosition() < 30;
                             }
                         })
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
-                                ActiveIntake.Block();
                                 ActiveIntake.powerOn();
-                                DropDown.setDown(0);
+                                DropDown.setDown(0.2);
                                 return true;
                             }
                         })
@@ -55,7 +53,7 @@ public class Sample extends LinearOpMode {
                                 Claw.open();
                                 ActiveIntake.Block();
                                 Arm.setArmAngle(OutTakeLogic.ArmTransfer);
-                                DropDown.setDown(0.1);
+                                DropDown.setDown(0.2);
                                 Elevator.PowerOnDownToTakeSample = true;
                                 Elevator.power = 1;
                                 Extendo.PowerOnToTransfer = true;
@@ -164,10 +162,10 @@ public class Sample extends LinearOpMode {
                             }
                             if((System.currentTimeMillis() - time) / 1000.f >= timeOut + 0.05){
                                 Extendo.Extend(Extendo.getCurrentPosition() + 200);
-                                Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x + 50, Localizer.getCurrentPosition().y - 20, Localizer.getCurrentPosition().h + Math.toRadians(10)));
+                                Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x - 100, Localizer.getCurrentPosition().y + 10, Localizer.getCurrentPosition().h + Math.toRadians(10)));
                                 park = Chassis.getTargetPosition();
                                 ActiveIntake.Reverse(1);
-                                DropDown.setDown(0);
+                                DropDown.setDown(0.5);
                                 time = -1;
                             }
                             return Storage.hasTeamPice();
@@ -185,6 +183,7 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
+                            park = new SparkFunOTOS.Pose2D(park.x - 100, park.y + 10, park.h + Math.toRadians(10));
                             ActiveIntake.Block();
                             ActiveIntake.Reverse(0.8);
                             Extendo.Extend(0);
@@ -214,17 +213,18 @@ public class Sample extends LinearOpMode {
                             if(time == -1){
                                 time = System.currentTimeMillis();
                             }
-                            if((System.currentTimeMillis() - time) / 1000.f >= 0.5){
+                            if((System.currentTimeMillis() - time) / 1000.f >= 0.2){
                                 Extendo.Extend(pos + 100);
                             }
-                            return Storage.hasTeamPice() || (double) (System.currentTimeMillis() - time) / 1000.f >= 1;
+                            return Storage.hasTeamPice() || (double) (System.currentTimeMillis() - time) / 1000.f >= 0.7;
                         }
                     })
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            ActiveIntake.Block();
-                            ActiveIntake.Reverse(0.8);
+                            ActiveIntake.Unblock();
+//                            ActiveIntake.Block();
+                            ActiveIntake.powerOn();
                             Extendo.Extend(0);
                             DropDown.setDown(0);
                             return true;
@@ -388,10 +388,10 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return Localizer.getCurrentPosition().x > -150;
+                        return Chassis.getPrecentageOfMotionDone() > 90;
                     }
                 })
-                .addTask(new TakeSample(700, 0.8))
+                .addTask(new TakeSample(700, 0.5))
 //                .waitForSync()
                 .lineToLinearHeadingAsync(basketPosition)
                 .addTask(new Transfer())
@@ -424,11 +424,11 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return Localizer.getCurrentPosition().x > -150;
+                        return Chassis.getPrecentageOfMotionDone() > 90;
                     }
                 })
 //                .waitForSync()
-                .addTask(new TakeSample(800, 0.8))
+                .addTask(new TakeSample(800, 0.5))
                 .lineToLinearHeadingAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
@@ -460,11 +460,11 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return Localizer.getCurrentPosition().x > -150;
+                        return Chassis.getPrecentageOfMotionDone() > 90;
                     }
                 })
 //                .waitForSync()
-                .addTask(new TakeSample(800, 0.8))
+                .addTask(new TakeSample(800, 0.5))
                 .lineToLinearHeadingAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
