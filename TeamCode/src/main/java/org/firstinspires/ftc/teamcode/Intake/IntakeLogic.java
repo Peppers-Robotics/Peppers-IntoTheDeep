@@ -24,8 +24,10 @@ public class IntakeLogic extends GenericController {
     private static int pos = 0;
     public static void update(){
         if(Controls.ImogenDriver) {
-            gamepad2.left_trigger = -Math.min(0, gamepad1.right_stick_x);
-            gamepad2.right_trigger = Math.max(0, gamepad1.right_stick_x);
+//            gamepad2.left_trigger = -Math.min(0, gamepad1.right_stick_x);
+//            gamepad2.right_trigger = Math.max(0, gamepad1.right_stick_x);
+            gamepad2.left_trigger = gamepad1.gamepad.left_bumper ? 1 : 0;
+            gamepad2.right_trigger = gamepad1.gamepad.right_bumper ? 1 : 0;
         }
         if(Controls.RetractExtendo && OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE) {
             state = States.RETRACT;
@@ -57,7 +59,7 @@ public class IntakeLogic extends GenericController {
                 ActiveIntake.Block();
 
                 Extendo.motor.setPower(-1);
-                if((Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 7.5 && Extendo.motor.getVelocity() < 2) || reset){
+                if((Extendo.getCurrentPosition() < 5 && Extendo.motor.getVelocity() < 2) || reset){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;

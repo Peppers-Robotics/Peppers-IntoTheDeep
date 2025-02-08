@@ -96,7 +96,16 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
-                return Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), Chassis.getTargetPosition()) < 0.5;
+                return Localizer.getVelocity().x < 5 && Localizer.getVelocity().y < 5;
+            }
+        });
+        return this;
+    }
+    public Scheduler waitForTrajDone(double precent){
+        addTask(new Task() {
+            @Override
+            public boolean Run() {
+                return Chassis.getPrecentageOfMotionDone() > precent;
             }
         });
         return this;

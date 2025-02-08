@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 @Config
 public class Extendo {
     public static CachedMotor motor;
-    public static PIDController pidController = new PIDController(0.01, 0, -0.0004);
+    public static PIDController pidController = new PIDController(0.015, 0, -0.0004);
     public static int MaxExtendoExtension = 850;
     private static double targetPosition = 0;
     public static boolean ReachedTargetPosition(){

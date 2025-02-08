@@ -20,11 +20,16 @@ public class Controls {
         gamepad2 = new AutoGamepad(gamepadD2);
     }
 
-    private static void reset(){
-        if(RetractExtendo) RetractExtendo = false;
-        if(ScoreLevel1) ScoreLevel1 = false;
-        if(ScoreLevel2) ScoreLevel2 = false;
-        if(GrabSpecimen) GrabSpecimen = false;
+    public static void CleanCommands(){
+        RetractExtendo = false;
+        ScoreLevel2 = false;
+        ScoreLevel1 = false;
+        Grab = false;
+        GrabSpecimen = false;
+        DunkToScore = false;
+        Transfer = false;
+        Throw = false;
+        SlowDown = false;
     }
     private static boolean ClimbingHelp = false, imogenHelper = false;
 
@@ -51,7 +56,7 @@ public class Controls {
         if(ImogenDriver){
             if(gamepad1.wasPressed.dpad_down)   ScoreLevel1  = true;
             if(gamepad1.wasPressed.dpad_up)     ScoreLevel2  = true;
-            if(gamepad1.wasPressed.square)      Grab         = true;
+            if(gamepad1.wasPressed.square){      Grab         = true; RetractExtendo = true;}
             if(gamepad1.wasPressed.circle)      Retract      = true;
             if(gamepad1.wasPressed.triangle)    GrabSpecimen = true;
             if(gamepad1.wasPressed.dpad_right)  Throw        = true;

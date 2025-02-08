@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
+import android.graphics.Bitmap;
+import android.media.MediaCodecInfo;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMUNew;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.AccelerationSensor;
@@ -21,6 +25,9 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import org.firstinspires.ftc.robotcontroller.internal.FtcOpModeRegister;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.android.AndroidAccelerometer;
+import org.firstinspires.ftc.robotcore.external.function.Consumer;
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
@@ -33,6 +40,11 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.opencv.videoio.VideoCapture;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvInternalCamera2Impl;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.io.BufferedReader;
 import java.util.List;
@@ -54,6 +66,23 @@ public class Robot {
             l.engage();
         }
     }
+
+    public static class LLStream implements CameraStreamSource {
+        private VideoCapture c;
+        public LLStream(){
+            c = new VideoCapture();
+            c.open("http://172.28.0.1:5800/stream.mjpg");
+        }
+        @Override
+        public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+
+        }
+    }
+
+    public static void startLimeLightStream(Limelight3A camera){
+
+    }
+
     public static void InitializeHubs(HardwareMap hm){
         hubs = hm.getAll(LynxModule.class);
         boolean s = hubs.get(0).getImuType() == LynxModuleImuType.BHI260;

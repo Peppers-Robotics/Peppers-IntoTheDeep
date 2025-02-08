@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -23,7 +24,7 @@ public class OpModeManager {
     public Gamepad gamepad1, gamepad2;
     public Telemetry telemetry;
     public static double tSpeed = 1;
-
+    public static double min = 0.4;
     public boolean isClimbing = false;
     public OpModeManager(HardwareMap hm, Gamepad g1, Gamepad g2, Telemetry t, Storage.Team team){
         hardwareMap = hm;
@@ -68,8 +69,11 @@ public class OpModeManager {
         }
         if(Elevator.getCurrentPosition() > 500) tSpeed = 0.6;
         else tSpeed = 1;
+        double pow = (min - 1) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition() + 1;
 
-        Chassis.drive(getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed, -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed, getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed);
+        Chassis.drive(getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
+                -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
+                getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow);
         OutTakeLogic.update();
         IntakeLogic.update();
         Extendo.update();
