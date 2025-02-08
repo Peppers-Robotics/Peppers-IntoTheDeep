@@ -120,6 +120,7 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Elevator.PowerOnDownToTakeSample = false;
+                                        Elevator.Disable = false;
                                         Extendo.PowerOnToTransfer = false;
                                         ActiveIntake.powerOff();
                                         Elevator.setTargetPosition(ElevatorUp);

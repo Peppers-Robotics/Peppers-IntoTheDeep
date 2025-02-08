@@ -15,7 +15,8 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 public class IntakeLogic extends GenericController {
     public enum States {
         RETRACT,
-        IDLE
+        IDLE,
+        RESET
     }
     public static States state = States.RETRACT;
     public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime(), veloTimer = new ElapsedTime();
@@ -38,6 +39,7 @@ public class IntakeLogic extends GenericController {
                 // :)
                 if(Math.abs(gamepad1.right_stick_y) > 0.01) {
                     Extendo.DISABLE = true;
+                    Extendo.PowerOnToTransfer = false;
 //                Extendo.Extend((int) (Extendo.getTargetPosition() + 35 * (gamepad1.right_stick_y * gamepad1.right_stick_y)));
 //                Extendo.update();
                     if (Extendo.getCurrentPosition() < 0 && gamepad1.right_stick_y > 0) break;
@@ -79,6 +81,27 @@ public class IntakeLogic extends GenericController {
                     }
                 } else time.reset();
                 break;
+            case RESET: // unused
+                Extendo.DISABLE = true;
+                Extendo.motor.setPower(-1);
+                DropDown.setDown(0);
+                if((Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 6.5 && Math.abs(Extendo.motor.getVelocity()) <= 1) || reset){ // STALL
+                    reset = true;
+                    Extendo.motor.setPower(0);
+                    if(time.seconds() >= 0.1){
+                        Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                        Extendo.Extend(0);
+                        pos = 0;
+                        state = States.IDLE;
+                        reset = false;
+                        Extendo.DISABLE = false;
+                        if(Storage.hasTeamPice())
+                            Controls.Transfer = true;
+                    }
+                } else time.reset();
+                break;
+
         }
         if(wasDriverActivated && !ActiveIntake.isOff() && Math.abs(gamepad2.right_trigger) <= 0.02 && Math.abs(gamepad2.left_trigger) <= 0.02){
             ActiveIntake.powerOff();
