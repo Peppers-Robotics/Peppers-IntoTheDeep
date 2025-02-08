@@ -407,7 +407,7 @@ public class OutTakeLogic {
                             public boolean Run() {
                                 Arm.setArmAngle(ArmScoreSample);
                                 Arm.setPivotAngle(PivotScoreSample);
-                                return false;
+                                return true;
                             }
                         })
                         .addTask(new Task() {

@@ -18,7 +18,7 @@ public class IntakeLogic extends GenericController {
         IDLE
     }
     public static States state = States.RETRACT;
-    public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime();
+    public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime(), veloTimer = new ElapsedTime();
     public static boolean wasDriverActivated = false;
     private static boolean reset = false;
     private static int pos = 0;
@@ -59,7 +59,8 @@ public class IntakeLogic extends GenericController {
                 ActiveIntake.Block();
 
                 Extendo.motor.setPower(-1);
-                if((Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 5 && Extendo.motor.getVelocity() < 2) || reset){
+                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
+                if(reset || veloTimer.seconds() > 0.4){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;
