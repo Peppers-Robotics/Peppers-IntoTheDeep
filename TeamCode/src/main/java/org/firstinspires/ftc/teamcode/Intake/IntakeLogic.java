@@ -59,7 +59,7 @@ public class IntakeLogic extends GenericController {
                 ActiveIntake.Block();
 
                 Extendo.motor.setPower(-1);
-                if((Extendo.getCurrentPosition() < 5 && Extendo.motor.getVelocity() < 2) || reset){
+                if((Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 5 && Extendo.motor.getVelocity() < 2) || reset){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;
