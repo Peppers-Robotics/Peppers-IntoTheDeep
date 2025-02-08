@@ -61,7 +61,8 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
-                                        Elevator.setTargetPosition(ElevatorIdle);
+                                        Elevator.PowerOnDownToTakeSample = true;
+                                        Elevator.power = 1;
                                         return Elevator.getCurrentPosition() < 10;
                                     }
                                 })
