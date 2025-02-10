@@ -40,6 +40,7 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
+import org.firstinspires.ftc.teamcode.OutTake.Extension;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.opencv.videoio.VideoCapture;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -56,6 +57,9 @@ public class Robot {
     public static DcMotorController ControlHubMotors, ExpansionHubMotors;
     public static ServoController ControlHubServos, ExpansionHubServos;
     public static double VOLTAGE = 12;
+    public static boolean isDisabled(){
+        return !hubs.get(0).isEngaged();
+    }
     public static void disable(){
         for(LynxModule l : hubs){
             l.disengage();
@@ -82,9 +86,14 @@ public class Robot {
     public static void startLimeLightStream(Limelight3A camera){
 
     }
-
     public static void InitializeHubs(HardwareMap hm){
+        InitializeHubs(hm, false);
+    }
+
+    public static void InitializeHubs(HardwareMap hm, boolean b){
         hubs = hm.getAll(LynxModule.class);
+//        if(b)
+//            disable();
         boolean s = hubs.get(0).getImuType() == LynxModuleImuType.BHI260;
 
         ControlHubMotors = hm.get(DcMotorController.class, "Control Hub");
@@ -125,8 +134,7 @@ public class Robot {
         telemetry.update();
     }
     public static void InitializeFull(HardwareMap hm){
-        InitializeHubs(hm);
-        disable();
+        InitializeHubs(hm, true);
         InitializeElevator();
         InitializeExtendo();
         InitializeDropDown();
@@ -137,6 +145,10 @@ public class Robot {
         InitializeActiveIntake();
         InitializeLocalizer(hm);
         InitializeStorage(hm);
+        InitializeExtension();
+    }
+    public static void InitializeExtension(){
+        Extension.servo = new ServoPlus(ControlHubServos, 4, Servo.Direction.FORWARD);
     }
     public static void InitializeChassis(){
         Chassis.FL = new CachedMotor(ExpansionHubMotors, 2, DcMotorSimple.Direction.FORWARD);
@@ -162,7 +174,7 @@ public class Robot {
     public static void InitializeDropDown(){
         DropDown.servo = new ServoPlus(ExpansionHubServos, 5, Servo.Direction.FORWARD);
     }
-    public static void InitializeActiveIntake(){
+   public static void InitializeActiveIntake(){
         ActiveIntake.motor = new CachedMotor(ExpansionHubMotors, 0, DcMotorSimple.Direction.FORWARD);
         ActiveIntake.blocker = new ServoPlus(ControlHubServos, 0, Servo.Direction.FORWARD); // TODO: portul bun
     }

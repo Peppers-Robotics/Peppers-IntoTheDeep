@@ -33,12 +33,8 @@ public class GetPositionSample {
         SparkFunOTOS.Pose2D p = getPositionRelativeToRobot(tx, ty);
         SparkFunOTOS.Pose2D R = Localizer.getCurrentPosition();
 
-        double d = Math.sqrt(p.x * p.x + p.y * p.y);
-        double t = -R.h + Math.atan2(p.x, p.y);
-        Robot.telemetry.addData("theta", Math.toDegrees(t));
-        Robot.telemetry.addData("distance", d);
-        double x = R.x + d * Math.sin(t);
-        double y = R.y + d * Math.cos(t);
+        double x = Math.cos(R.h) * p.x + Math.sin(R.h) * p.y;
+        double y = Math.cos(R.h) * p.y - Math.sin(R.h) * p.x;
 
         return new SparkFunOTOS.Pose2D(x, y, 0);
     }

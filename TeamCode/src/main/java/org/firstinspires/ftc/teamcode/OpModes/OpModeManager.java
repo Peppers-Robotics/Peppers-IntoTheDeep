@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
+import org.firstinspires.ftc.teamcode.OutTake.Extension;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogic;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
@@ -41,8 +42,10 @@ public class OpModeManager {
         Elevator.controller.setFreq(40);
 
         Extendo.Extend(0);
-        ActiveIntake.Block();
+        Extension.Retract();
+        ActiveIntake.Unblock();
         Claw.open();
+        b = false;
     }
     public static double getSquaredSigned(double h){
         return Math.signum(h) * (h * h);
@@ -55,7 +58,13 @@ public class OpModeManager {
         }
         return sgn * h;
     }
+    private static boolean b = false;
     public void update(){
+//        if(!b && Robot.isDisabled() && !gamepad1.atRest()) {
+//            Robot.enable();
+//            b = true;
+//        }
+
         Robot.clearCache();
 
         if(Controls.Climbing && !isClimbing){

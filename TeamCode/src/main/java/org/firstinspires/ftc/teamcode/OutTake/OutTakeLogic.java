@@ -27,6 +27,7 @@ public class OutTakeLogic {
     public static double ArmIdle = 5, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 0;
     public static boolean save2 = false;
     public static double coeff = 2;
+    public static double TakeSpecimenExtension = 0.35, TransferExtension = 0.3;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,
@@ -71,7 +72,14 @@ public class OutTakeLogic {
                                     public boolean Run() {
                                         Elevator.PowerOnDownToTakeSample = true;
                                         Elevator.power = 0.5;
-                                        return true;
+                                        return Arm.getPrecentOfArmMotionCompleted() > 90;
+                                    }
+                                })
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
+                                        Extension.Extend(TakeSpecimenExtension);
+                                        return true; // TODO: add motionProfile
                                     }
                                 })
                                 ;
@@ -89,6 +97,7 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         ActiveIntake.powerOn();
+                                        Extension.Extend(TransferExtension);
                                         return true;
                                     }
                                 })
@@ -129,6 +138,13 @@ public class OutTakeLogic {
                                             Arm.setPivotAngle(PivotUpSample);
                                         }
                                         return Arm.getCurrentArmAngle() >= 100;
+                                    }
+                                })
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
+                                        Extension.Extend(0);
+                                        return true;
                                     }
                                 })
                         ;
@@ -293,6 +309,7 @@ public class OutTakeLogic {
                                             Arm.setArmAngle(ArmScoreSpecimen);
                                             if (Arm.getCurrentArmAngle() < 250)
                                                 Arm.setPivotAngle(PivotScoreSpecimen);
+                                            if(Arm.getCurrentArmAngle() < 120) Extension.Extend(1);
                                             return Arm.motionCompleted() && Elevator.ReachedTargetPosition();
                                         }
                                     })
@@ -320,6 +337,14 @@ public class OutTakeLogic {
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
+                                            Extension.Extend(0);
+                                            return true;
+                                        }
+                                    })
+                                    .waitSeconds(0.2)
+                                    .addTask(new Task() {
+                                        @Override
+                                        public boolean Run() {
                                             Elevator.setTargetPosition(ElevatorUp);
                                             Arm.setArmAngle(ArmTakeSpecimen);
                                             return Elevator.getCurrentPosition() < ElevatorUp + 50;
@@ -340,7 +365,10 @@ public class OutTakeLogic {
                                             CurrentState = States.IDLE_TAKE_SPECIMEN;
                                             Controls.GrabSpecimen = false;
                                             Controls.Grab = false;
-                                            return true;
+                                            if(Arm.motionCompleted()){
+                                                Extension.Extend(TakeSpecimenExtension);
+                                            }
+                                            return Arm.motionCompleted();
                                         }
                                     })
                             ;
@@ -436,6 +464,7 @@ public class OutTakeLogic {
                         @Override
                         public boolean Run() {
                             Claw.open();
+                            Extension.Retract();
                             if(Elevator.getCurrentPosition() > ElevatorUp)
                                 Arm.setArmAngle(ArmTransfer);
                             Elevator.setTargetPosition(ElevatorUp + 100);

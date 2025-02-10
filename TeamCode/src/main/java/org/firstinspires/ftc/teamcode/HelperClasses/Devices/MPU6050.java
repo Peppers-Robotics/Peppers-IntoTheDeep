@@ -27,7 +27,9 @@ public class MPU6050 extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         super(deviceClient, true);
 
         this.deviceClient.setI2cAddress(I2cAddr.create7bit(MPU6050_ADDRESS));
-        ((LynxI2cDeviceSynch)(this.deviceClient)).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        try {
+            ((LynxI2cDeviceSynch) (this.deviceClient)).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        } catch (Exception ignored){}
 
         super.registerArmingStateCallback(false);
         this.deviceClient.engage();

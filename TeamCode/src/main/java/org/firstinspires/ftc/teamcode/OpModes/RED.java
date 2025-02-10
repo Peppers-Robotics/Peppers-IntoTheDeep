@@ -16,6 +16,7 @@ public class RED extends LinearOpMode {
         OpModeManager opmode = new OpModeManager(hardwareMap, gamepad1, gamepad2, telemetry, Storage.Team.RED);
 
         waitForStart();
+
         Robot.enable();
         DropDown.setDown(0);
 

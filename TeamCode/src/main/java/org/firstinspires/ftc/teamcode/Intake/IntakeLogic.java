@@ -36,10 +36,11 @@ public class IntakeLogic extends GenericController {
         }
         switch (state){
             case IDLE:
+                if(Extendo.PowerOnToTransfer) break;
                 // :)
                 if(Math.abs(gamepad1.right_stick_y) > 0.01) {
                     Extendo.DISABLE = true;
-                    Extendo.PowerOnToTransfer = false;
+//                    Extendo.PowerOnToTransfer = false;
 //                Extendo.Extend((int) (Extendo.getTargetPosition() + 35 * (gamepad1.right_stick_y * gamepad1.right_stick_y)));
 //                Extendo.update();
                     if (Extendo.getCurrentPosition() < 0 && gamepad1.right_stick_y > 0) break;
@@ -61,8 +62,8 @@ public class IntakeLogic extends GenericController {
                 ActiveIntake.Block();
 
                 Extendo.motor.setPower(-1);
-                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(reset || veloTimer.seconds() > 0.4){
+//                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
+                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 6 && Math.abs(Extendo.motor.getVelocity()) < 3)){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;

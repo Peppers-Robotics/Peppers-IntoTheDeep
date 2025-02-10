@@ -63,7 +63,7 @@ public class AutoTakeSample extends LinearOpMode {
                     public boolean Run() {
                         Extendo.Extend((int) GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);
                         Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h));
-                        return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 20;
+                        return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 5;
                     }
                 })
                 .addTask(new Task() {

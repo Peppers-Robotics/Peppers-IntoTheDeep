@@ -150,7 +150,6 @@ public class Sample extends LinearOpMode {
                         public boolean Run() {
                             Claw.open();
                             ActiveIntake.Unblock();
-                            ActiveIntake.powerOn(1);
                             Extendo.Extend(0);
 //                            return Extendo.getCurrentPosition() > pos - 10;
                             return true;
@@ -175,7 +174,14 @@ public class Sample extends LinearOpMode {
                                     park.h + GetPositionSample.getExtendoRotPair(result.getTx(), result.getTy()).h));
                             Extendo.Extend((int) GetPositionSample.getExtendoRotPair(result.getTx(), result.getTy()).x);
 
-                            return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 20;
+                            return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 5;
+                        }
+                    })
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            ActiveIntake.powerOn(1);
+                            return true;
                         }
                     })
                     .addTask(new Task() {
@@ -276,6 +282,11 @@ public class Sample extends LinearOpMode {
     }
     public static SparkFunOTOS.Pose2D
             basketPosition = new SparkFunOTOS.Pose2D(514, -147, Math.toRadians(47)),
+            basketPosition2 = new SparkFunOTOS.Pose2D(0, 0, 0),
+            basketPosition3 = new SparkFunOTOS.Pose2D(0, 0 ,0),
+            basketPosition4 = new SparkFunOTOS.Pose2D(0, 0, 0),
+            basketPositionSub = new SparkFunOTOS.Pose2D(0, 0, 0),
+
             sample1 = new SparkFunOTOS.Pose2D(280, -345, Math.toRadians(85)),
             sample2 = new SparkFunOTOS.Pose2D(450, -400, Math.toRadians(95)),
             sample3 = new SparkFunOTOS.Pose2D(459, -400, Math.toRadians(115)),
@@ -298,6 +309,7 @@ public class Sample extends LinearOpMode {
         camera = hardwareMap.get(Limelight3A.class, "camera");
         camera.start();
         camera.pipelineSwitch(0);
+        Chassis.setProfiles(6000, 6000, 3000, 3000, 500, 500);
 
         Scheduler scheduler = new Scheduler();
         scheduler
@@ -399,7 +411,7 @@ public class Sample extends LinearOpMode {
                     public boolean Run() {
                         Claw.open();
                         Robot.telemetry.addData("time", (System.currentTimeMillis() - startTime) / 1000.f);
-                        Chassis.setProfiles(2000, 2000, 2000, 2000, 700, 700);
+                        Chassis.setProfiles(4000, 4000, 5000, 5000, 800, 800);
                         return true;
                     }
                 })
