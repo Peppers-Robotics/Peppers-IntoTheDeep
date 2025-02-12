@@ -28,12 +28,14 @@ public class Chassis {
         BR.setPower(br * BRd);
     }
 
+
+    public static void drivePolar(double mod, double alpha){
+
+    }
+
     // Autonomous implementation
 
-
-
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
-    public static double angleStrafe = 0, angleForward = 10;
     public static PIDController Strafe = new PIDController(0.002, 0.001, 0.01),
                                 Forward = new PIDController(-0.007, -0.005, 0.03),
                                 Heading       = new PIDController(2, 0, -0.1);

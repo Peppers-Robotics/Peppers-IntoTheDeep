@@ -19,7 +19,7 @@ public class IntakeLogic extends GenericController {
         RESET
     }
     public static States state = States.RETRACT;
-    public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime(), veloTimer = new ElapsedTime();
+    public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime();
     public static boolean wasDriverActivated = false;
     private static boolean reset = false;
     private static int pos = 0;
@@ -36,11 +36,13 @@ public class IntakeLogic extends GenericController {
         }
         switch (state){
             case IDLE:
-                if(Extendo.PowerOnToTransfer) break;
+                if(OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE_WITH_SAMPLE){
+                    if(!OutTakeLogic.currentTask.done()) break;
+                }
                 // :)
                 if(Math.abs(gamepad1.right_stick_y) > 0.01) {
                     Extendo.DISABLE = true;
-//                    Extendo.PowerOnToTransfer = false;
+                    Extendo.PowerOnToTransfer = false;
 //                Extendo.Extend((int) (Extendo.getTargetPosition() + 35 * (gamepad1.right_stick_y * gamepad1.right_stick_y)));
 //                Extendo.update();
                     if (Extendo.getCurrentPosition() < 0 && gamepad1.right_stick_y > 0) break;
@@ -63,7 +65,7 @@ public class IntakeLogic extends GenericController {
 
                 Extendo.motor.setPower(-1);
 //                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 6 && Math.abs(Extendo.motor.getVelocity()) < 3)){
+                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 4 && Math.abs(Extendo.motor.getVelocity()) < 3)){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;
@@ -137,6 +139,10 @@ public class IntakeLogic extends GenericController {
         if(!Controls.ImogenDriver) {
             gamepad2.update();
         }
+        if(Storage.hasTeamPice()){
+            ActiveIntake.Block();
+        } else
+            ActiveIntake.Unblock();
         Robot.telemetry.addData("Intake State", state.toString());
     }
 }

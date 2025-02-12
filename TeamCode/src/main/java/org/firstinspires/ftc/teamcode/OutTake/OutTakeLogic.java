@@ -18,16 +18,16 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample, ElevatorScoreSample1 = 300, ElevatorScoreSample2 = 997;
-    public static double ElevatorScoreSpecimen = 400;
+    public static double ElevatorScoreSample, ElevatorScoreSample1 = 300, ElevatorScoreSample2 = 750;
+    public static double ElevatorScoreSpecimen = 360;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
-    public static double ArmScoreSample = 250, PivotScoreSample = 0;
-    public static double ArmTakeSpecimen = 370, PivotTakeSpecimen = 0;
+    public static double ArmScoreSample = 220, PivotScoreSample = 0;
+    public static double ArmTakeSpecimen = 324, PivotTakeSpecimen = 10;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0;
     public static double ArmIdle = 5, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 0;
     public static boolean save2 = false;
     public static double coeff = 2;
-    public static double TakeSpecimenExtension = 0.35, TransferExtension = 0.3;
+    public static double TakeSpecimenExtension = 0.35, TransferExtension = 0.35, ScoreSampleExtension = 1;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,
@@ -37,7 +37,7 @@ public class OutTakeLogic {
         IDLE_SCORE_SAMPLE,
     }
     public static States CurrentState = States.IDLE;
-    private static Scheduler currentTask = new Scheduler();
+    public static Scheduler currentTask = new Scheduler();
 
     public static void update(){
         if(currentTask.done()) {
@@ -178,6 +178,14 @@ public class OutTakeLogic {
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
+                                            Extension.Retract();
+                                            return true;
+                                        }
+                                    })
+                                    .waitSeconds(0.2)
+                                    .addTask(new Task() {
+                                        @Override
+                                        public boolean Run() {
                                             Localizer.Update();
                                             Arm.setArmAngle(ArmTransfer);
                                             if(Arm.getCurrentArmAngle() < 200) Claw.close();
@@ -264,7 +272,17 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
+                                        Extendo.PowerOnToTransfer = false;
+//                                        Extension.Extend(ScoreSampleExtension);
+                                        return true;
+                                    }
+                                })
+                                .waitSeconds(0.1)
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
                                         Arm.setArmAngle(ArmScoreSample);
+                                        if(Arm.getCurrentArmAngle() > 180) Extension.Extend(ScoreSampleExtension);
                                         Arm.setPivotAngle(PivotScoreSample);
                                         return Arm.motionCompleted();
                                     }
@@ -401,14 +419,13 @@ public class OutTakeLogic {
                                         @Override
                                         public boolean Run() {
                                             Arm.setArmAngle(ArmTransfer);
-                                            Elevator.setTargetPosition(ElevatorUp);
+                                            Elevator.setTargetPosition(ElevatorIdle);
                                             return Arm.motionCompleted();
                                         }
                                     })
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
-                                            Elevator.setTargetPosition(ElevatorIdle);
                                             Arm.setArmAngle(ArmIdle);
                                             return true;
                                         }
@@ -427,9 +444,17 @@ public class OutTakeLogic {
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
+                                ActiveIntake.powerOff();
                                 Elevator.setTargetPosition(ElevatorScoreSample);
 //                                return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 300;
                                 return Elevator.getCurrentPosition() > ElevatorUp - 50;
+                            }
+                        })
+                        .addTask(new Task() {
+                            @Override
+                            public boolean Run() {
+                                Extendo.PowerOnToTransfer = false;
+                                return true;
                             }
                         })
                         .addTask(new Task() {
@@ -445,6 +470,9 @@ public class OutTakeLogic {
                             public boolean Run() {
 //                                Arm.setArmAngle(ArmScoreSample);
 //                                Arm.setPivotAngle(PivotScoreSample);
+                                if(Arm.getCurrentArmAngle() > 180){
+                                    Extension.Extend(ScoreSampleExtension);
+                                }
                                 return Arm.motionCompleted();
                             }
                         });
@@ -465,17 +493,24 @@ public class OutTakeLogic {
                         public boolean Run() {
                             Claw.open();
                             Extension.Retract();
-                            if(Elevator.getCurrentPosition() > ElevatorUp)
-                                Arm.setArmAngle(ArmTransfer);
-                            Elevator.setTargetPosition(ElevatorUp + 100);
-                            if(Arm.getCurrentArmAngle() < 200) Claw.close();
+//                            if(Elevator.getCurrentPosition() > ElevatorUp)
+//                            Elevator.setTargetPosition(ElevatorUp + 100);
+//                            if(Arm.getCurrentArmAngle() < 200) Claw.close();
+                            return true;
+                        }
+                    })
+                    .waitSeconds(0.2)
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            Arm.setArmAngle(ArmTransfer);
                             return Arm.motionCompleted() && Arm.armProfile.getTargetPosition() == ArmTransfer;
                         }
                     })
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Elevator.setTargetPosition(0);
+                            Elevator.setTargetPosition(ElevatorIdle);
                             Elevator.PowerOnDownToTakeSample = true;
                             Elevator.power = 1;
                             return true;

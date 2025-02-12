@@ -44,6 +44,8 @@ public class AutoTakeSample extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Robot.InitializeHubs(hardwareMap);
         Robot.InitializeFull(hardwareMap);
+        Robot.enable();
+        DropDown.setDown(0);
 
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "camera");
 
@@ -55,7 +57,7 @@ public class AutoTakeSample extends LinearOpMode {
                     @Override
                     public boolean Run() {
                         res = ll.getLatestResult();
-                        return res != null;
+                        return res != null && (res.getTx() != 0);
                     }
                 })
                 .addTask(new Task() {
@@ -63,9 +65,10 @@ public class AutoTakeSample extends LinearOpMode {
                     public boolean Run() {
                         Extendo.Extend((int) GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);
                         Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h));
-                        return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 5;
+                        return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 4;
                     }
                 })
+                .waitSeconds(0.1)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -117,6 +120,8 @@ public class AutoTakeSample extends LinearOpMode {
             if(res != null) {
                 Robot.telemetry.addData("rot", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h);
                 Robot.telemetry.addData("ext", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);
+                Robot.telemetry.addData("pos forward", GetPositionSample.getPositionRelativeToRobot(res.getTx(), res.getTy()).x);
+                Robot.telemetry.addData("pos lateral", GetPositionSample.getPositionRelativeToRobot(res.getTx(), res.getTy()).y);
             }
 
             Extendo.update();

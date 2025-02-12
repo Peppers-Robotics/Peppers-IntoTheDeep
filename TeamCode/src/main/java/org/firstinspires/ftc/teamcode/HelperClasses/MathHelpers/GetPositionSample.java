@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(25), h = 275.214, cameraOffsetX = 80, cameraOffsetY = 135, centerToExtendo = 200;
+    public static double initialAngle = Math.toRadians(25), h = 275.214, cameraOffsetX = 105.053, cameraOffsetY = 110.67, centerToExtendo = 158;
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
@@ -23,8 +23,8 @@ public class GetPositionSample {
     public static SparkFunOTOS.Pose2D getExtendoRotPair(double tx, double ty){
         SparkFunOTOS.Pose2D pose = getPositionRelativeToRobot(tx, ty);
         double extendoDist = AutoTakeSample.DistanceToExtendo(pose.x - centerToExtendo);
-        double rot = Math.atan2(pose.y, pose.x);
-        return new SparkFunOTOS.Pose2D(extendoDist, 0, -rot);
+        double rot = Math.atan(pose.y / pose.x);
+        return new SparkFunOTOS.Pose2D(extendoDist, 0, rot * Math.signum(pose.y));
     }
     public static SparkFunOTOS.Pose2D getPositionRelativeToFiled(double tx, double ty){
         if(Localizer.pinPoint == null){

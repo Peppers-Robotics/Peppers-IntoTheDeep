@@ -20,7 +20,7 @@ public class Arm {
     static {
         armProfile = new AsymmetricMotionProfile(7500, 4500, 3000);
         pivotProfile = new AsymmetricMotionProfile(3000, 4500, 2000);
-        diffy = new DifferentialHelper(1/2.f);
+        diffy = new DifferentialHelper(1);
     }
 
 
@@ -45,7 +45,9 @@ public class Arm {
 
     }
 
+    @Deprecated
     public static void setPivotAngle(double angle){
+        angle = 0;
         if(pivotProfile.getPosition() == angle) return;
         pivotProfile.startMotion(pivotPrevPos, angle);
         pivotPrevPos = angle;
