@@ -14,6 +14,14 @@ public class GetPositionSample {
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
+
+    public static SparkFunOTOS.Pose2D getPositionRelativeToRobot(SparkFunOTOS.Pose2D fieldPos){
+        double d = Localizer.getDistanceFromTwoPoints(fieldPos, Localizer.getCurrentPosition());
+        double t = Localizer.getCurrentPosition().h - Math.atan2(fieldPos.y, fieldPos.x);
+        double x = d * Math.cos(t);
+        double y = d * Math.sin(t);
+        return new SparkFunOTOS.Pose2D(x, y, 0);
+    }
     public static SparkFunOTOS.Pose2D getPositionRelativeToRobot(double tx, double ty){
         double Y = h * Math.tan(Math.PI / 2 - initialAngle + Math.toRadians(ty));
         double X = Math.tan(Math.toRadians(tx)) * Y - cameraOffsetX;
@@ -26,15 +34,17 @@ public class GetPositionSample {
         double rot = Math.atan(pose.y / pose.x);
         return new SparkFunOTOS.Pose2D(extendoDist, 0, rot * Math.signum(pose.y));
     }
-    public static SparkFunOTOS.Pose2D getPositionRelativeToFiled(double tx, double ty){
+    public static SparkFunOTOS.Pose2D getPositionRelativeToFiled(double tx, double ty, SparkFunOTOS.Pose2D R){
         if(Localizer.pinPoint == null){
             RobotLog.e("Localizer not initialized, use `Localizer.Initialize(hardwareMap);`");
         }
         SparkFunOTOS.Pose2D p = getPositionRelativeToRobot(tx, ty);
-        SparkFunOTOS.Pose2D R = Localizer.getCurrentPosition();
+        double omega = R.h - getExtendoRotPair(tx, ty).h;
 
-        double x = Math.cos(R.h) * p.x + Math.sin(R.h) * p.y;
-        double y = Math.cos(R.h) * p.y - Math.sin(R.h) * p.x;
+        double d = Math.sqrt(p.x * p.x + p.y * p.y);
+
+        double x = R.x - d * Math.cos(omega);
+        double y = R.y + d * Math.sin(omega);
 
         return new SparkFunOTOS.Pose2D(x, y, 0);
     }

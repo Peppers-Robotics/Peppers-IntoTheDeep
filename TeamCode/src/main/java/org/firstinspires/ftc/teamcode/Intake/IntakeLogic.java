@@ -36,9 +36,7 @@ public class IntakeLogic extends GenericController {
         }
         switch (state){
             case IDLE:
-                if(OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE_WITH_SAMPLE){
-                    if(!OutTakeLogic.currentTask.done()) break;
-                }
+                if(OutTakeLogic.Transfering) break;
                 // :)
                 if(Math.abs(gamepad1.right_stick_y) > 0.01) {
                     Extendo.DISABLE = true;
@@ -99,8 +97,11 @@ public class IntakeLogic extends GenericController {
                         state = States.IDLE;
                         reset = false;
                         Extendo.DISABLE = false;
-                        if(Storage.hasTeamPice())
+                        Extendo.motor.setPower(0);
+                        if(Storage.hasTeamPice()) {
                             Controls.Transfer = true;
+                            OutTakeLogic.Transfering = true;
+                        }
                     }
                 } else time.reset();
                 break;

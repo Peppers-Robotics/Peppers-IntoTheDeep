@@ -21,15 +21,15 @@ public class Controls {
     }
 
     public static void CleanCommands(){
-        RetractExtendo = false;
-        ScoreLevel2 = false;
-        ScoreLevel1 = false;
+//        RetractExtendo = false;
+//        ScoreLevel2 = false;
+//        ScoreLevel1 = false;
         Grab = false;
         GrabSpecimen = false;
         DunkToScore = false;
-        Transfer = false;
-        Throw = false;
-        SlowDown = false;
+//        Transfer = false;
+//        Throw = false;
+//        SlowDown = false;
     }
     private static boolean ClimbingHelp = false, imogenHelper = false;
 

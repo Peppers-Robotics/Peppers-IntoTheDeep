@@ -88,6 +88,7 @@ public class OpModeManager {
         Extendo.update();
         Elevator.update();
         Arm.update();
+        Controls.CleanCommands();
         Controls.Update();
     }
 }

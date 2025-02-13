@@ -14,7 +14,7 @@ import java.util.List;
 @Config
 public class Chassis {
     public static CachedMotor FL, FR, BL, BR;
-    public static int FLd = 1, FRd = -1, BLd = 1, BRd = -1;
+    public static double FLd = 1, FRd = -1, BLd = 1, BRd = -1;
     public static void drive(double x, double y, double r){
         double d = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
         double fl = (y + x + r) / d;
@@ -62,8 +62,18 @@ public class Chassis {
             yProfile = new AsymmetricMotionProfile(3000, 4000, 1000),
             hProfile = new AsymmetricMotionProfile(Math.PI * 2, Math.PI, Math.PI);
     public static void resetProfiles(){
-        xProfile = new AsymmetricMotionProfile(xMV, xAccel, xDecc);
-        yProfile = new AsymmetricMotionProfile(yMV, yAccel, yDecc);
+//        xProfile = new AsymmetricMotionProfile(xMV, xAccel, xDecc);
+        xProfile.maxVelocity = xMV;
+        xProfile.acceleration = xAccel;
+        xProfile.deceleration = xDecc;
+        xProfile.startMotion(xProfile.getPosition(), xProfile.getTargetPosition(), xProfile.getVelocity());
+
+        yProfile.maxVelocity = yMV;
+        yProfile.acceleration = yAccel;
+        yProfile.deceleration = yDecc;
+        yProfile.startMotion(yProfile.getPosition(), yProfile.getTargetPosition(), yProfile.getVelocity());
+
+//        yProfile = new AsymmetricMotionProfile(yMV, yAccel, yDecc);
     }
     public static void setProfiles(double xA, double yA, double xMV, double yMV, double xD, double yD){
         xProfile = new AsymmetricMotionProfile(xMV, xA, xD);

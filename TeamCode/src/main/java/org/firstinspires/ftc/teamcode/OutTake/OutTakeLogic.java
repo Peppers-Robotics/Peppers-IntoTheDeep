@@ -19,10 +19,10 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 @Config
 public class OutTakeLogic {
     public static double ElevatorScoreSample, ElevatorScoreSample1 = 300, ElevatorScoreSample2 = 750;
-    public static double ElevatorScoreSpecimen = 360;
+    public static double ElevatorScoreSpecimen = 330;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 220, PivotScoreSample = 0;
-    public static double ArmTakeSpecimen = 324, PivotTakeSpecimen = 10;
+    public static double ArmTakeSpecimen = 320, PivotTakeSpecimen = 10;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0;
     public static double ArmIdle = 5, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 0;
     public static boolean save2 = false;
@@ -38,6 +38,7 @@ public class OutTakeLogic {
     }
     public static States CurrentState = States.IDLE;
     public static Scheduler currentTask = new Scheduler();
+    public static boolean Transfering = false;
 
     public static void update(){
         if(currentTask.done()) {
@@ -96,6 +97,7 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
+                                        Transfering = true;
                                         ActiveIntake.powerOn();
                                         Extension.Extend(TransferExtension);
                                         return true;
@@ -144,6 +146,7 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Extension.Extend(0);
+                                        Transfering = false;
                                         return true;
                                     }
                                 })
@@ -152,7 +155,7 @@ public class OutTakeLogic {
 
                         CurrentState = States.IDLE_WITH_SAMPLE;
                         Controls.Transfer = false;
-                    }
+                    } else Transfering = false;
                     break;
                 case IDLE_SCORE_SAMPLE:
                     Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * coeff);

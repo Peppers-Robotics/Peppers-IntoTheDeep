@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 public class DropDown {
     public static ServoPlus servo;
     public static double Up = 280;
-    public static double retractedDown = 180, extendedDown = 205;
+    public static double retractedDown = 180, extendedDown = 195;
 
     public static void setDown(double precent){
         double down = retractedDown + (extendedDown - retractedDown) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition();
