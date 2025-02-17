@@ -208,17 +208,19 @@ public class Sample extends LinearOpMode {
                         @Override
                         public boolean Run() {
                             Extendo.Extend(
-                                    (int) GetPositionSample.getExtendoRotPairByField(
-                                            GetPositionSample.getPositionRelativeToFiled(result.getTx(), result.getTy(), took)
-                                    ).x
+//                                    (int) GetPositionSample.getExtendoRotPairByField(
+//                                            GetPositionSample.getPositionRelativeToFiled(result.getTx(), result.getTy(), took)
+//                                    ).x
+                                    0
                             );
                             Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(
                                     park.x,
                                     park.y,
                                     GetPositionSample.getExtendoRotPairByField(
                                             GetPositionSample.getPositionRelativeToFiled(result.getTx(), result.getTy(), took)
-                                    ).h - Math.PI
+                                    ).h
                             ));
+                            Robot.telemetry.addData("target (ex, rot)", Extendo.getTargetPosition() + " " + Chassis.getTargetPosition().h);
                             if(Math.abs(Extendo.getCurrentPosition() - Extendo.getTargetPosition()) <= 20 &&
                                Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) <= 10){
                                 start = true;
