@@ -207,7 +207,6 @@ public class Sample extends LinearOpMode {
                         long time = -1;
                         @Override
                         public boolean Run() {
-                            if(time == -1) time = System.currentTimeMillis();
                             Extendo.Extend(
                                     (int) GetPositionSample.getExtendoRotPairByField(
                                             GetPositionSample.getPositionRelativeToFiled(result.getTx(), result.getTy(), took)
@@ -218,7 +217,7 @@ public class Sample extends LinearOpMode {
                                     park.y,
                                     GetPositionSample.getExtendoRotPairByField(
                                             GetPositionSample.getPositionRelativeToFiled(result.getTx(), result.getTy(), took)
-                                    ).h + Math.PI
+                                    ).h - Math.PI
                             ));
                             if(Math.abs(Extendo.getCurrentPosition() - Extendo.getTargetPosition()) <= 20 &&
                                Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) <= 10){
@@ -227,8 +226,9 @@ public class Sample extends LinearOpMode {
                             if(start){
                                 ActiveIntake.powerOn();
                                 DropDown.setDown(1);
+                                if(time == -1) time = System.currentTimeMillis();
                             }
-                            return Storage.hasTeamPice() || (System.currentTimeMillis() - time) / 1000.f > timeOut;
+                            return Storage.getStorageStatus() == Storage.SpecimenType.YELLOW || ((System.currentTimeMillis() - time) / 1000.f > timeOut && time != -1);
 //                            return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 20;
                         }
                     })
