@@ -44,6 +44,8 @@ public class Chassis {
         Strafe.setTargetPosition(0);
         Forward.setTargetPosition(0);
         Heading.setTargetPosition(0);
+        while(pose.h > 2*Math.PI) pose.h -= 2 * Math.PI;
+        while(pose.h < 0) pose.h += 2 * Math.PI;
         targetPosition = pose;
     }
     static{

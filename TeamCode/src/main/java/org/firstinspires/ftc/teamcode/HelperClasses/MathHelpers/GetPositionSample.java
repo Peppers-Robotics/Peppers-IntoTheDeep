@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(25), h = 275.214, cameraOffsetX = 105.053, cameraOffsetY = 110.67, centerToExtendo = 158;
+    public static double initialAngle = Math.toRadians(5), h = 286.2526 , cameraOffsetX = 105.053, cameraOffsetY = 110.67, centerToExtendo = 100;
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
@@ -21,6 +21,13 @@ public class GetPositionSample {
         double x = d * Math.cos(t);
         double y = d * Math.sin(t);
         return new SparkFunOTOS.Pose2D(x, y, 0);
+    }
+
+    public static SparkFunOTOS.Pose2D getExtendoRotPairByField(SparkFunOTOS.Pose2D s){
+        SparkFunOTOS.Pose2D R = Localizer.getCurrentPosition();
+        double h = Math.atan2(s.y - R.y, s.x - R.x);
+        double e = Localizer.getDistanceFromTwoPoints(s, R) - centerToExtendo;
+        return new SparkFunOTOS.Pose2D(e, e, h);
     }
     public static SparkFunOTOS.Pose2D getPositionRelativeToRobot(double tx, double ty){
         double Y = h * Math.tan(Math.PI / 2 - initialAngle + Math.toRadians(ty));

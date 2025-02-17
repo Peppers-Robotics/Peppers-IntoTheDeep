@@ -36,6 +36,12 @@ public class Localizer {
                 (p1.y - p2.y) * (p1.y - p2.y)
         );
     }
+    public static double getAngleDifference(double h1, double h2){
+        double d = Math.abs(h1 - h2);
+        while(d < 0) d += 2 * Math.PI;
+        while(d > 2 * Math.PI) d -= Math.PI;
+        return d;
+    }
 
     public static void Update(){
         pinPoint.update();
@@ -51,7 +57,10 @@ public class Localizer {
         pinPoint.resetPosAndIMU();
     }
     public static SparkFunOTOS.Pose2D getCurrentPosition(){
-        return new SparkFunOTOS.Pose2D(pinPoint.getPosX(), pinPoint.getPosY(), pinPoint.getHeading());
+        double h = pinPoint.getHeading();
+        while(h > 2*Math.PI) h -= 2 * Math.PI;
+        while(h < 0) h += 2 * Math.PI;
+        return new SparkFunOTOS.Pose2D(pinPoint.getPosX(), pinPoint.getPosY(), h);
     }
     /* PinPoint velocity is too noisy to be used for anything useful
         so a basic low pass filter won't be enough to make something useful.
