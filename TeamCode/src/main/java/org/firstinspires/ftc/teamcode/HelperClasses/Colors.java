@@ -13,12 +13,12 @@ public class Colors {
 
     }
     public enum ColorType {
-        BLUE(new Color(62, 111, 255)),
+        BLUE(new Color(0, 0, 255)),
 //        GREEN(new Color(0, 255, 0)),
-        RED(new Color(255, 117, 51)),
-        YELLOW(new Color(227, 255, 52)),
+        RED(new Color(255, 0, 0)),
+        YELLOW(new Color(255, 255, 0)),
         BLACK(new Color(0, 0, 0)),
-        WHITE(new Color(146, 255, 223)),
+        WHITE(new Color(255, 255, 255)),
         GREEN(new Color(0, 255, 0)),
 //        CYAN(new Color(0, 255, 255)),
 //        PURPLE(new Color(255, 0, 255)),
@@ -37,7 +37,7 @@ public class Colors {
         double rDiff = c1.r - c2.r;
         double gDiff = c1.g - c2.g;
         double bDiff = c1.b - c2.b;
-        return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+        return Math.cbrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
     }
 
 

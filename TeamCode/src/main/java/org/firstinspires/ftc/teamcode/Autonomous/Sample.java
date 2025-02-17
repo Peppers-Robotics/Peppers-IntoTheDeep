@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import android.widget.TabHost;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -176,12 +177,13 @@ public class Sample extends LinearOpMode {
 //                    .lineToAsync(new SparkFunOTOS.Pose2D(park.x, park.y - 100, park.h))
 //                    .waitForSync()
 //                    .waitSeconds(0.6)
-                    .addTask(new Task() {
-                        @Override
-                        public boolean Run() {
-                            return Chassis.getPrecentageOfMotionDone() > 90;
-                        }
-                    })
+//                    .addTask(new Task() {
+//                        @Override
+//                        public boolean Run() {
+//                            return Chassis.getPrecentageOfMotionDone() > 90;
+//                        }
+//                    })
+                    .waitForSync()
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -402,6 +404,7 @@ public class Sample extends LinearOpMode {
         Extension.Retract();
         Chassis.setProfiles(6000, 6000, 4000, 4000, 1200, 1200);
         Storage.team = Storage.Team.BLUE;
+        Robot.telemetry = new MultipleTelemetry(telemetry, Robot.telemetry);
 
         Scheduler scheduler = new Scheduler();
         scheduler
