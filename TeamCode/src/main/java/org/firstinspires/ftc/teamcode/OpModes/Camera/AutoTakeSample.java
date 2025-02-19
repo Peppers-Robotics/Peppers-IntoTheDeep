@@ -64,6 +64,7 @@ public class AutoTakeSample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
+                        run = true;
                         res = ll.getLatestResult();
                         return res != null;
                     }
@@ -216,7 +217,7 @@ public class AutoTakeSample extends LinearOpMode {
 
         while(opModeIsActive()){
             Robot.clearCache();
-            takeNew.update();
+            task.update();
             if(res != null) {
                 Robot.telemetry.addData("rot", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h);
                 Robot.telemetry.addData("ext", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);

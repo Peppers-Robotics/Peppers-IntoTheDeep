@@ -96,7 +96,7 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
-                return Localizer.getVelocity().x < 5 && Localizer.getVelocity().y < 5;
+                return Localizer.getVelocity().x < 3 && Localizer.getVelocity().y < 3 && Localizer.getVelocity().h < Math.toRadians(3);
             }
         });
         return this;
@@ -109,6 +109,9 @@ public class Scheduler implements Cloneable {
             }
         });
         return this;
+    }
+    public void clear(){
+        tasks.clear();
     }
 
     @NonNull

@@ -21,6 +21,14 @@ apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 
 android {
+
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                cppFlags ''
+            }
+        }
+    }
     namespace = 'org.firstinspires.ftc.teamcode'
     packagingOptions {
         jniLibs.useLegacyPackaging true

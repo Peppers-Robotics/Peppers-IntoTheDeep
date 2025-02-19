@@ -38,7 +38,7 @@ public class Chassis {
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
     public static PIDController Strafe = new PIDController(0.002, 0.001, 0.01),
                                 Forward = new PIDController(-0.007, -0.005, 0.03),
-                                Heading       = new PIDController(2, 0, -0.1);
+                                Heading       = new PIDController(1.5, 0, -0.1);
 
     public static void setTargetPosition(SparkFunOTOS.Pose2D pose){
         Strafe.setTargetPosition(0);
@@ -57,7 +57,11 @@ public class Chassis {
     public static SparkFunOTOS.Pose2D getTargetPosition(){
         return targetPosition;
     }
-
+    public static void holdOrientation(double x, double y, double h){
+        double e = h - Localizer.getCurrentPosition().h;
+        double rot = Heading.calculatePower(e, Localizer.getVelocity().h);
+        drive(x, y, rot);
+    }
 
     public static double xAccel = 4000, yAccel = 4000, xMV = 3000, yMV = 3000, xDecc = 2500, yDecc = 1000;
     public static AsymmetricMotionProfile xProfile = new AsymmetricMotionProfile(3000, 4000, 2500),

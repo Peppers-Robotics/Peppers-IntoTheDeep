@@ -9,8 +9,8 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.apache.commons.math3.exception.util.Localizable;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.GetPositionSample;
+import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.LimeLightStream;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
@@ -28,8 +28,12 @@ public class CameraDebug extends LinearOpMode {
         waitForStart();
         camera.start();
         camera.pipelineSwitch(0);
+        LimeLightStream stream = new LimeLightStream("http://172.28.0.1:8500/source.mjpg", 1280, 720);
+
+        FtcDashboard.getInstance().startCameraStream(stream, 20);
+
         LLResult r = null;
-        SparkFunOTOS.Pose2D p = null;
+        SparkFunOTOS.Pose2D p = null, o = null;
 
         while (opModeIsActive()){
             Robot.clearCache();
@@ -38,6 +42,7 @@ public class CameraDebug extends LinearOpMode {
                 r = camera.getLatestResult();
                 if(r != null){
                     p = GetPositionSample.getPositionRelativeToFiled(r.getTx(), r.getTy(), Localizer.getCurrentPosition());
+                    o = GetPositionSample.getPositionRelativeToRobot(r.getTx(), r.getTy());
                 }
                 photo = false;
             }
@@ -45,10 +50,12 @@ public class CameraDebug extends LinearOpMode {
 //                Robot.telemetry.addData("samplePositionRelativeToRobot", GetPositionSample.getPositionRelativeToRobot(r.getTx(), r.getTy()));
 //                Robot.telemetry.addData("samplePositionRelativeToField", GetPositionSample.getPositionRelativeToFiled(r.getTx(), r.getTy()));
 //                SparkFunOTOS.Pose2D p = GetPositionSample.getPositionRelativeToRobot(r.getTx(), r.getTy());
-//                Robot.telemetry.addData("robot pos", "(" + p.x + ", " + p.y + ", " + Math.toDegrees(p.h) + " deg)");
                 Robot.telemetry.addData("field pos", "(" + p.x + ", " + p.y + ", " + Math.toDegrees(p.h) + " deg)");
+                Robot.telemetry.addData("robot pos", "(" + o.x + ", " + o.y + ", " + Math.toDegrees(o.h) + " deg)");
             }
             telemetry.update();
         }
+        FtcDashboard.getInstance().stopCameraStream();
+        stream.close();
     }
 }

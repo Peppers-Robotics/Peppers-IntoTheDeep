@@ -41,7 +41,7 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
         super(deviceClient, deviceClientIsOwned);
         timeDistance = System.currentTimeMillis();
         timeRGB = System.currentTimeMillis();
-        setFreqToUpdate(50);
+        setFreqToUpdate(20);
     }
     public void changeLEDsettings(LEDPulseModulation l, LEDCurrent c){
         setLEDParameters(l, c);
