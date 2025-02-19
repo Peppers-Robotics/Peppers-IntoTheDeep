@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(15), h = 281.043 , cameraOffsetX = 105.053, cameraOffsetY = 110.67, centerToExtendo = 140;
+    public static double initialAngle = Math.toRadians(15), h = 281.043 , cameraOffsetX = 105.053, cameraOffsetY = 110.67, centerToExtendo = 130;
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }

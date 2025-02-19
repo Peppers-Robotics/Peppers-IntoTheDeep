@@ -189,7 +189,7 @@ public class Sample extends LinearOpMode {
 //                    })
                     .waitForSync()
                     .waitForStill()
-                    .waitSeconds(1)
+                    .waitSeconds(0.2)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -267,9 +267,9 @@ public class Sample extends LinearOpMode {
                                 if(p == -1) p = Extendo.getTargetPosition();
                             }
                             if(p != -1) {
-                                p += 0.001;
+                                p += 0.1;
                                 Extendo.Extend((int) p);
-                                Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Chassis.getTargetPosition().x, Chassis.getTargetPosition().y, Chassis.getTargetPosition().h + 0.01));
+                                Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Chassis.getTargetPosition().x, Chassis.getTargetPosition().y, Chassis.getTargetPosition().h + 0.001));
                             }
                             return Storage.getStorageStatus() == Storage.SpecimenType.YELLOW || ((System.currentTimeMillis() - time) / 1000.f > timeOut && time != -1);
 //                            return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 20;
