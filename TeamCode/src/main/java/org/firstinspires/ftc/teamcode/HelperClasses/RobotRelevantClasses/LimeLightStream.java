@@ -14,10 +14,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LimeLightStream implements CameraStreamSource {
-    static {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME); // Load OpenCV
-    }
-
     private VideoCapture camera;
     private Mat frame;
     private Lock frameLock;
@@ -25,7 +21,8 @@ public class LimeLightStream implements CameraStreamSource {
     private Bitmap latestBitmap;
 
     public LimeLightStream(String ipAddr, int Width, int Height) {
-        this.camera = new VideoCapture(ipAddr);
+        this.camera = new VideoCapture(0);
+        camera.open("http://172.28.0.1:5800/stream.mjpg");
         this.frame = new Mat();
         this.frameLock = new ReentrantLock();
         this.latestBitmap = Bitmap.createBitmap(Width, Height, Bitmap.Config.ARGB_8888);

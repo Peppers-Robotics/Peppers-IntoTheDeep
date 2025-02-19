@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 public class Extendo {
     public static CachedMotor motor;
     public static PIDController pidController = new PIDController(0.01, 0, -0.0004);
-    public static int MaxExtendoExtension = 850;
+    public static int MaxExtendoExtension = 820;
     private static double targetPosition = 0;
     static {
         pidController.setFreq(40);

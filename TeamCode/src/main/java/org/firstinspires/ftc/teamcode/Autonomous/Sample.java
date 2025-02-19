@@ -135,7 +135,7 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Claw.close();
+//                            Claw.close();
                             Extendo.Extend(600);
                             Extension.Retract();
                             Arm.setArmAngle(OutTakeLogic.ArmIdle);
@@ -188,6 +188,8 @@ public class Sample extends LinearOpMode {
 //                        }
 //                    })
                     .waitForSync()
+                    .waitForStill()
+                    .waitSeconds(1)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -208,15 +210,13 @@ public class Sample extends LinearOpMode {
 //                        }
 //                    })
                     .waitForSync()
-                    .waitForStill()
-                    .waitSeconds(0.4)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
                             Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(
                                     Localizer.getCurrentPosition().x,
                                     Localizer.getCurrentPosition().y,
-                                    Localizer.getCurrentPosition().h -
+                                    Localizer.getCurrentPosition().h +
                                     GetPositionSample.getExtendoRotPair(result.getTx(), result.getTy()).h
                             ));
                             return true;
@@ -250,6 +250,7 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         boolean start = false;
                         long time = -1;
+                        double p = -1;
                         @Override
                         public boolean Run() {
 
@@ -263,6 +264,12 @@ public class Sample extends LinearOpMode {
                                 ActiveIntake.powerOn();
                                 DropDown.setDown(1);
                                 if(time == -1) time = System.currentTimeMillis();
+                                if(p == -1) p = Extendo.getTargetPosition();
+                            }
+                            if(p != -1) {
+                                p += 0.001;
+                                Extendo.Extend((int) p);
+                                Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Chassis.getTargetPosition().x, Chassis.getTargetPosition().y, Chassis.getTargetPosition().h + 0.01));
                             }
                             return Storage.getStorageStatus() == Storage.SpecimenType.YELLOW || ((System.currentTimeMillis() - time) / 1000.f > timeOut && time != -1);
 //                            return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 20;

@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.GetPositionSampl
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.LimeLightStream;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
+import org.firstinspires.ftc.teamcode.HelperClasses.MJpegStreamDecoder;
 
 @TeleOp
 @Config
@@ -28,24 +29,24 @@ public class CameraDebug extends LinearOpMode {
         waitForStart();
         camera.start();
         camera.pipelineSwitch(0);
-        LimeLightStream stream = new LimeLightStream("http://172.28.0.1:8500/source.mjpg", 1280, 720);
-
-        FtcDashboard.getInstance().startCameraStream(stream, 20);
-
+//        MJpegStreamDecoder stream = new MJpegStreamDecoder("http://172.29.0.1:5800/stream");
+//
+//        FtcDashboard.getInstance().startCameraStream(stream, 20);
+//
         LLResult r = null;
         SparkFunOTOS.Pose2D p = null, o = null;
 
         while (opModeIsActive()){
             Robot.clearCache();
             Localizer.Update();
-            if(r == null || photo){
+//            if(r == null || photo){
                 r = camera.getLatestResult();
                 if(r != null){
                     p = GetPositionSample.getPositionRelativeToFiled(r.getTx(), r.getTy(), Localizer.getCurrentPosition());
                     o = GetPositionSample.getPositionRelativeToRobot(r.getTx(), r.getTy());
                 }
                 photo = false;
-            }
+//            }
             if(r != null) {
 //                Robot.telemetry.addData("samplePositionRelativeToRobot", GetPositionSample.getPositionRelativeToRobot(r.getTx(), r.getTy()));
 //                Robot.telemetry.addData("samplePositionRelativeToField", GetPositionSample.getPositionRelativeToFiled(r.getTx(), r.getTy()));
@@ -55,7 +56,7 @@ public class CameraDebug extends LinearOpMode {
             }
             telemetry.update();
         }
-        FtcDashboard.getInstance().stopCameraStream();
-        stream.close();
+//        FtcDashboard.getInstance().stopCameraStream();
+//        stream.close();
     }
 }

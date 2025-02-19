@@ -127,6 +127,7 @@ public class AutoTakeSample extends LinearOpMode {
                         res = ll.getLatestResult();
                         capture = Localizer.getCurrentPosition();
                         return res != null;
+
                     }
                 })
                 .addTask(new Task() {
@@ -143,7 +144,7 @@ public class AutoTakeSample extends LinearOpMode {
                         Chassis.setTargetPosition( new SparkFunOTOS.Pose2D(
                                 Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y,
 //                                Localizer.getCurrentPosition().h +
-                                        Math.PI + GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(res.getTx(), res.getTy(), capture)).h
+                                    GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(res.getTx(), res.getTy(), capture)).h
                         ));
                         return true;
                     }
@@ -219,10 +220,12 @@ public class AutoTakeSample extends LinearOpMode {
             Robot.clearCache();
             task.update();
             if(res != null) {
-                Robot.telemetry.addData("rot", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h);
-                Robot.telemetry.addData("ext", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);
+//                Robot.telemetry.addData("rot", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h);
+//                Robot.telemetry.addData("ext", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);
                 Robot.telemetry.addData("pos forward", GetPositionSample.getPositionRelativeToRobot(res.getTx(), res.getTy()).x);
                 Robot.telemetry.addData("pos lateral", GetPositionSample.getPositionRelativeToRobot(res.getTx(), res.getTy()).y);
+                 SparkFunOTOS.Pose2D r = GetPositionSample.getPositionRelativeToFiled(res.getTx(), res.getTy(), capture);
+                Robot.telemetry.addData("field pos", r.x + ", " + r.y );
             }
 
             hz = 1 / t.seconds();

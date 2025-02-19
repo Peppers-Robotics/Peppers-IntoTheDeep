@@ -124,4 +124,8 @@ public class Scheduler implements Cloneable {
             throw new AssertionError();
         }
     }
+
+    public void clear() {
+        tasks.clear();
+    }
 }

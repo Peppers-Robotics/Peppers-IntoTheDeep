@@ -17,6 +17,6 @@ public class DropDown {
 
         double angle = Up - (Up - down) * precent;
         servo.setAngle(angle);
-        Robot.telemetry.addData("Extendo Pos", Extendo.getCurrentPosition());
+        //Robot.telemetry.addData("Extendo Pos", Extendo.getCurrentPosition());
     }
 }

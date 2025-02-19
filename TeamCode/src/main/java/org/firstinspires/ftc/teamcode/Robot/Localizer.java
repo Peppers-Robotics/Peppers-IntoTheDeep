@@ -22,6 +22,13 @@ public class Localizer {
     public static SparkFunOTOS.Pose2D Div(SparkFunOTOS.Pose2D pose, double d){
         return new SparkFunOTOS.Pose2D(pose.x / d, pose.y / d, pose.h / d);
     }
+
+    public static double normalizeRadians(double raw){
+        while(raw > Math.PI * 2) raw -= Math.PI * 2;
+        while(raw < Math.PI * 0) raw += Math.PI * 2;
+        return raw;
+    }
+
     public static void Initialize(HardwareMap hm){
         pinPoint = hm.get(PinPoint.class, "pinpoint");
         pinPoint.setOffsets(X, Y);
