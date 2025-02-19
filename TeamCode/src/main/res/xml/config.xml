@@ -5,8 +5,10 @@
             <FastColorRangeSensor name="Storage" port="0" bus="3" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
-            <ControlHubImuBHI260AP name="imuProst" port="0" bus="0" />
-            <goBILDAPinpoint name="pinpoint" port="0" bus="3" />
+            <MPU6050 name="imu" port="0" bus="3" />
+            <goBILDAPinpoint name="pinpoint" port="0" bus="0" />
+            <ControlHubImuBHI260AP name="imuProst" port="1" bus="0" />
         </LynxModule>
     </LynxUsbDevice>
+    <EthernetDevice serialNumber="EthernetOverUsb:eth0:172.29.0.29" name="camera" port="0" ipAddress="172.29.0.1" />
 </Robot>
