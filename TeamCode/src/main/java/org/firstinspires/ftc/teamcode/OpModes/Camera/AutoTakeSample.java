@@ -58,7 +58,67 @@ public class AutoTakeSample extends LinearOpMode {
         run = false;
         res = null;
 
+        Scheduler task = new Scheduler();
         Scheduler takeNew = new Scheduler();
+        task
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        run = true;
+                        res = ll.getLatestResult();
+                        return res != null;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Extendo.Extend((int) GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);
+                        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h));
+                        return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 4;
+                    }
+                })
+                .waitSeconds(0.1)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        ActiveIntake.Unblock();
+                        ActiveIntake.powerOn();
+                        DropDown.setDown(1);
+                        return true;
+                    }
+                })
+                .waitSeconds(0.05)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        return Storage.hasTeamPice();
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        ActiveIntake.Block();
+                        return true;
+                    }
+                })
+                .waitSeconds(0.2)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        ActiveIntake.Reverse(0.8);
+                        DropDown.setDown(0);
+                        return true;
+                    }
+                })
+                .waitSeconds(0.05)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Extendo.Extend(0);
+                        return true;
+                    }
+                })
+                ;
         res = null;
         takeNew
                 .addTask(new Task() {
@@ -157,7 +217,7 @@ public class AutoTakeSample extends LinearOpMode {
 
         while(opModeIsActive()){
             Robot.clearCache();
-            takeNew.update();
+            task.update();
             if(res != null) {
                 Robot.telemetry.addData("rot", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h);
                 Robot.telemetry.addData("ext", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);

@@ -13,17 +13,20 @@ import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogic;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
+import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Autonomous(name = "5 + 0")
 public class Specimen extends LinearOpMode {
+    public static double scoredLine = 0;
     public static SparkFunOTOS.Pose2D scoreSpecimen = new SparkFunOTOS.Pose2D(0, 0, 0),
         sample1 = new SparkFunOTOS.Pose2D(0, 0, 0),
         sample2 = new SparkFunOTOS.Pose2D(0, 0, 0),
         sample3 = new SparkFunOTOS.Pose2D(0, 0, 0),
         humanReverse = new SparkFunOTOS.Pose2D(0, 0, 0),
+        humanPreTake = new SparkFunOTOS.Pose2D(0, 0, 0),
         humanTake = new SparkFunOTOS.Pose2D(0, 0 ,0);
 
     public static class ScoreSpecimen extends Task{
@@ -49,8 +52,13 @@ public class Specimen extends LinearOpMode {
                             return Arm.getCurrentArmAngle() < 300;
                         }
                     })
-                    .lineTo(scoreSpecimen)
-                    .waitSeconds(0.1) // maybe remove
+                    .lineToAsync(scoreSpecimen)
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            return Localizer.getCurrentPosition().x > scoredLine; // TODO: change if needed
+                        }
+                    })
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -81,6 +89,7 @@ public class Specimen extends LinearOpMode {
                             return true;
                         }
                     })
+                    .waitForTrajDone(90)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -89,10 +98,17 @@ public class Specimen extends LinearOpMode {
                             return Elevator.getCurrentPosition() < 50;
                         }
                     })
+                    .waitForTrajDone(powerLift ? 90 : 0)
+                    .waitSeconds(0.1)
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            Claw.close();
+                            return true;
+                        }
+                    })
+                    .waitSeconds(0.15)
             ;
-
-
-
         }
 
         @Override
@@ -206,6 +222,7 @@ public class Specimen extends LinearOpMode {
                 .waitForTrajDone(75)
                 .addTask(new TakeSample(400))
                 .lineToLinearHeadingAsync(humanReverse)
+                .addTask(new SpecimenTake(false))
                 .addTask(new SpitToHP(300))
 
                 .lineToLinearHeadingAsync(sample2)
@@ -228,8 +245,39 @@ public class Specimen extends LinearOpMode {
                     }
                 })
                 .lineToLinearHeadingAsync(humanTake)
+                .addTask(new SpecimenTake(true))
+                .addTask(new ScoreSpecimen())
+
+                .lineToLinearHeadingAsync(humanTake)
+                .addTask(new SpecimenTake(true))
+                .addTask(new ScoreSpecimen())
+
+                .lineToLinearHeadingAsync(humanTake)
+                .addTask(new SpecimenTake(true))
+                .addTask(new ScoreSpecimen())
+
+                .lineToLinearHeadingAsync(humanTake)
+                .addTask(new SpecimenTake(true))
+                .addTask(new ScoreSpecimen())
 
                 ;
+
+        while(opModeInInit()){
+            Elevator.update();
+            Extendo.update();
+            Arm.update();
+            Robot.clearCache();
+            DropDown.setDown(0);
+        }
+
+        while (opModeIsActive()) {
+            auto.update();
+
+            Elevator.update();
+            Extendo.update();
+            Arm.update();
+            Robot.clearCache();
+        }
 
     }
 }

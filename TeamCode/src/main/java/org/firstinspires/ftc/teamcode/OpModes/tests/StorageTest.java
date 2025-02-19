@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Climb.Climb;
+import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @TeleOp
@@ -14,15 +15,14 @@ public class StorageTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Robot.InitializeHubs(hardwareMap);
-        Robot.InitializeClimb();
-        Robot.InitializeExtendo();
+        Robot.InitializeStorage(hardwareMap);
         waitForStart();
 
         while (opModeIsActive()){
             Robot.clearCache();
+            Storage.getStorageStatus();
 
-            if(climb)
-                Climb.Update();
+            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
         }
     }
 }

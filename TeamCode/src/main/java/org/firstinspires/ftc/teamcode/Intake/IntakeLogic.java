@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Intake;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -34,23 +35,30 @@ public class IntakeLogic extends GenericController {
             state = States.RETRACT;
             Controls.RetractExtendo = false;
         }
+        if(OutTakeLogic.Transfering) gamepad1.right_stick_y = 0;
+        if(Extendo.getCurrentPosition() <= 80) Extendo.DISABLE = false;
+        else Extendo.DISABLE = true;
         switch (state){
             case IDLE:
                 if(OutTakeLogic.Transfering) break;
                 // :)
                 if(Math.abs(gamepad1.right_stick_y) > 0.01) {
-                    Extendo.DISABLE = true;
                     Extendo.PowerOnToTransfer = false;
+                    Extendo.DISABLE = true;
 //                Extendo.Extend((int) (Extendo.getTargetPosition() + 35 * (gamepad1.right_stick_y * gamepad1.right_stick_y)));
 //                Extendo.update();
-                    if (Extendo.getCurrentPosition() < 0 && gamepad1.right_stick_y > 0) break;
-                    if (Extendo.getCurrentPosition() > Extendo.getMaxPosition() && gamepad1.right_stick_y < 0)
+                    if (Extendo.getCurrentPosition() < 0 && gamepad1.right_stick_y > 0){
+                        Extendo.motor.setPower(0);
                         break;
+                    }
+                    if (Extendo.getCurrentPosition() > Extendo.getMaxPosition() && gamepad1.right_stick_y < 0) {
+                        Extendo.motor.setPower(0);
+                        break;
+                    }
                     Extendo.motor.setPower(-Math.signum(gamepad1.right_stick_y) * (gamepad1.right_stick_y * gamepad1.right_stick_y));
                     pos = Extendo.getCurrentPosition();
                 } else {
-                    Extendo.DISABLE = false;
-                    Extendo.Extend(pos);
+                    Extendo.motor.setPower(0);
                 }
                 Robot.telemetry.addData("tp", Extendo.getTargetPosition());
                 break;
@@ -63,7 +71,7 @@ public class IntakeLogic extends GenericController {
 
                 Extendo.motor.setPower(-1);
 //                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 4 && Math.abs(Extendo.motor.getVelocity()) < 3)){
+                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 4 && Math.abs(Extendo.motor.getVelocity()) < 3 && Extendo.getCurrentPosition() < 10)){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;
@@ -79,29 +87,6 @@ public class IntakeLogic extends GenericController {
                         reset = false;
                         if(Storage.hasTeamPice())
                             Controls.Transfer = true;
-                    }
-                } else time.reset();
-                break;
-            case RESET: // unused
-                Extendo.DISABLE = true;
-                Extendo.motor.setPower(-1);
-                DropDown.setDown(0);
-                if((Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 6.5 && Math.abs(Extendo.motor.getVelocity()) <= 1) || reset){ // STALL
-                    reset = true;
-                    Extendo.motor.setPower(0);
-                    if(time.seconds() >= 0.1){
-                        Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                        Extendo.Extend(0);
-                        pos = 0;
-                        state = States.IDLE;
-                        reset = false;
-                        Extendo.DISABLE = false;
-                        Extendo.motor.setPower(0);
-                        if(Storage.hasTeamPice()) {
-                            Controls.Transfer = true;
-                            OutTakeLogic.Transfering = true;
-                        }
                     }
                 } else time.reset();
                 break;
@@ -131,7 +116,7 @@ public class IntakeLogic extends GenericController {
             wasDriverActivated = true;
         }
         if(Math.abs(gamepad2.left_trigger) > 0.02 && (ActiveIntake.isOff() || wasDriverActivated)){
-            ActiveIntake.Reverse(gamepad2.left_trigger);
+            ActiveIntake.Reverse(Math.max(gamepad2.left_trigger, 0.8));
             //unblock
             ActiveIntake.Unblock();
             wasDriverActivated = true;
@@ -140,10 +125,11 @@ public class IntakeLogic extends GenericController {
         if(!Controls.ImogenDriver) {
             gamepad2.update();
         }
-        if(Storage.hasTeamPice()){
-            ActiveIntake.Block();
-        } else
-            ActiveIntake.Unblock();
+//        if(Storage.hasTeamPice() && ActiveIntake.motor.getPower() < 0.2){
+//            ActiveIntake.Block();
+//        } else
+//            ActiveIntake.Unblock();
         Robot.telemetry.addData("Intake State", state.toString());
+//        RobotLog.ii("Intake State", state.toString());
     }
 }

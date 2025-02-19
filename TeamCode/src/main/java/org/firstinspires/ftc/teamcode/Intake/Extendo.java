@@ -90,7 +90,7 @@ public class Extendo {
         return getCurrentPosition() >= MaxExtendoExtension;
     }
 
-    public static double getMaxPosition() {
+    public static int getMaxPosition() {
         return MaxExtendoExtension;
     }
 }

@@ -22,7 +22,7 @@ public class AsymmetricMotionProfile {
     public void startMotion(double initialPos, double targetPos){
         initialVelocity = 0;
         if(initialPos == targetPos){
-            RobotLog.i("(stub! - handled) Asymmetric Motion can't make a profile for a distance of 0 units");
+            RobotLog.e("(stub! - handled) Asymmetric Motion can't make a profile for a distance of 0 units");
             return;
         }
         double dist = Math.abs(targetPos - initialPos);

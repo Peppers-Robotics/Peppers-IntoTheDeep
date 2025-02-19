@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Robot;
 
 import android.graphics.Bitmap;
 import android.media.MediaCodecInfo;
+import android.provider.MediaStore;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
@@ -27,6 +28,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.android.AndroidAccelerometer;
 import org.firstinspires.ftc.robotcore.external.function.Consumer;
 import org.firstinspires.ftc.robotcore.external.function.Continuation;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
@@ -42,16 +44,22 @@ import org.firstinspires.ftc.teamcode.OutTake.Claw;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.Extension;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvInternalCamera2Impl;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.io.BufferedReader;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Robot {
     public static List<LynxModule> hubs;
+
     public static Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     public static IMU imu;
     public static DcMotorController ControlHubMotors, ExpansionHubMotors;
@@ -68,18 +76,6 @@ public class Robot {
     public static void enable(){
         for(LynxModule l : hubs){
             l.engage();
-        }
-    }
-
-    public static class LLStream implements CameraStreamSource {
-        private VideoCapture c;
-        public LLStream(){
-            c = new VideoCapture();
-            c.open("http://172.28.0.1:5800/stream.mjpg");
-        }
-        @Override
-        public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
-
         }
     }
 
@@ -128,10 +124,14 @@ public class Robot {
         }
     }
     public static void clearCache(){
+        clearCache(true);
+    }
+    public static void clearCache(boolean update){
         for(LynxModule l : hubs){
             l.clearBulkCache();
         }
-        telemetry.update();
+        if(update)
+            telemetry.update();
     }
     public static void InitializeFull(HardwareMap hm){
         InitializeHubs(hm, true);

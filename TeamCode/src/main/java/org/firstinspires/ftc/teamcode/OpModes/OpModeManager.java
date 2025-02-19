@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
@@ -44,6 +46,7 @@ public class OpModeManager {
         Extendo.Extend(0);
         Extension.Retract();
         ActiveIntake.Unblock();
+        Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Claw.open();
         b = false;
     }
@@ -59,13 +62,14 @@ public class OpModeManager {
         return sgn * h;
     }
     private static boolean b = false;
+    long s = 0;
     public void update(){
 //        if(!b && Robot.isDisabled() && !gamepad1.atRest()) {
 //            Robot.enable();
 //            b = true;
 //        }
 
-        Robot.clearCache();
+        Robot.clearCache(gamepad1.back);
 
         if(Controls.Climbing && !isClimbing){
             Climb.run = Climb.climb.clone();
@@ -90,5 +94,8 @@ public class OpModeManager {
         Arm.update();
         Controls.CleanCommands();
         Controls.Update();
+
+        RobotLog.ii("freq", String.valueOf(1000.f / ((System.currentTimeMillis() - s))));
+        s = System.currentTimeMillis();
     }
 }
