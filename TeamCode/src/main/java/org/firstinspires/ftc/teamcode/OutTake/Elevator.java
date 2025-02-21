@@ -64,9 +64,9 @@ public class Elevator {
             }
             return;
         }
-        Robot.telemetry.addData("Elevator Current Position", motor.getCurrentPosition());
-        Robot.telemetry.addData("Elevator enabled", motor.isMotorEnabled());
-        Robot.telemetry.addData("TargetPosition", targetPos);
+//        Robot.telemetry.addData("Elevator Current Position", motor.getCurrentPosition());
+//        Robot.telemetry.addData("Elevator enabled", motor.isMotorEnabled());
+//        Robot.telemetry.addData("TargetPosition", targetPos);
 
         if (RESET) {
             if (motor.getCurrent(CurrentUnit.AMPS) > 6.5 || was) {

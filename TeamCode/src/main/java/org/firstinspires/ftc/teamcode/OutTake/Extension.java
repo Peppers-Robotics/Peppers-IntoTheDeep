@@ -10,10 +10,15 @@ public class Extension {
     public static ServoPlus servo;
     public static double extendoPos = 120, retractPos = 319;
     public static LinearFunction f = new LinearFunction(retractPos, extendoPos);
+    private static double frac = 0;
     public static void Retract(){
         servo.setAngle(retractPos);
     }
     public static void Extend(double precent){
+        frac     = precent;
         servo.setAngle(f.getOutput(precent));
+    }
+    public static double getPrecent(){
+        return frac;
     }
 }

@@ -34,7 +34,7 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
     }
     private long timeDistance = 0, timeRGB = 0;
     private double freq = 20;
-    private double lowPassFilter = 0.6;
+    private double lowPassFilter = 1;
     public ColorRangeSensorPacket p = new ColorRangeSensorPacket();
     public ColorRangeSensorPacket RGB = new ColorRangeSensorPacket();
     public FastColorRangeSensor(I2cDeviceSynchSimple deviceClient, boolean deviceClientIsOwned) {
@@ -69,9 +69,9 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
             p.B = (int) (this.blue() * this.lowPassFilter + p.B * (1 - lowPassFilter));
             p.A = Math.max(p.G, Math.max(p.R, p.B));
 
-            RGB.R = Range.clip((p.R / p.A) * 255, 0, 255);
-            RGB.G = Range.clip((p.G / p.A) * 255, 0, 255);
-            RGB.B = Range.clip((p.B / p.A) * 255, 0, 255);
+            RGB.R = Range.clip((p.R) , 0, 255);
+            RGB.G = Range.clip((p.G) , 0, 255);
+            RGB.B = Range.clip((p.B) , 0, 255);
 
             timeRGB = System.currentTimeMillis();
         }

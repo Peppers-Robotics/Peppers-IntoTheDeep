@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Tasks;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.Mutex;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -16,6 +17,8 @@ import java.util.Objects;
 public class Scheduler implements Cloneable {
 
     public LinkedList<Task> tasks;
+    private boolean mutex = false;
+
     public Scheduler(){
         tasks = new LinkedList<>();
     }
@@ -45,6 +48,8 @@ public class Scheduler implements Cloneable {
     public boolean Next = false;
 
     public void update(){
+        if(mutex) return;
+        mutex = true;
         if(done()) return;
         Task t = tasks.getLast();
         boolean result = t.Run();
@@ -53,10 +58,12 @@ public class Scheduler implements Cloneable {
                 tasks.removeLast();
                 Next = false;
             }
+            mutex = false;
             return;
         }
         if(result)
             tasks.removeLast();
+        mutex = false;
     }
 
     public Scheduler lineTo(SparkFunOTOS.Pose2D pose){
@@ -126,6 +133,9 @@ public class Scheduler implements Cloneable {
     }
 
     public void clear() {
+        if(mutex) return;
+        mutex = true;
         tasks.clear();
+        mutex = false;
     }
 }

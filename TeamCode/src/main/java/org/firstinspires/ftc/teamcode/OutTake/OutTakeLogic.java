@@ -18,16 +18,16 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample, ElevatorScoreSample1 = 300, ElevatorScoreSample2 = 750;
-    public static double ElevatorScoreSpecimen = 330;
+    public static double ElevatorScoreSample, ElevatorScoreSample1 = 300, ElevatorScoreSample2 = 700;
+    public static double ElevatorScoreSpecimen = 220;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 220, PivotScoreSample = 0;
-    public static double ArmTakeSpecimen = 325, PivotTakeSpecimen = 10;
+    public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0;
     public static double ArmIdle = 5, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 0;
     public static boolean save2 = false;
     public static double coeff = 2;
-    public static double TakeSpecimenExtension = 0.35, TransferExtension = 0.35, ScoreSampleExtension = 1;
+    public static double TakeSpecimenExtension = 0.32, TransferExtension = 0.35, ScoreSampleExtension = 1;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,
@@ -309,6 +309,7 @@ public class OutTakeLogic {
                                         public boolean Run() {
                                             Elevator.PowerOnDownToTakeSample = true;
                                             Elevator.Disable = false;
+                                            Elevator.power = 1;
                                             return true;
                                         }
                                     })
@@ -319,7 +320,7 @@ public class OutTakeLogic {
                                             return true;
                                         }
                                     })
-                                    .waitSeconds(0.1)
+                                    .waitSeconds(0.2)
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
@@ -330,7 +331,7 @@ public class OutTakeLogic {
                                             Arm.setArmAngle(ArmScoreSpecimen);
                                             if (Arm.getCurrentArmAngle() < 250)
                                                 Arm.setPivotAngle(PivotScoreSpecimen);
-                                            if(Arm.getCurrentArmAngle() < 120) Extension.Extend(1);
+                                            if(Arm.getCurrentArmAngle() < 120) Extension.Extend(100);
                                             return Arm.motionCompleted() && Elevator.ReachedTargetPosition();
                                         }
                                     })
@@ -436,6 +437,7 @@ public class OutTakeLogic {
                             ;
                         }
                         Controls.Grab = false;
+                        Controls.Transfer = false;
                     }
                     break;
             }

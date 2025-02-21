@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -9,11 +11,40 @@ import org.firstinspires.ftc.teamcode.OpModes.Camera.AutoTakeSample;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(15), h = 281.043 , cameraOffsetX = 105.053, cameraOffsetY = 110.67, centerToExtendo = 130;
+    public static double initialAngle = Math.toRadians(15), h = 281.043 , cameraOffsetX = 105.053, cameraOffsetY = 110.67, centerToExtendo = 190;
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
+    }
+
+    public static LLResultTypes.DetectorResult getOptimalResult(LLResult camera, int targetID){
+        List<LLResultTypes.DetectorResult> detections = camera.getDetectorResults();
+
+        // split the list into two separate lists
+        List<LLResultTypes.DetectorResult> targetSamples = detections.stream().filter(e -> e.getClassId() == targetID).collect(Collectors.toList());
+        detections = detections.stream().filter(e -> e.getClassId() != targetID).collect(Collectors.toList());
+
+        double[] score = new double[targetSamples.size()];
+
+        for(LLResultTypes.DetectorResult target : targetSamples){
+
+        }
+        int idx = 0;
+        double mx = -1e10;
+        for(int i = 0; i < score.length; i++){
+            if(score[i] > mx){
+                mx = score[i];
+                idx = i;
+            }
+        }
+        return targetSamples.get(idx);
     }
 
     public static SparkFunOTOS.Pose2D getPositionRelativeToRobot(SparkFunOTOS.Pose2D fieldPos){

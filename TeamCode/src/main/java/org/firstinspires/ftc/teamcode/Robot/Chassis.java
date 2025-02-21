@@ -38,7 +38,7 @@ public class Chassis {
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
     public static PIDController Strafe = new PIDController(0.002, 0.001, 0.01),
                                 Forward = new PIDController(-0.007, -0.005, 0.03),
-                                Heading       = new PIDController(1.5, 0, -0.1);
+                                Heading       = new PIDController(1.7, 0, -0.1);
 
     public static void setTargetPosition(SparkFunOTOS.Pose2D pose){
         Strafe.setTargetPosition(0);
@@ -106,6 +106,9 @@ public class Chassis {
     }
     public static void profiledBeziereCurve(List<SparkFunOTOS.Pose2D> points){
 
+    }
+    public static void setHeading(double h){
+        setTargetPosition(new SparkFunOTOS.Pose2D(targetPosition.x, targetPosition.y, h));
     }
 
     public static void Update(){

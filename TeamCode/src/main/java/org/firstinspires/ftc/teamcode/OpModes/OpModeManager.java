@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
-import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.IntakeLogic;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
@@ -44,7 +43,12 @@ public class OpModeManager {
         Elevator.controller.setFreq(40);
 
         Extendo.Extend(0);
-        Extension.Retract();
+
+        Elevator.setTargetPosition(Elevator.getTargetPosition());
+        Arm.setArmAngle(Arm.getCurrentArmAngle());
+
+//        Extension.Retract();
+        Extension.Extend(Extension.getPrecent());
         ActiveIntake.Unblock();
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Claw.open();
@@ -69,7 +73,7 @@ public class OpModeManager {
 //            b = true;
 //        }
 
-        Robot.clearCache(gamepad1.back);
+        Robot.clearCache(false);
 
         if(Controls.Climbing && !isClimbing){
             Climb.run = Climb.climb.clone();

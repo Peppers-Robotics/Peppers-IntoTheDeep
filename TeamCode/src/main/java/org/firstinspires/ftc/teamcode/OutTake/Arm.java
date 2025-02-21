@@ -39,9 +39,9 @@ public class Arm {
         servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
         servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
 
-        Robot.telemetry.addData("profiled arm angle", armProfile.getPosition());
-        Robot.telemetry.addData("profiled pivot angle", pivotProfile.getPosition());
-        Robot.telemetry.addData("Raw servo positions", "(" + servo1.getPosition() + ", " + servo2.getPosition() + ")");
+//        Robot.telemetry.addData("profiled arm angle", armProfile.getPosition());
+//        Robot.telemetry.addData("profiled pivot angle", pivotProfile.getPosition());
+//        Robot.telemetry.addData("Raw servo positions", "(" + servo1.getPosition() + ", " + servo2.getPosition() + ")");
 
     }
 
