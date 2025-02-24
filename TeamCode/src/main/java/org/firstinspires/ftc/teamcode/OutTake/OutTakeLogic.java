@@ -18,10 +18,10 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample, ElevatorScoreSample1 = 300, ElevatorScoreSample2 = 700;
+    public static double ElevatorScoreSample, ElevatorScoreSample1 = 100, ElevatorScoreSample2 = 870; // 700
     public static double ElevatorScoreSpecimen = 220;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
-    public static double ArmScoreSample = 220, PivotScoreSample = 0;
+    public static double ArmScoreSample = 240, PivotScoreSample = 0; // 220
     public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0;
     public static double ArmIdle = 5, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 0;
@@ -89,7 +89,7 @@ public class OutTakeLogic {
                         Controls.GrabSpecimen = false;
                         CurrentState = States.IDLE_TAKE_SPECIMEN;
                     }
-                    if (Storage.hasTeamPice() && Controls.Transfer) {
+                    if (Controls.Transfer) {
 
                         currentTask = new Scheduler();
                         {
@@ -285,7 +285,7 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Arm.setArmAngle(ArmScoreSample);
-                                        if(Arm.getCurrentArmAngle() > 180) Extension.Extend(ScoreSampleExtension);
+                                        if(Arm.getCurrentArmAngle() > 180) Extension.Extend(0);
                                         Arm.setPivotAngle(PivotScoreSample);
                                         return Arm.motionCompleted();
                                     }

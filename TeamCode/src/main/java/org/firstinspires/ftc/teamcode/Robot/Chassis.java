@@ -27,6 +27,10 @@ public class Chassis {
         BL.setPower(bl * BLd);
         BR.setPower(br * BRd);
     }
+    public static double holdHeading(){
+        double err = getTargetPosition().h - Localizer.getCurrentPosition().h;
+        return Heading.calculatePower(err, Localizer.getVelocity().h);
+    }
 
 
     public static void drivePolar(double mod, double alpha){
@@ -59,6 +63,7 @@ public class Chassis {
     }
     public static void holdOrientation(double x, double y, double h){
         double e = h - Localizer.getCurrentPosition().h;
+        e = Localizer.normalizeRadians(e);
         double rot = Heading.calculatePower(e, Localizer.getVelocity().h);
         drive(x, y, rot);
     }

@@ -16,7 +16,7 @@ public class Colors {
         BLUE(new Color(80, 140, 202)),
 //        GREEN(new Color(0, 255, 0)),
         RED(new Color(220, 140, 80)),
-        YELLOW(new Color(255, 255, 117)),
+        YELLOW(new Color(200, 200, 100)),
         BLACK(new Color(0, 0, 0)),
         WHITE(new Color(255, 255, 223)),
         GREEN(new Color(0, 255, 0)),

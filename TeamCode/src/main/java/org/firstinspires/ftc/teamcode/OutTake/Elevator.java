@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
 public class Elevator {
-    public static boolean Disable = false;
+    public static boolean Disable = true;
     public static CachedMotor motor;
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
@@ -64,7 +64,7 @@ public class Elevator {
             }
             return;
         }
-//        Robot.telemetry.addData("Elevator Current Position", motor.getCurrentPosition());
+        Robot.telemetry.addData("Elevator Current Position", motor.getCurrentPosition());
 //        Robot.telemetry.addData("Elevator enabled", motor.isMotorEnabled());
 //        Robot.telemetry.addData("TargetPosition", targetPos);
 

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -19,13 +20,14 @@ import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.Extension;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogic;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
+import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 public class OpModeManager {
     public HardwareMap hardwareMap;
     public Gamepad gamepad1, gamepad2;
     public Telemetry telemetry;
-    public static double tSpeed = 1;
+    public static double tSpeed = 1, rot = 0.7;
     public static double min = 0.4;
     public boolean isClimbing = false;
     public OpModeManager(HardwareMap hm, Gamepad g1, Gamepad g2, Telemetry t, Storage.Team team){
@@ -52,6 +54,8 @@ public class OpModeManager {
         ActiveIntake.Unblock();
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Claw.open();
+        Chassis.Heading.setPidCoefficients(new PIDCoefficients(0.5, 0, 0));
+        Rotation = 0;
         b = false;
     }
     public static double getSquaredSigned(double h){
@@ -66,6 +70,7 @@ public class OpModeManager {
         return sgn * h;
     }
     private static boolean b = false;
+    public static double Rotation = 0;
     long s = 0;
     public void update(){
 //        if(!b && Robot.isDisabled() && !gamepad1.atRest()) {
@@ -73,7 +78,7 @@ public class OpModeManager {
 //            b = true;
 //        }
 
-        Robot.clearCache(false);
+        Robot.clearCache();
 
         if(Controls.Climbing && !isClimbing){
             Climb.run = Climb.climb.clone();
@@ -88,9 +93,20 @@ public class OpModeManager {
         else tSpeed = 1;
         double pow = (min - 1) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition() + 1;
 
-        Chassis.drive(getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
+
+//        Rotation += getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot;
+//        Rotation = Localizer.normalizeRadians(Rotation);
+//            Chassis.holdOrientation(
+//                    getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
+//                    -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
+//                    Rotation
+//            );
+
+        Chassis.drive(
+                getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
                 -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
-                getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow);
+                getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
+        );
         OutTakeLogic.update();
         IntakeLogic.update();
         Extendo.update();
@@ -98,8 +114,10 @@ public class OpModeManager {
         Arm.update();
         Controls.CleanCommands();
         Controls.Update();
+//        Localizer.Update();
 
         RobotLog.ii("freq", String.valueOf(1000.f / ((System.currentTimeMillis() - s))));
+        telemetry.addData("rot", Rotation);
         s = System.currentTimeMillis();
     }
 }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers;
 
+import android.graphics.Point;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -23,6 +25,45 @@ public class GetPositionSample {
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
+    public static class Point2d{
+        private double x, y;
+        public Point2d(double xVal, double yVal){
+            x = xVal;
+            y = yVal;
+        }
+        public Point2d(){
+            x = 0;
+            y = 0;
+        }
+
+        public Point2d add(Point2d op){
+            return new Point2d(x + op.x, y + op.y);
+        }
+        public Point2d sub(Point2d op){
+            return new Point2d(x - op.x, y - op.y);
+        }
+        public Point2d mul(Point2d op){
+            return new Point2d(x * op.x, y * op.y);
+        }
+        public Point2d div(Point2d op){
+            return new Point2d(x / op.x, y / op.y);
+        }
+
+        public static double getSlope(Point2d A, Point2d B){
+            return (A.y - B.y) / (A.x - B.x);
+        }
+        public static double getYintercept(Point2d A, Point2d B){
+            return A.y - getSlope(A, B) * A.x;
+        }
+        public static boolean isPointInsideParallelLines(Point2d A1, Point2d B1, Point2d A2, Point2d B2, Point2d point){
+
+        }
+        public static double getDistance(Point2d A, Point2d B){
+            return Math.sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
+        }
+    }
+
+    public static double middleX = 630, middleY = -1000;
 
     public static LLResultTypes.DetectorResult getOptimalResult(LLResult camera, int targetID){
         List<LLResultTypes.DetectorResult> detections = camera.getDetectorResults();
@@ -34,7 +75,6 @@ public class GetPositionSample {
         double[] score = new double[targetSamples.size()];
 
         for(LLResultTypes.DetectorResult target : targetSamples){
-
         }
         int idx = 0;
         double mx = -1e10;

@@ -85,8 +85,8 @@ public class IntakeLogic extends GenericController {
                         ActiveIntake.powerOff();
                         ActiveIntake.Block();
                         reset = false;
-                        if(Storage.hasTeamPice())
-                            Controls.Transfer = true;
+//                        if(Storage.hasTeamPice())
+                        Controls.Transfer = true;
                     }
                 } else time.reset();
                 break;
