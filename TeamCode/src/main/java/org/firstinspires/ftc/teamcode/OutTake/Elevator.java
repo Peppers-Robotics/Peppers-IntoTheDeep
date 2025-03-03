@@ -45,7 +45,7 @@ public class Elevator {
     }
 
     public static double getTargetPosition(){ return targetPos; }
-    public static double getCurrentPosition(){ return encoder.getCurrentPosition(); }
+    public static double getCurrentPosition(){ return -encoder.getCurrentPosition(); }
     public static boolean PIDControllerInWork;
 
 //    public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
@@ -85,8 +85,8 @@ public class Elevator {
                 }
 
             } else {
-                motor.setPower(1);
-                motor2.setPower(1);
+                motor.setPower(-1);
+                motor2.setPower(-1);
                 time.reset();
             }
             return;
@@ -98,12 +98,12 @@ public class Elevator {
             controller.setPidCoefficients(climb);
             motor.setMotorDisable();
             motor2.setMotorDisable();
-            double pp = controller.calculatePower(encoder.getCurrentPosition());
+            double pp = controller.calculatePower(getCurrentPosition());
 //            Chassis.FL.setPower(pp);
 //            Chassis.FR.setPower(pp);
 //            Chassis.BL.setPower(-pp);
 //            Chassis.BR.setPower(-pp);
-            Chassis.drive(pp, 0, 0);
+            Chassis.drive(-pp, 0, 0);
             return;
         }
         if(getTargetPosition() <= 0 && getCurrentPosition() < 30 && !PowerOnDownToTakeSample){
@@ -116,22 +116,22 @@ public class Elevator {
 
         motionProfile.update();
         if (PowerOnDownToTakeSample) {
-            motor.setPower(power);
-            motor2.setPower(power);
+            motor.setPower(-power);
+            motor2.setPower(-power);
             motor.setMotorEnable();
             motor2.setMotorEnable();
         } else {
             controller.setPidCoefficients(normal);
             if (motor.isMotorEnabled()) {
 //                controller.setTargetPosition(motionProfile.getPosition(), false);
-                double p = controller.calculatePower(encoder.getCurrentPosition(), encoder.getVelocity());
+                double p = controller.calculatePower(getCurrentPosition(), -encoder.getVelocity());
                 //c2
                 if(Elevator.getCurrentPosition() > 400){
                     double kf = (kfUp - kfDown) / (elevatorMax - elevatorMin) * Elevator.getCurrentPosition() + 0;
                     p += kf;
                 }
-                motor.setPower(-p);
-                motor2.setPower(-p);
+                motor.setPower(p);
+                motor2.setPower(p);
             }
         }
 
