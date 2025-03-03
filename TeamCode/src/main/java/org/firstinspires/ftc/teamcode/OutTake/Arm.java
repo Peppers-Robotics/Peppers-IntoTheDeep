@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
 public class Arm {
-    public static double s1Offset = 350, s2Offset = 0;
+    public static double s1Offset = 345, s2Offset = 345;
     private static double armPrevPos = 0, pivotPrevPos = 0;
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;
@@ -25,16 +25,20 @@ public class Arm {
 
 
     public static void setArmAngle(double angle){
+        angle *= -1;
         if(armProfile.getPosition() == angle) return;
         armProfile.startMotion(armPrevPos, angle);
         armPrevPos = angle;
+    }
+    public static double getArmTargetPosition(){
+        return -armProfile.getTargetPosition();
     }
 
     public static void update(){
         armProfile.update();
         pivotProfile.update();
-        diffy.setAngleToFirstJoint(armProfile.getPosition());
-        diffy.setAngleToSecondJoint(pivotProfile.getPosition());
+        diffy.setAngleToSecondJoint(armProfile.getPosition());
+        diffy.setAngleToFirstJoint(pivotProfile.getPosition());
 
         servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
         servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
@@ -47,7 +51,7 @@ public class Arm {
 
     @Deprecated
     public static void setPivotAngle(double angle){
-        angle = 0;
+//        angle = 0;
         if(pivotProfile.getPosition() == angle) return;
         pivotProfile.startMotion(pivotPrevPos, angle);
         pivotPrevPos = angle;
@@ -63,7 +67,7 @@ public class Arm {
         return armProfile.getPrecentOfMotion();
     }
     public static double getCurrentArmAngle(){
-        return armProfile.getPosition();
+        return -armProfile.getPosition();
     }
 
 }

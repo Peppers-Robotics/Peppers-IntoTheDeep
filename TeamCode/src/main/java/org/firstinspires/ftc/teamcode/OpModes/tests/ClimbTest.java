@@ -6,8 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
+import org.firstinspires.ftc.teamcode.OpModes.OpModeManager;
 import org.firstinspires.ftc.teamcode.OutTake.Arm;
 import org.firstinspires.ftc.teamcode.OutTake.Elevator;
+import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogic;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
@@ -18,7 +20,7 @@ public class ClimbTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Robot.InitializeFull(hardwareMap);
         Robot.enable();
-        Arm.setArmAngle(13);
+        Arm.setArmAngle(OutTakeLogic.ArmIdle);
         Climb.DisengagePTO();
         Climb.DeactivateWheelie();
         DropDown.setDown(0);
@@ -34,6 +36,8 @@ public class ClimbTest extends LinearOpMode {
             if(climb){
                 Climb.Update();
             }
+            Robot.telemetry.addData("Climb power", OpModeManager.getPowerConsumption());
+            Robot.telemetry.update();
 
             Elevator.update();
             Arm.update();

@@ -2,13 +2,16 @@
 <Robot type="FirstInspires-FTC">
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
-            <FastColorRangeSensor name="Storage" port="0" bus="3" />
+            <FastColorRangeSensor name="Storage" port="0" bus="0" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
             <MPU6050 name="imu" port="0" bus="3" />
             <goBILDAPinpoint name="pinpoint" port="0" bus="0" />
-            <ControlHubImuBHI260AP name="imuProst" port="1" bus="0" />
+<!--            <ExpansionHubImuBNO055 name="imuProst" port="1" bus="0" />-->
+            <LynxEmbeddedIMU name="imuProst" port="0" bus="0" />
         </LynxModule>
+        <ServoHub name="Servo Hub 1" port="1">
+        </ServoHub>
     </LynxUsbDevice>
     <EthernetDevice serialNumber="EthernetOverUsb:eth0:172.29.0.29" name="camera" port="0" ipAddress="172.29.0.1" />
 </Robot>

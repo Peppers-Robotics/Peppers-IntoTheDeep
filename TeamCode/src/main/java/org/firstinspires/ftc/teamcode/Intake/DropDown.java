@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 @Config
 public class DropDown {
     public static ServoPlus servo;
-    public static double Up = 280;
-    public static double retractedDown = 180, extendedDown = 220;
+    public static double Up = 290;
+    public static double retractedDown = 185, extendedDown = 185;
 
     public static void setDown(double precent){
         double down = retractedDown + (extendedDown - retractedDown) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition();

@@ -7,27 +7,30 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.Autonomous.Sample;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.Intake.IntakeLogic;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
+import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample, ElevatorScoreSample1 = 100, ElevatorScoreSample2 = 870; // 700
-    public static double ElevatorScoreSpecimen = 220;
+    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 120, ElevatorScoreSample2 = 740; // 700
+    public static double ElevatorScoreSpecimen = 330;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 240, PivotScoreSample = 0; // 220
     public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 110, PivotScoreSpecimen = 0;
-    public static double ArmIdle = 5, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 0;
+    public static double ArmIdle = 2, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 2;
     public static boolean save2 = false;
     public static double coeff = 2;
-    public static double TakeSpecimenExtension = 0.32, TransferExtension = 0.35, ScoreSampleExtension = 1;
+    public static double TakeSpecimenExtension = 0.32, TransferExtension = 0.3, ScoreSampleExtension = 1, takeSpecimenPower = 0.7;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,
@@ -45,6 +48,7 @@ public class OutTakeLogic {
 
             switch (CurrentState) {
                 case IDLE:
+//                    DropDown.setDown(0);
                     if (Controls.GrabSpecimen) {
                         Controls.Transfer = false;
                         currentTask = new Scheduler();
@@ -72,7 +76,7 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Elevator.PowerOnDownToTakeSample = true;
-                                        Elevator.power = 0.5;
+                                        Elevator.power = takeSpecimenPower;
                                         return Arm.getPrecentOfArmMotionCompleted() > 90;
                                     }
                                 })
@@ -89,7 +93,7 @@ public class OutTakeLogic {
                         Controls.GrabSpecimen = false;
                         CurrentState = States.IDLE_TAKE_SPECIMEN;
                     }
-                    if (Controls.Transfer) {
+                    if (Controls.Transfer && Storage.hasTeamPice()) {
 
                         currentTask = new Scheduler();
                         {
@@ -100,16 +104,16 @@ public class OutTakeLogic {
                                         Transfering = true;
                                         ActiveIntake.powerOn();
                                         Extension.Extend(TransferExtension);
+//                                        Arm.setArmAngle(ArmTransfer);
                                         return true;
                                     }
                                 })
-                                .waitSeconds(0.1)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
                                         Claw.open();
                                         ActiveIntake.Block();
-                                        Arm.setArmAngle(ArmTransfer);
+//                                        Arm.setArmAngle(ArmTransfer);
                                         DropDown.setDown(DropDownTransfer);
                                         Elevator.PowerOnDownToTakeSample = true;
                                         Elevator.power = 1;
@@ -118,7 +122,7 @@ public class OutTakeLogic {
                                         return true;
                                     }
                                 })
-                                .waitSeconds(0.1)
+                                .waitSeconds(0.15)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
@@ -126,7 +130,7 @@ public class OutTakeLogic {
                                         return true;
                                     }
                                 })
-                                .waitSeconds(0.2)
+                                .waitSeconds(0.1)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
@@ -134,30 +138,35 @@ public class OutTakeLogic {
                                         Elevator.Disable = false;
                                         Extendo.PowerOnToTransfer = false;
                                         ActiveIntake.powerOff();
-                                        Elevator.setTargetPosition(ElevatorUp);
-                                        if (Elevator.getCurrentPosition() > ElevatorUp - 80) {
-                                            Arm.setArmAngle(ArmUpSample);
-                                            Arm.setPivotAngle(PivotUpSample);
-                                        }
-                                        return Arm.getCurrentArmAngle() >= 100;
-                                    }
-                                })
-                                .addTask(new Task() {
-                                    @Override
-                                    public boolean Run() {
-                                        Extension.Extend(0);
-                                        Transfering = false;
+//                                        Elevator.setTargetPosition(ElevatorScoreSample);
+//                                        if (Elevator.getCurrentPosition() > ElevatorUp - 80) {
+//                                            Arm.setArmAngle(ArmUpSample);
+//                                            Arm.setPivotAngle(PivotUpSample);
+//                                        }
+//                                        return Arm.getCurrentArmAngle() >= 100;
+                                        Extension.Retract();
+//                                        DropDown.setDown(0.6);
+                                        Transfering = true;
                                         return true;
                                     }
                                 })
+                                .waitSeconds(0.1)
+
                         ;
                     }
 
                         CurrentState = States.IDLE_WITH_SAMPLE;
-                        Controls.Transfer = false;
                     } else Transfering = false;
+                    if (Controls.ScoreLevel2 && Storage.isStorageEmpty()){
+                        Transfering = false;
+                        currentTask = new Scheduler();
+
+                        Elevator.setTargetPosition(ElevatorScoreSample2);
+                        Controls.ScoreLevel2 = false;
+                    }
                     break;
                 case IDLE_SCORE_SAMPLE:
+                    Transfering = false;
                     Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * coeff);
                     if(save2){
                         ElevatorScoreSample2 = Elevator.getTargetPosition();
@@ -226,16 +235,20 @@ public class OutTakeLogic {
                         }
 
                         Controls.Grab = false;
+                        Controls.RetractExtendo = false;
+                        Controls.Transfer = false;
                         CurrentState = States.IDLE;
                         Controls.ScoreLevel2 = false;
                         Controls.ScoreLevel1 = false;
                     }
 //                    break;
                 case IDLE_WITH_SAMPLE:
+                    Transfering = false;
 //                    Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * coeff);
                     if (Controls.ScoreLevel1) {
 
                         save2 = false;
+                        ElevatorScoreSample = ElevatorScoreSample1;
                         currentTask = new Scheduler();
                         {
                             currentTask
@@ -243,7 +256,7 @@ public class OutTakeLogic {
                                         @Override
                                         public boolean Run() {
                                             Elevator.setTargetPosition(ElevatorScoreSample);
-                                            return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 120;
+                                            return Elevator.getCurrentPosition() >= ElevatorUp - 100;
                                         }
                                     })
                                     .addTask(new Task() {
@@ -251,11 +264,10 @@ public class OutTakeLogic {
                                         public boolean Run() {
                                             Arm.setArmAngle(ArmScoreSample);
                                             Arm.setPivotAngle(PivotScoreSample);
-                                            return Arm.motionCompleted();
+                                            return Arm.motionCompleted() && Elevator.getCurrentPosition() > ElevatorScoreSample - 200;
                                         }
                                     });
                         }
-                        ElevatorScoreSample = ElevatorScoreSample1;
                         Controls.ScoreLevel1 = false;
                         Controls.Grab = false;
                         CurrentState = States.IDLE_SCORE_SAMPLE;
@@ -268,26 +280,17 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
+                                        Elevator.PowerOnDownToTakeSample = false;
                                         Elevator.setTargetPosition(ElevatorScoreSample);
-                                        return Math.abs(Elevator.getCurrentPosition() - ElevatorScoreSample) < 300;
+                                        return Elevator.getCurrentPosition() >= ElevatorUp - 100;
                                     }
                                 })
-                                .addTask(new Task() {
-                                    @Override
-                                    public boolean Run() {
-                                        Extendo.PowerOnToTransfer = false;
-//                                        Extension.Extend(ScoreSampleExtension);
-                                        return true;
-                                    }
-                                })
-                                .waitSeconds(0.1)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
                                         Arm.setArmAngle(ArmScoreSample);
-                                        if(Arm.getCurrentArmAngle() > 180) Extension.Extend(0);
                                         Arm.setPivotAngle(PivotScoreSample);
-                                        return Arm.motionCompleted();
+                                        return Arm.motionCompleted() && Elevator.getCurrentPosition() > ElevatorScoreSample - 200;
                                     }
                                 });
                     }
@@ -309,7 +312,6 @@ public class OutTakeLogic {
                                         public boolean Run() {
                                             Elevator.PowerOnDownToTakeSample = true;
                                             Elevator.Disable = false;
-                                            Elevator.power = 1;
                                             return true;
                                         }
                                     })
@@ -320,7 +322,7 @@ public class OutTakeLogic {
                                             return true;
                                         }
                                     })
-                                    .waitSeconds(0.2)
+                                    .waitSeconds(0.08)
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
@@ -359,6 +361,7 @@ public class OutTakeLogic {
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
+                                            Arm.setArmAngle(170);
                                             Extension.Extend(0);
                                             return true;
                                         }
@@ -383,7 +386,7 @@ public class OutTakeLogic {
                                         @Override
                                         public boolean Run() {
                                             Elevator.PowerOnDownToTakeSample = true;
-                                            Elevator.power = 0.8;
+                                            Elevator.power = takeSpecimenPower;
                                             CurrentState = States.IDLE_TAKE_SPECIMEN;
                                             Controls.GrabSpecimen = false;
                                             Controls.Grab = false;
@@ -437,6 +440,7 @@ public class OutTakeLogic {
                             ;
                         }
                         Controls.Grab = false;
+                        Controls.RetractExtendo = false;
                         Controls.Transfer = false;
                     }
                     break;
@@ -491,8 +495,11 @@ public class OutTakeLogic {
 //            save2 = true;
 //        }
         if(Controls.Retract){
+
+            Robot.telemetry.addLine("RETRACT !$#%@$^%&^%*&%^$%#$");
             currentTask.removeAllTasks();
             currentTask = new Scheduler();
+            Transfering = false;
             {
             currentTask
                     .addTask(new Task() {
@@ -511,7 +518,7 @@ public class OutTakeLogic {
                         @Override
                         public boolean Run() {
                             Arm.setArmAngle(ArmTransfer);
-                            return Arm.motionCompleted() && Arm.armProfile.getTargetPosition() == ArmTransfer;
+                            return Arm.motionCompleted() && Arm.getArmTargetPosition() == ArmTransfer;
                         }
                     })
                     .addTask(new Task() {
@@ -549,6 +556,8 @@ public class OutTakeLogic {
             }
             CurrentState = States.IDLE;
             Controls.Retract = false;
+            Controls.Transfer = false;
+            Controls.RetractExtendo = false;
         }
 
         currentTask.update();

@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
+import org.firstinspires.ftc.teamcode.OpModes.OpModeManager;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogic;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
@@ -85,8 +86,8 @@ public class IntakeLogic extends GenericController {
                         ActiveIntake.powerOff();
                         ActiveIntake.Block();
                         reset = false;
-//                        if(Storage.hasTeamPice())
-                        Controls.Transfer = true;
+                        if(Storage.hasTeamPice())
+                            Controls.Transfer = true;
                     }
                 } else time.reset();
                 break;
@@ -103,7 +104,7 @@ public class IntakeLogic extends GenericController {
             if(Storage.hasTeamPice()) {
                 if(blocker.seconds() >= 0.15) {
                     ActiveIntake.Block();
-                    ActiveIntake.Reverse(0.7);
+                    ActiveIntake.Reverse(0.5);
                     DropDown.setDown(0);
                 }
             } else {
@@ -116,7 +117,7 @@ public class IntakeLogic extends GenericController {
             wasDriverActivated = true;
         }
         if(Math.abs(gamepad2.left_trigger) > 0.02 && (ActiveIntake.isOff() || wasDriverActivated)){
-            ActiveIntake.Reverse(Math.max(gamepad2.left_trigger, 0.8));
+            ActiveIntake.Reverse(OpModeManager.getPowerSigned(gamepad2.left_trigger, 4));
             //unblock
             ActiveIntake.Unblock();
             wasDriverActivated = true;

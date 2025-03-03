@@ -17,15 +17,18 @@ public class ServoTest extends LinearOpMode {
         while (opModeIsActive()){
             if(hub == Hubs.ControlHub){
                 Robot.ControlHubServos.setServoPosition(port, angle / 355.f);
-            } else {
+            } else if(hub == Hubs.ExpansionHub) {
                 Robot.ExpansionHubServos.setServoPosition(port, angle / 355.f);
+            } else {
+                Robot.ServoHub.setServoPosition(port, angle / 355.f);
             }
         }
     }
 
     public enum Hubs{
         ControlHub,
-        ExpansionHub
+        ExpansionHub,
+        ServoHub
     }
     public static Hubs hub = Hubs.ControlHub;
     public static int port = 0;

@@ -13,15 +13,12 @@ import org.firstinspires.ftc.teamcode.OpModes.Camera.AutoTakeSample;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(15), h = 281.043 , cameraOffsetX = 105.053, cameraOffsetY = 110.67, centerToExtendo = 190;
+    public static double initialAngle = Math.toRadians(15), h = 270.78 , cameraOffsetX = 91.053, cameraOffsetY = 140.148, centerToExtendo = 162.664;
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
@@ -55,8 +52,8 @@ public class GetPositionSample {
         public static double getYintercept(Point2d A, Point2d B){
             return A.y - getSlope(A, B) * A.x;
         }
-        public static boolean isPointInsideParallelLines(Point2d A1, Point2d B1, Point2d A2, Point2d B2, Point2d point){
-
+        public static boolean isPointInsideParallelLines(double m1, double m2, double n1, double n2, Point2d point){
+            return m1 * point.x + n1 > point.y && point.y > m2 * point.x + n2;
         }
         public static double getDistance(Point2d A, Point2d B){
             return Math.sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
@@ -65,7 +62,7 @@ public class GetPositionSample {
 
     public static double middleX = 630, middleY = -1000;
 
-    public static LLResultTypes.DetectorResult getOptimalResult(LLResult camera, int targetID){
+    public static LLResultTypes.DetectorResult getOptimalResultSmort(LLResult camera, int targetID){
         List<LLResultTypes.DetectorResult> detections = camera.getDetectorResults();
 
         // split the list into two separate lists
@@ -85,6 +82,24 @@ public class GetPositionSample {
             }
         }
         return targetSamples.get(idx);
+    }
+    public static double XBarSub = -470;
+    public static LLResultTypes.DetectorResult getOptimalResult(LLResult result, int targetID){
+        List<LLResultTypes.DetectorResult> detections = result.getDetectorResults();
+
+        // split the list into two separate lists
+        List<LLResultTypes.DetectorResult> targetSamples = detections.stream().filter(e -> e.getClassId() == targetID).collect(Collectors.toList());
+        detections = detections.stream().filter(e -> e.getClassId() != targetID).collect(Collectors.toList());
+        for(LLResultTypes.DetectorResult detection : detections){
+            double distSampleRobot = getExtendoRotPair(detection.getTargetXDegreesNoCrosshair(), detection.getTargetYDegreesNoCrosshair()).x;
+            double distRobotToBar = Math.abs(XBarSub - Localizer.getCurrentPosition().x);
+            double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
+
+            if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo){
+                return detection;
+            }
+        }
+        return detections.get(0);
     }
 
     public static SparkFunOTOS.Pose2D getPositionRelativeToRobot(SparkFunOTOS.Pose2D fieldPos){

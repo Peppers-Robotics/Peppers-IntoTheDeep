@@ -40,22 +40,22 @@ public class Chassis {
     // Autonomous implementation
 
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
-    public static PIDController Strafe = new PIDController(0.002, 0.001, 0.01),
-                                Forward = new PIDController(-0.007, -0.005, 0.03),
-                                Heading       = new PIDController(1.7, 0, -0.1);
+    public static PIDController Strafe = new PIDController(0.015, 0.5, 0.001),
+                                Forward = new PIDController(-0.01, -0.1, 0.001),
+                                Heading       = new PIDController(1.5, 0, 0.1);
 
     public static void setTargetPosition(SparkFunOTOS.Pose2D pose){
         Strafe.setTargetPosition(0);
         Forward.setTargetPosition(0);
         Heading.setTargetPosition(0);
-        while(pose.h > 2*Math.PI) pose.h -= 2 * Math.PI;
-        while(pose.h < 0) pose.h += 2 * Math.PI;
+        while(pose.h > Math.PI) pose.h -= 2 * Math.PI;
+        while(pose.h < -Math.PI) pose.h += 2 * Math.PI;
         targetPosition = pose;
     }
     static{
-        Strafe.setFreq(500);
-        Forward.setFreq(500);
-        Heading.setFreq(500);
+        Strafe.setFreq(50);
+        Forward.setFreq(50);
+        Heading.setFreq(50);
     }
 
     public static SparkFunOTOS.Pose2D getTargetPosition(){
@@ -71,9 +71,9 @@ public class Chassis {
     public static double xAccel = 4000, yAccel = 4000, xMV = 3000, yMV = 3000, xDecc = 2500, yDecc = 1000;
     public static AsymmetricMotionProfile xProfile = new AsymmetricMotionProfile(3000, 4000, 2500),
             yProfile = new AsymmetricMotionProfile(3000, 4000, 1000),
-            hProfile = new AsymmetricMotionProfile(Math.PI * 2, Math.PI, Math.PI);
+            hProfile = new AsymmetricMotionProfile(Math.PI * 2, Math.PI * 2, Math.PI);
     public static void resetProfiles(){
-//        xProfile = new AsymmetricMotionProfile(xMV, xAccel, xDecc);
+        xProfile = new AsymmetricMotionProfile(xMV, xAccel, xDecc);
         xProfile.maxVelocity = xMV;
         xProfile.acceleration = xAccel;
         xProfile.deceleration = xDecc;
@@ -82,9 +82,9 @@ public class Chassis {
         yProfile.maxVelocity = yMV;
         yProfile.acceleration = yAccel;
         yProfile.deceleration = yDecc;
-        yProfile.startMotion(yProfile.getPosition(), yProfile.getTargetPosition(), yProfile.getVelocity());
+        yProfile = new AsymmetricMotionProfile(yMV, yAccel, yDecc);
 
-//        yProfile = new AsymmetricMotionProfile(yMV, yAccel, yDecc);
+        yProfile.startMotion(yProfile.getPosition(), yProfile.getTargetPosition(), yProfile.getVelocity());
     }
     public static void setProfiles(double xA, double yA, double xMV, double yMV, double xD, double yD){
         xProfile = new AsymmetricMotionProfile(xMV, xA, xD);
@@ -105,6 +105,7 @@ public class Chassis {
         linearHeading = false;
     }
     public static void profiledLinearHeading(SparkFunOTOS.Pose2D pose){
+        pose.h = Localizer.normalizeRadians(pose.h);
         headingInterpolation = new LinearFunction(Localizer.getCurrentPosition().h, pose.h);
         profiledFollow(pose);
         linearHeading = true;
@@ -138,9 +139,7 @@ public class Chassis {
                 getTargetPosition().y - Localizer.getCurrentPosition().y,
                 getTargetPosition().h - Localizer.getCurrentPosition().h);
 
-        double Herror = normal.h;
-        while(Herror < -Math.PI) Herror += Math.PI * 2;
-        while(Herror >  Math.PI) Herror -= Math.PI * 2;
+        double Herror = Localizer.normalizeRadians(normal.h);
         SparkFunOTOS.Pose2D error = new SparkFunOTOS.Pose2D(
                 Math.cos(Localizer.getCurrentPosition().h) * normal.x + Math.sin(Localizer.getCurrentPosition().h) * normal.y,
                 Math.sin(Localizer.getCurrentPosition().h) * normal.x - Math.cos(Localizer.getCurrentPosition().h) * normal.y,

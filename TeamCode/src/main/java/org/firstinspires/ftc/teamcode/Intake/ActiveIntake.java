@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 public class ActiveIntake {
     public static CachedMotor motor;
     public static ServoPlus blocker;
-    public static double block = 130, unblock = 260;
+    public static double block = 180, unblock = 265;
 
     public static void Block(){
         blocker.setAngle(block);
@@ -31,6 +31,7 @@ public class ActiveIntake {
         motor.setPower(0);
     }
     public static void Reverse(double power){
+        if(power > 0.6) power = 0.6;
         motor.setPower(power);
     }
     public static boolean isOff(){

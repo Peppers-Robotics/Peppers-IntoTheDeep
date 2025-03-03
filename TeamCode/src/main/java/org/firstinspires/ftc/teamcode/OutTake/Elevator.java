@@ -15,13 +15,13 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
 public class Elevator {
-    public static boolean Disable = true;
-    public static CachedMotor motor;
+    public static boolean Disable = false;
+    public static CachedMotor motor, motor2, encoder;
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
     public static PIDCoefficients normal = new PIDCoefficients(0.008, 0, -0.00015);
-    public static double kfUp = 0.22, kfDown = 0.04, elevatorMin = 400, elevatorMax = 1080;
-    public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(6000, 7000, 7000);
+    public static double kfUp = 0.1, kfDown = 0.04, elevatorMin = 400, elevatorMax = 1080;
+    public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(10000, 12000, 10000);
 
     static {
         PIDControllerInWork = true;
@@ -35,17 +35,17 @@ public class Elevator {
     synchronized public static void setTargetPosition(double pos){
         pos *= 1;
         if(pos == targetPos) return;
-        motionProfile.startMotion(targetPos, pos);
+//        motionProfile.startMotion(targetPos, pos);
         targetPos = pos;
         motionProfile.update();
-        controller.setTargetPosition(pos, false);
+        controller.setTargetPosition(pos, true);
         PowerOnDownToTakeSample = false;
         motor.setMotorEnable();
 //        controller.setTargetPosition(motionProfile.getPosition());
     }
 
     public static double getTargetPosition(){ return targetPos; }
-    public static double getCurrentPosition(){ return motor.getCurrentPosition(); }
+    public static double getCurrentPosition(){ return encoder.getCurrentPosition(); }
     public static boolean PIDControllerInWork;
 
 //    public static boolean ReachedTargetPosition(){ return Math.abs(getCurrentPosition() - 2) <= getTargetPosition(); }
@@ -53,18 +53,21 @@ public class Elevator {
     public static final double ratio = 1070/435.f;
     public static boolean RESET = true;
     public static ElapsedTime time = new ElapsedTime();
-    private static boolean was = false;
+    private static boolean was = false, dis = false;
 
     public static void update() {
         if (Disable) {
-            motor.setPower(0);
-            if(Climb.PTOActivated()) {
-                Chassis.FL.setPower(0);
-                Chassis.FR.setPower(0);
-            }
+                motor.setPower(0);
+                motor2.setPower(0);
+                if (Climb.PTOActivated()) {
+                    Chassis.FL.setPower(0);
+                    Chassis.FR.setPower(0);
+                    Chassis.BL.setPower(0);
+                    Chassis.BR.setPower(0);
+                }
             return;
-        }
-        Robot.telemetry.addData("Elevator Current Position", motor.getCurrentPosition());
+        } else dis = false;
+        Robot.telemetry.addData("Elevator Current Position", encoder.getCurrentPosition());
 //        Robot.telemetry.addData("Elevator enabled", motor.isMotorEnabled());
 //        Robot.telemetry.addData("TargetPosition", targetPos);
 
@@ -72,14 +75,18 @@ public class Elevator {
             if (motor.getCurrent(CurrentUnit.AMPS) > 6.5 || was) {
                 was = true;
                 motor.setPower(0);
+                motor2.setPower(0);
                 if (time.seconds() > 0.2) {
                     motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     RESET = false;
                 }
 
             } else {
-                motor.setPower(-1);
+                motor.setPower(1);
+                motor2.setPower(1);
                 time.reset();
             }
             return;
@@ -90,30 +97,41 @@ public class Elevator {
         if(Climb.PTOActivated()){
             controller.setPidCoefficients(climb);
             motor.setMotorDisable();
-            double pp = -controller.calculatePower(motor.getCurrentPosition());
-            Chassis.FL.setPower(pp);
-            Chassis.FR.setPower(pp);
+            motor2.setMotorDisable();
+            double pp = controller.calculatePower(encoder.getCurrentPosition());
+//            Chassis.FL.setPower(pp);
+//            Chassis.FR.setPower(pp);
+//            Chassis.BL.setPower(-pp);
+//            Chassis.BR.setPower(-pp);
+            Chassis.drive(pp, 0, 0);
             return;
         }
         if(getTargetPosition() <= 0 && getCurrentPosition() < 30 && !PowerOnDownToTakeSample){
             motor.setMotorDisable();
+            motor2.setMotorDisable();
         } else if(getTargetPosition() > 0 || PowerOnDownToTakeSample){
             motor.setMotorEnable();
+            motor2.setMotorEnable();
         }
 
-
+        motionProfile.update();
         if (PowerOnDownToTakeSample) {
-            motor.setPower(-power);
+            motor.setPower(power);
+            motor2.setPower(power);
             motor.setMotorEnable();
+            motor2.setMotorEnable();
         } else {
             controller.setPidCoefficients(normal);
             if (motor.isMotorEnabled()) {
-                double p = controller.calculatePower(motor.getCurrentPosition(), motor.getVelocity());
+//                controller.setTargetPosition(motionProfile.getPosition(), false);
+                double p = controller.calculatePower(encoder.getCurrentPosition(), encoder.getVelocity());
+                //c2
                 if(Elevator.getCurrentPosition() > 400){
                     double kf = (kfUp - kfDown) / (elevatorMax - elevatorMin) * Elevator.getCurrentPosition() + 0;
                     p += kf;
                 }
-                motor.setPower(p);
+                motor.setPower(-p);
+                motor2.setPower(-p);
             }
         }
 

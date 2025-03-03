@@ -3,16 +3,18 @@ package org.firstinspires.ftc.teamcode.Robot;
 import android.net.IpSecManager;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.PinPoint;
 
+@Config
 public class Localizer {
 
-    public static double X = 132.5, Y = -0.6;
-    public static PinPoint.EncoderDirection xPod = PinPoint.EncoderDirection.REVERSED, yPod = PinPoint.EncoderDirection.FORWARD;
+    public static double X = 118.016, Y = 0.116, yawScalar = 1.0019;
+    public static PinPoint.EncoderDirection xPod = PinPoint.EncoderDirection.FORWARD, yPod = PinPoint.EncoderDirection.FORWARD;
     public static PinPoint pinPoint;
     private static SparkFunOTOS.Pose2D velocity = new SparkFunOTOS.Pose2D();
     private static SparkFunOTOS.Pose2D lastPose = new SparkFunOTOS.Pose2D();
@@ -24,14 +26,15 @@ public class Localizer {
     }
 
     public static double normalizeRadians(double raw){
-        while(raw > Math.PI * 2) raw -= Math.PI * 2;
-        while(raw < Math.PI * 0) raw += Math.PI * 2;
+        while(raw > Math.PI) raw -= Math.PI * 2;
+        while(raw < -Math.PI) raw += Math.PI * 2;
         return raw;
     }
 
     public static void Initialize(HardwareMap hm){
         pinPoint = hm.get(PinPoint.class, "pinpoint");
         pinPoint.setOffsets(X, Y);
+        pinPoint.setYawScalar(yawScalar);
         pinPoint.setEncoderDirections(xPod, yPod);
         pinPoint.resetPosAndIMU();
     }
@@ -45,8 +48,8 @@ public class Localizer {
     }
     public static double getAngleDifference(double h1, double h2){
         double d = Math.abs(h1 - h2);
-        while(d < 0) d += 2 * Math.PI;
-        while(d > 2 * Math.PI) d -= Math.PI;
+        while(d < -Math.PI) d += 2 * Math.PI;
+        while(d > Math.PI) d -= 2 * Math.PI;
         return d;
     }
 
@@ -54,7 +57,7 @@ public class Localizer {
         pinPoint.update();
         velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, getCurrentPosition().h - lastPose.h);
         lastPose = getCurrentPosition();
-        Div(velocity, time.seconds());
+        velocity = Div(velocity, time.seconds());
 
         Robot.telemetry.addData("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");
         time.reset();
@@ -65,8 +68,7 @@ public class Localizer {
     }
     public static SparkFunOTOS.Pose2D getCurrentPosition(){
         double h = pinPoint.getHeading();
-        while(h > 2*Math.PI) h -= 2 * Math.PI;
-        while(h < 0) h += 2 * Math.PI;
+        h = normalizeRadians(h);
         return new SparkFunOTOS.Pose2D(pinPoint.getPosX(), pinPoint.getPosY(), h);
     }
     /* PinPoint velocity is too noisy to be used for anything useful

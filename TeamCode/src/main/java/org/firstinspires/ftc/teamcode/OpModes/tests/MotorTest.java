@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes.tests;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -15,6 +17,7 @@ public class MotorTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Robot.InitializeHubs(hardwareMap);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         waitForStart();
 
@@ -24,6 +27,14 @@ public class MotorTest extends LinearOpMode {
             } else {
                 Robot.ExpansionHubMotors.setMotorPower(motor, power);
             }
+
+            for(int i = 0; i < 4; i++){
+                telemetry.addData("c" + i, Robot.ControlHubMotors.getMotorCurrentPosition(i));
+                telemetry.addData("e" + i, Robot.ExpansionHubMotors.getMotorCurrentPosition(i));
+            }
+            Robot.clearCache();
+
+            telemetry.update();
         }
     }
 }
