@@ -15,9 +15,10 @@ import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 
 @TeleOp(group = "Chassis")
 @Config
-@Disabled
 public class BackAndForth extends LinearOpMode {
-    public static double DISTANCE = 1500;
+//    public static double DISTANCE = 1500;
+    public static SparkFunOTOS.Pose2D pose = new SparkFunOTOS.Pose2D(0, 0, 0);
+    public static double h = 10;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -28,13 +29,15 @@ public class BackAndForth extends LinearOpMode {
         Robot.InitializeDropDown();
 
         Scheduler run = new Scheduler();
+        Scheduler up = new Scheduler();
 
         run
-                .waitSeconds(1)
-                .lineTo(new SparkFunOTOS.Pose2D(DISTANCE, 0, 0))
-                .waitSeconds(4)
-                .lineTo(new SparkFunOTOS.Pose2D(0, 0, 0))
-                .waitSeconds(3)
+                .lineToAsync(new SparkFunOTOS.Pose2D(pose.x, pose.y, Math.toRadians(h)))
+                .waitForSync()
+                .waitSeconds(2)
+                .lineToAsync(new SparkFunOTOS.Pose2D(0, 0, 0))
+                .waitForSync()
+                .waitSeconds(2)
         ;
         Extendo.Extend(0);
         DropDown.setDown(0);
@@ -42,18 +45,10 @@ public class BackAndForth extends LinearOpMode {
 
         while(opModeIsActive()){
             Robot.clearCache();
-            if(run.done()){
-                run = new Scheduler();
-                run
-                        .waitSeconds(1)
-                        .lineTo(new SparkFunOTOS.Pose2D(DISTANCE, 0, 0))
-                        .waitSeconds(4)
-                        .lineTo(new SparkFunOTOS.Pose2D(0, 0, 0))
-                        .waitSeconds(3)
-                        ;
+            if(up.done()){
+                up = run.clone();
             }
-
-            run.update();
+            up.update();
             Localizer.Update();
             Chassis.Update();
             Extendo.update();

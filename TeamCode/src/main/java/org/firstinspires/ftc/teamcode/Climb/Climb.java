@@ -140,7 +140,7 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(pitch < 4){
+                        if(pitch < 3.5){
                             Elevator.setTargetPosition(BAR2 - 250);
                             return true;
                         }

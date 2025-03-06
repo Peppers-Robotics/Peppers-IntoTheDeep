@@ -4,12 +4,13 @@ import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
+import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 @Config
 public class ActiveIntake {
     public static CachedMotor motor;
     public static ServoPlus blocker;
-    public static double block = 180, unblock = 265;
+    public static double block = 180, unblock = 264;
 
     public static void Block(){
         blocker.setAngle(block);
@@ -31,7 +32,10 @@ public class ActiveIntake {
         motor.setPower(0);
     }
     public static void Reverse(double power){
-        if(power > 0.6) power = 0.6;
+//        if(power > 0.6) power = 0.6;
+        if(power < 0.8){
+            power *= Robot.VOLTAGE/12.f;
+        }
         motor.setPower(power);
     }
     public static boolean isOff(){

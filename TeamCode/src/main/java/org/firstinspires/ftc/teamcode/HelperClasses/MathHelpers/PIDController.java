@@ -45,13 +45,16 @@ public class PIDController {
         if(d != null){
             D = d;
         }
-        Isum += error * dtime * clamp;
-        double r = pidCoefficients.p * P + pidCoefficients.i * Isum + pidCoefficients.d * D;
+        Isum += error * dtime;
+        double r = pidCoefficients.p * P + pidCoefficients.d * D;
 //        double r = pidCoefficients.p * P + pidCoefficients.d * D;
 
         if(Math.abs(r) >= maxActuatorOutput && error * r > 0){
             clamp = 0;
+            Isum = 0;
         } else clamp = 1;
+
+        r += pidCoefficients.i * Isum;
 
         et.reset();
 
@@ -71,5 +74,8 @@ public class PIDController {
     }
     public void setMaxActuatorOutput(double mao){
         maxActuatorOutput = mao;
+    }
+    public PIDCoefficients getCoeff(){
+        return pidCoefficients;
     }
 }

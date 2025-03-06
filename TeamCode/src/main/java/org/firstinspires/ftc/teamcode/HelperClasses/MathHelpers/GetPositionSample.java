@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(15), h = 270.78 , cameraOffsetX = 91.053, cameraOffsetY = 140.148, centerToExtendo = 162.664;
+    public static double initialAngle = Math.toRadians(15), h = 270.78 , cameraOffsetX = 91.053, cameraOffsetY = 140.148, centerToExtendo = 185;
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
@@ -68,38 +68,41 @@ public class GetPositionSample {
         // split the list into two separate lists
         List<LLResultTypes.DetectorResult> targetSamples = detections.stream().filter(e -> e.getClassId() == targetID).collect(Collectors.toList());
         detections = detections.stream().filter(e -> e.getClassId() != targetID).collect(Collectors.toList());
+        for(LLResultTypes.DetectorResult detection : targetSamples){
+            double distSampleRobot = getExtendoRotPair(detection.getTargetXDegreesNoCrosshair(), detection.getTargetYDegreesNoCrosshair()).x;
+//            double distRobotToBar = Math.abs(XBarSub - Localizer.getCurrentPosition().x);
+            double distRobotToBar = 30;
+            double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
 
-        double[] score = new double[targetSamples.size()];
+            if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo && // not close to a bar
+                    distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) + centerToExtendo // not too far away
+                    && getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y + Localizer.getCurrentPosition().y < halfYTerrain
+                    //TODO: putini vecini aproape
 
-        for(LLResultTypes.DetectorResult target : targetSamples){
-        }
-        int idx = 0;
-        double mx = -1e10;
-        for(int i = 0; i < score.length; i++){
-            if(score[i] > mx){
-                mx = score[i];
-                idx = i;
+            ){
+                return detection;
             }
         }
-        return targetSamples.get(idx);
+        return targetSamples.get(0);
     }
-    public static double XBarSub = -470;
+    public static double XBarSub = 0, halfYTerrain = 0;
     public static LLResultTypes.DetectorResult getOptimalResult(LLResult result, int targetID){
         List<LLResultTypes.DetectorResult> detections = result.getDetectorResults();
 
         // split the list into two separate lists
         List<LLResultTypes.DetectorResult> targetSamples = detections.stream().filter(e -> e.getClassId() == targetID).collect(Collectors.toList());
         detections = detections.stream().filter(e -> e.getClassId() != targetID).collect(Collectors.toList());
-        for(LLResultTypes.DetectorResult detection : detections){
+        for(LLResultTypes.DetectorResult detection : targetSamples){
             double distSampleRobot = getExtendoRotPair(detection.getTargetXDegreesNoCrosshair(), detection.getTargetYDegreesNoCrosshair()).x;
-            double distRobotToBar = Math.abs(XBarSub - Localizer.getCurrentPosition().x);
+//            double distRobotToBar = Math.abs(XBarSub - Localizer.getCurrentPosition().x);
+            double distRobotToBar = 30;
             double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
 
-            if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo){
+            if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo && distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) + centerToExtendo){
                 return detection;
             }
         }
-        return detections.get(0);
+        return targetSamples.get(0);
     }
 
     public static SparkFunOTOS.Pose2D getPositionRelativeToRobot(SparkFunOTOS.Pose2D fieldPos){
@@ -135,7 +138,9 @@ public class GetPositionSample {
         SparkFunOTOS.Pose2D pose = getPositionRelativeToRobot(tx, ty);
         double extendoDist = MMToEncoderTicks(Math.sqrt(pose.x * pose.x + pose.y * pose.y) - centerToExtendo);
         double rot = Math.atan(pose.y / -pose.x);
-        return new SparkFunOTOS.Pose2D(extendoDist, 0, rot);
+        double fwd = pose.x - Extendo.MaxExtendoExtension;
+        if(fwd < 0) fwd = 0;
+        return new SparkFunOTOS.Pose2D(extendoDist, fwd, rot);
     }
     public static SparkFunOTOS.Pose2D getPositionRelativeToFiled(double tx, double ty, SparkFunOTOS.Pose2D R){
         if(Localizer.pinPoint == null){

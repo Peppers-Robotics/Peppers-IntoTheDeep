@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
+import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
@@ -88,7 +89,7 @@ public class OpModeManager {
 //            b = true;
 //        }
 
-        Robot.clearCache(false);
+        Robot.clearCache(gamepad1.options);
 
         if(Controls.Climbing && !isClimbing){
             Chassis.drive(0, 0, 0);
@@ -134,7 +135,27 @@ public class OpModeManager {
         Controls.Update();
 //        Localizer.Update();
 
-        RobotLog.ii("freq", String.valueOf(1000.f / ((System.currentTimeMillis() - s))));
+//        RobotLog.ii("freq", String.valueOf(1000.f / ((System.currentTimeMillis() - s))));
+        if(gamepad1.options) {
+            Storage.getStorageStatus();
+            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
+
+            Robot.telemetry.addData("yellow confidence",
+                    Colors.getColorDistance(Colors.ColorType.YELLOW.getColor(),
+                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+
+            Robot.telemetry.addData("red confidence",
+                    Colors.getColorDistance(Colors.ColorType.RED.getColor(),
+                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+
+            Robot.telemetry.addData("blue confidence",
+                    Colors.getColorDistance(Colors.ColorType.BLUE.getColor(),
+                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+
+            Robot.telemetry.addData("nothing confidence",
+                    Colors.getColorDistance(Colors.ColorType.NONE.getColor(),
+                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+        }
         s = System.currentTimeMillis();
     }
 }

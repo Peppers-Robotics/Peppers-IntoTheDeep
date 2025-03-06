@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 120, ElevatorScoreSample2 = 740; // 700
+    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 200, ElevatorScoreSample2 = 740; // 700
     public static double ElevatorScoreSpecimen = 330;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 240, PivotScoreSample = 0; // 220
@@ -30,7 +30,7 @@ public class OutTakeLogic {
     public static double ArmIdle = 2, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 2;
     public static boolean save2 = false;
     public static double coeff = 2;
-    public static double TakeSpecimenExtension = 0.32, TransferExtension = 0.3, ScoreSampleExtension = 1, takeSpecimenPower = 0.7;
+    public static double TakeSpecimenExtension = 0.32, TransferExtension = 0.3, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.7;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,
@@ -111,7 +111,8 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
-                                        Claw.open();
+//                                        Claw.open();
+                                        Claw.closeAbit();
                                         ActiveIntake.Block();
 //                                        Arm.setArmAngle(ArmTransfer);
                                         DropDown.setDown(DropDownTransfer);
@@ -186,7 +187,7 @@ public class OutTakeLogic {
                                             return true;
                                         }
                                     })
-                                    .waitSeconds(0.3)
+                                    .waitSeconds(0.1)
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
@@ -209,8 +210,10 @@ public class OutTakeLogic {
                                         public boolean Run() {
                                             if(Arm.getCurrentArmAngle() < 200) Claw.close();
 //                                            Arm.setArmAngle(ArmTransfer);
-                                            Elevator.setTargetPosition(ElevatorUp);
-                                            return Arm.motionCompleted();
+//                                            Elevator.setTargetPosition(0);
+//                                            Elevator.PowerOnDownToTakeSample = true;
+//                                            Elevator.power = 1;
+                                            return Arm.getCurrentArmAngle() < 100;
                                         }
                                     })
                                     .addTask(new Task() {

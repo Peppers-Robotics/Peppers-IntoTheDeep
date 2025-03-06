@@ -93,14 +93,14 @@ public class IntakeLogic extends GenericController {
                 break;
 
         }
-        if(wasDriverActivated && !ActiveIntake.isOff() && Math.abs(gamepad2.right_trigger) <= 0.02 && Math.abs(gamepad2.left_trigger) <= 0.02){
+        if(wasDriverActivated && !ActiveIntake.isOff() && !gamepad1.gamepad.right_bumper && !gamepad2.gamepad.right_bumper && !gamepad1.gamepad.left_bumper && !gamepad2.gamepad.left_bumper){
             ActiveIntake.powerOff();
             DropDown.setDown(0);
             //block
             ActiveIntake.Block();
             wasDriverActivated = false;
         }
-        if(Math.abs(gamepad2.right_trigger) > 0.02 && (ActiveIntake.isOff() || wasDriverActivated)){
+        if((gamepad1.gamepad.right_bumper || gamepad2.gamepad.right_bumper) && (ActiveIntake.isOff() || wasDriverActivated)){
             if(Storage.hasTeamPice()) {
                 if(blocker.seconds() >= 0.15) {
                     ActiveIntake.Block();
@@ -116,8 +116,8 @@ public class IntakeLogic extends GenericController {
             //unblock
             wasDriverActivated = true;
         }
-        if(Math.abs(gamepad2.left_trigger) > 0.02 && (ActiveIntake.isOff() || wasDriverActivated)){
-            ActiveIntake.Reverse(OpModeManager.getPowerSigned(gamepad2.left_trigger, 4));
+        if((gamepad1.gamepad.left_bumper || gamepad2.gamepad.left_bumper) && (ActiveIntake.isOff() || wasDriverActivated)){
+            ActiveIntake.Reverse(Math.min(OpModeManager.getPowerSigned(gamepad2.left_trigger, 4), 0.6));
             //unblock
             ActiveIntake.Unblock();
             wasDriverActivated = true;

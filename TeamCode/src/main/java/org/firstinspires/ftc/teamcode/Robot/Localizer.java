@@ -8,6 +8,9 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.PinPoint;
 
 @Config
@@ -34,9 +37,9 @@ public class Localizer {
     public static void Initialize(HardwareMap hm){
         pinPoint = hm.get(PinPoint.class, "pinpoint");
         pinPoint.setOffsets(X, Y);
-        pinPoint.setYawScalar(yawScalar);
+//        pinPoint.setYawScalar(yawScalar);
         pinPoint.setEncoderDirections(xPod, yPod);
-        pinPoint.resetPosAndIMU();
+//        pinPoint.resetPosAndIMU();
     }
     public static double getDistanceFromTwoPoints(SparkFunOTOS.Pose2D p1, SparkFunOTOS.Pose2D p2){
         if(p1 == null) p1 = new SparkFunOTOS.Pose2D();
@@ -52,9 +55,19 @@ public class Localizer {
         while(d > Math.PI) d -= 2 * Math.PI;
         return d;
     }
-
+    private static long imuUpdate = 0;
     public static void Update(){
         pinPoint.update();
+
+        if(1000.f / (System.currentTimeMillis() - imuUpdate) >= 10) {
+            double h = Robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            while (h < 0) h += 2 * Math.PI;
+            while (h > 2 * Math.PI) h -= Math.PI * 2;
+
+            pinPoint.setPosition(new Pose2D(DistanceUnit.MM, getCurrentPosition().x, getCurrentPosition().y, AngleUnit.RADIANS, h));
+            imuUpdate = System.currentTimeMillis();
+        }
+
         velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, getCurrentPosition().h - lastPose.h);
         lastPose = getCurrentPosition();
         velocity = Div(velocity, time.seconds());

@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 
-@TeleOp(name = "BackAndForth")
+@TeleOp
 @Config
 public class AsyncTrajectory extends LinearOpMode {
     public static double DISTANCE = 1500;

@@ -56,7 +56,7 @@ public class PinPoint extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     private int yEncoderValue  = 0;
     private float xPosition    = 0;
     private float yPosition    = 0;
-    private float hOrientation = 0;
+    public float hOrientation = 0;
     private float xVelocity    = 0;
     private float yVelocity    = 0;
     private float hVelocity    = 0;

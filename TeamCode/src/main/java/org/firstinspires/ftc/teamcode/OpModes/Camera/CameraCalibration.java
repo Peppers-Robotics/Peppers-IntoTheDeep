@@ -13,15 +13,20 @@ import java.util.Objects;
 public class CameraCalibration extends LinearOpMode {
     private static double mean = 0;
     private static long samples = 0;
-    private static double realTargetValue = 800;
+    private static double realTargetValue = 600;
     @Override
     public void runOpMode() throws InterruptedException {
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "camera");
+        ll.start();
+        ll.pipelineSwitch(0);
         LLResult res = null;
 
         mean = 0;
         samples = 0;
-        telemetry.addLine("Put a sample at " + realTargetValue + " mm away from camera lens");
+        while(opModeInInit()) {
+            telemetry.addLine("Put a sample at " + realTargetValue + " mm away from camera lens");
+            telemetry.update();
+        }
 
         waitForStart();
 

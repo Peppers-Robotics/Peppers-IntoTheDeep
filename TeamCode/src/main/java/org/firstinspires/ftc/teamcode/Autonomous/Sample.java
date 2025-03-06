@@ -9,9 +9,8 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.GetPositionSample;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
@@ -38,6 +37,7 @@ public class Sample extends LinearOpMode {
     public static boolean isRetracting = false;
     public static double parkElevator = 250;
     public static Limelight3A camera;
+    public static PIDCoefficients headingCoeff;
     private static LLResult result = null;
     public static class Transfer extends Task{
         private Scheduler transfer;
@@ -48,7 +48,14 @@ public class Sample extends LinearOpMode {
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
-                                return Extendo.getCurrentPosition() < 20;
+                                Claw.open();
+                                Extendo.PowerOnToTransfer = true;
+                                Extension.Retract();
+                                Arm.setArmAngle(OutTakeLogic.ArmIdle);
+                                if(Extendo.getCurrentPosition() < 40){
+                                    Elevator.PowerOnDownToTakeSample = true;
+                                }
+                                return Extendo.getCurrentPosition() < 10;
                             }
                         })
                         .addTask(new Task() {
@@ -56,17 +63,17 @@ public class Sample extends LinearOpMode {
                             public boolean Run() {
                                 ActiveIntake.powerOn();
                                 DropDown.setDown(0);
+                                Elevator.PowerOnDownToTakeSample = true;
                                 Extension.Extend(OutTakeLogic.TransferExtension);
-                                return true;
+                                return Extendo.getCurrentPosition() < 2;
                             }
                         })
-                        .waitSeconds(0.05)
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
                                 Claw.open();
                                 ActiveIntake.Block();
-                                Arm.setArmAngle(OutTakeLogic.ArmIdle-2);
+                                Arm.setArmAngle(OutTakeLogic.ArmIdle - 1);
                                 DropDown.setDown(0);
                                 Elevator.PowerOnDownToTakeSample = true;
                                 Elevator.power = 1;
@@ -75,7 +82,7 @@ public class Sample extends LinearOpMode {
                                 return true;
                             }
                         })
-                        .waitSeconds(0.10)
+                        .waitSeconds(0.05)
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
@@ -91,16 +98,14 @@ public class Sample extends LinearOpMode {
                                 Extendo.PowerOnToTransfer = false;
                                 Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
                                 if(Elevator.getTargetPosition() > 200)
-                                    Arm.setArmAngle(OutTakeLogic.ArmUpSample);
-                                return Arm.getCurrentArmAngle() >= 100;
+                                    Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
+                                return true;
                             }
                         })
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
                                 ActiveIntake.powerOff();
-//                                Extension.Extend(OutTakeLogic.ScoreSampleExtension);
-                                Extension.Extend(0.2);
                                 return Math.abs(Elevator.getCurrentPosition() - Elevator.getTargetPosition()) < 300;
                             }
                         })
@@ -109,7 +114,8 @@ public class Sample extends LinearOpMode {
                             public boolean Run() {
                                 Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
                                 if(Arm.getCurrentArmAngle() >= 190){
-                                    Extension.Extend(0);
+                                    Extension.Extend(OutTakeLogic.ScoreSampleExtension);
+//                                    Extension.Extend(0);
                                 }
                                 DropDown.setDown(0);
                                 return Arm.motionCompleted();
@@ -133,13 +139,14 @@ public class Sample extends LinearOpMode {
                         @Override
                         public boolean Run() {
 //                            Claw.close();
-                            if(Extendo.getTargetPosition() < 100)
-                                Extendo.Extend(100);
+                            if(Extendo.getTargetPosition() < 200 && Extendo.getCurrentPosition() < 200)
+                                Extendo.Extend(200);
 //                            Extension.Extend(OutTakeLogic.TransferExtension);
                             Extension.Retract();
                             Arm.setArmAngle(OutTakeLogic.ArmIdle);
                             Elevator.PowerOnDownToTakeSample = true;
                             Elevator.setTargetPosition(0);
+                            Extension.Extend(OutTakeLogic.TransferExtension);
                             Elevator.power = 1;
                             isRetracting = true;
                             return true;
@@ -185,7 +192,8 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            return Localizer.getAngleDifference(Localizer.getVelocity().h, 0) <= Math.toRadians(2) && Localizer.getAngleDifference(Localizer.getCurrentPosition().h, park.h) < Math.toRadians(1);
+                            Robot.telemetry.clearAll();
+                            return Localizer.getAngleDifference(Localizer.getVelocity().h, 0) <= Math.toRadians(2) && Localizer.getAngleDifference(Localizer.getCurrentPosition().h, park.h) < Math.toRadians(4);
                         }
                     })
                     .addTask(new Task() {
@@ -197,23 +205,28 @@ public class Sample extends LinearOpMode {
                             took = Localizer.getCurrentPosition();
                             if(result != null && result.isValid()){
                                 camera.captureSnapshot("image" + cnt++);
+                                Robot.telemetry.addLine("I SAW SOMETHING . . .");
+                                headingCoeff = Chassis.Heading.getCoeff();
+                                Chassis.Heading.setPidCoefficients(new PIDCoefficients(3, 0.5, 0.07));
+
                             }
 //                            Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y, park.h));
-                            return result != null && result.isValid() && Localizer.getVelocity().x < 2 && Localizer.getVelocity().y < 2 && Localizer.getAngleDifference(park.h, Localizer.getCurrentPosition().h) < Math.toRadians(2);
+                            return result != null && result.isValid() /*&& Localizer.getVelocity().x < 2 && Localizer.getVelocity().y < 2 && Localizer.getAngleDifference(park.h, Localizer.getCurrentPosition().h) < Math.toRadians(2)*/;
                         }
                     })
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-//                            LLResultTypes.DetectorResult res = GetPositionSample.getOptimalResult(result, 2);
-//                            tx = res.getTargetXDegreesNoCrosshair();
-//                            ty = res.getTargetYDegreesNoCrosshair();
-                            tx = result.getTxNC();
-                            ty = result.getTyNC();
+
+                            LLResultTypes.DetectorResult res = GetPositionSample.getOptimalResult(result, 2);
+                            tx = res.getTargetXDegrees();
+                            ty = res.getTargetYDegrees();
+//                            tx = result.getTx();
+//                            ty = result.getTy();
                             Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(
-                                    Localizer.getCurrentPosition().x,
-                                    Localizer.getCurrentPosition().y,
-                                    Localizer.getCurrentPosition().h +
+                                    took.x,
+                                    took.y,
+                                    took.h +
                                     GetPositionSample.getExtendoRotPair(tx, ty).h
                             ));
                             return true;
@@ -222,7 +235,7 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            return Math.toDegrees(Math.abs(Localizer.getCurrentPosition().h - Chassis.getTargetPosition().h)) < 10;
+                            return Math.toDegrees(Math.abs(Localizer.getCurrentPosition().h - Chassis.getTargetPosition().h)) < 1.5;
                         }
                     })
                     .addTask(new Task() {
@@ -231,7 +244,7 @@ public class Sample extends LinearOpMode {
                             Extendo.Extend(
                                     (int) GetPositionSample.getExtendoRotPair(
                                             tx, ty
-                                    ).x - 130
+                                    ).x - 100
                             );
                             return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 10;
                         }
@@ -250,8 +263,8 @@ public class Sample extends LinearOpMode {
                         @Override
                         public boolean Run() {
 
-                            Robot.telemetry.addData("target (ex, rot)", Extendo.getTargetPosition() + " " + Math.toRadians(Chassis.getTargetPosition().h));
-                            Robot.telemetry.addData("sample distance forward", GetPositionSample.getPositionRelativeToRobot(tx, ty).x);
+//                            Robot.telemetry.addData("target (ex, rot)", Extendo.getTargetPosition() + " " + Math.toRadians(Chassis.getTargetPosition().h));
+//                            Robot.telemetry.addData("sample distance forward", GetPositionSample.getPositionRelativeToRobot(tx, ty).x);
                             if(Math.abs(Extendo.getCurrentPosition() - Extendo.getTargetPosition()) <= 10 &&
                                Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) <= Math.toRadians(10)){
                                 start = true;
@@ -269,32 +282,38 @@ public class Sample extends LinearOpMode {
                             if(((System.currentTimeMillis() - time) / 1000.f > timeOut + (ActiveIntake.motor.getCurrent(CurrentUnit.AMPS) > 3 ? 0.5 : 0) && time != -1)){
                                 return true;
                             }
-                            Robot.telemetry.addData("POW", ActiveIntake.motor.getCurrent(CurrentUnit.AMPS));
+//                            Robot.telemetry.addData("POW", ActiveIntake.motor.getCurrent(CurrentUnit.AMPS));
                             return Storage.hasTeamPice();
                         }
                     })
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
+                            Chassis.Heading.setPidCoefficients(headingCoeff);
                             if(Storage.hasTeamPice()) {
+                                ActiveIntake.Block();
                                 DropDown.setDown(0);
                                 Extension.Extend(OutTakeLogic.TransferExtension);
                                 result = null;
                                 return true;
                             } else {
-                                ActiveIntake.Block();
+                                ActiveIntake.Reverse(0.6);
+                                ActiveIntake.Unblock();
                             }
                             result = null;
                             camera.reloadPipeline();
                             return true;
                         }
                     })
-                    .waitSeconds(0.1)
+                    .waitSeconds(0.2)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
                             if(Storage.hasTeamPice())
                                 ActiveIntake.Block();
+                            else {
+                                ActiveIntake.Unblock();
+                            }
                             ActiveIntake.Reverse(0.5);
                             Extendo.Extend(0);
                             DropDown.setDown(0);
@@ -314,7 +333,7 @@ public class Sample extends LinearOpMode {
                             ActiveIntake.powerOn(1);
                             DropDown.setDown(1);
                             Extendo.Extend(pos);
-                            return Extendo.getCurrentPosition() > pos - 20 || Storage.hasTeamPice();
+                            return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 20 || Storage.hasTeamPice();
                         }
                     })
                     .addTask(new Task() {
@@ -350,7 +369,7 @@ public class Sample extends LinearOpMode {
             return take.done();
         }
     }
-    public static class GoToTakeSampleFromSubmersible extends Task{
+    public static class GoToTakeSampleFromSubmersible extends Task {
         private Scheduler go, tmp;
         private static final Scheduler takeTry = new Scheduler();
         static {
@@ -361,7 +380,7 @@ public class Sample extends LinearOpMode {
         public GoToTakeSampleFromSubmersible(){
             go = new Scheduler();
             go
-                    .lineToLinearHeadingAsync(park)
+                    .lineToLinearHeadingAsync(new SparkFunOTOS.Pose2D(park.h, park.y, Math.toRadians(10)))
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -387,7 +406,8 @@ public class Sample extends LinearOpMode {
                         }
                     })
                     .waitForTrajDone(90)
-                    .lineTo(new SparkFunOTOS.Pose2D(park.x, park.y + 100, park.h))
+                    .lineToAsync(new SparkFunOTOS.Pose2D(park.x - 150, park.y, park.h))
+                    .waitForSync()
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -401,19 +421,27 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Chassis.setProfiles(3000, 3000, 4500, 4500, 700, 700);
+                            Chassis.setProfiles(5000, 5000, 10000, 10000, 700, 700);
                             return true;
                         }
                     })
-                    .lineToLinearHeadingAsync(basketPosition)
+                    .lineToAsync(new SparkFunOTOS.Pose2D(basketPosition.x - 80, basketPosition.y, Math.toRadians(45)))
+                    .waitForTrajDone(60)
                     .addTask(new Transfer())
                     .waitForSync()
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Claw.open();
+                            Arm.setArmAngle(Arm.getCurrentArmAngle() + 20);
+                            return true;
+                        }
+                    })
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            Claw.closeAbit();
                             Robot.telemetry.addData("time", (System.currentTimeMillis() - startTime) / 1000.f);
-                            Chassis.setProfiles(4000, 4000, 3000, 3000, 700, 700);
+                            Chassis.setProfiles(5000, 5000, 5000, 5000, 2000, 2000);
                             return true;
                         }
                     })
@@ -428,11 +456,11 @@ public class Sample extends LinearOpMode {
     }
 
     public static SparkFunOTOS.Pose2D
-            basketPosition = new SparkFunOTOS.Pose2D(500, -100, Math.toRadians(48)),
-            sample1 = new SparkFunOTOS.Pose2D(510, -300, Math.toRadians(70)),
-            sample2 = new SparkFunOTOS.Pose2D(510, -230, Math.toRadians(78)),
-            sample3 = new SparkFunOTOS.Pose2D(470, -260, Math.toRadians(110)),
-            park = new SparkFunOTOS.Pose2D(-420, -1450, Math.toRadians(20)),
+            basketPosition = new SparkFunOTOS.Pose2D(460, -170, Math.toRadians(65)),
+            sample1 = new SparkFunOTOS.Pose2D(510, -230, Math.toRadians(70)),
+            sample2 = new SparkFunOTOS.Pose2D(510, -230, Math.toRadians(90)),
+            sample3 = new SparkFunOTOS.Pose2D(470, -260, Math.toRadians(115)),
+            park = new SparkFunOTOS.Pose2D(-320, -1320, Math.toRadians(0)),
             parkk = new SparkFunOTOS.Pose2D(-470, -1460, Math.toRadians(0))
     ;
 
@@ -452,7 +480,8 @@ public class Sample extends LinearOpMode {
         camera.start();
         camera.pipelineSwitch(0);
         Extension.Retract();
-        Chassis.setProfiles(6500, 6500, 10000, 10000, 4000, 4000);
+        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
+        Chassis.setProfiles(5000, 5000, 10000, 10000, 4000, 4000);
 //        Storage.team = Storage.Team.RED;
         cnt = 0;
         camera.deleteSnapshots();
@@ -460,13 +489,12 @@ public class Sample extends LinearOpMode {
 
         Scheduler scheduler = new Scheduler();
         scheduler
-                .lineToAsync(new SparkFunOTOS.Pose2D(basketPosition.x, basketPosition.y, basketPosition.h))
+                .lineToLinearHeadingAsync(new SparkFunOTOS.Pose2D(basketPosition.x, basketPosition.y, Math.toRadians(45)))
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
                         Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
-                        Arm.setPivotAngle(10);
-                        Arm.setArmAngle(220);
+                        Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
                         return true;
                     }
                 })
@@ -487,58 +515,61 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extension.Extend(0.2);
-//                        Extension.Retract();
-                        DropDown.setDown(1);
+                        Extension.Extend(OutTakeLogic.ScoreSampleExtension);
+                        DropDown.setDown(0);
                         return true;
                     }
                 })
-                .waitSeconds(0.1)
                 .waitForSync()
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend(0);
+                        Extendo.Extend(820);
+//                        Chassis.Heading.setPidCoefficients(new PIDCoefficients(1.5, 0.5, 0.07));
                         ActiveIntake.powerOn();
+                        Arm.setArmAngle(Arm.getCurrentArmAngle() + 20);
                         return true;
                     }
                 })
-                .waitSeconds(0.08)
+                .lineToAsync(new SparkFunOTOS.Pose2D(basketPosition.x, basketPosition.y, sample1.h))
+                .waitSeconds(0.1)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Claw.open();
+                        Claw.closeAbit();
                         return true;
                     }
                 })
+                .waitSeconds(0.05)
                 .lineToAsync(sample1)
 
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        DropDown.setDown(0.4);
-                        return Localizer.getCurrentPosition().h > Math.toRadians(45) && Localizer.getCurrentPosition().y < -200;
+                        return Localizer.getCurrentPosition().h > Math.toRadians(50) && Localizer.getCurrentPosition().y < -200;
                     }
                 })
                 .addTask(new Retract())
-//                .waitForSync()
+                .waitForSync()
                 .addTask(new TakeSample(850))
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
+                .waitForSync()
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend(0);
+//                        Extendo.Extend(0);
                         ActiveIntake.powerOn();
+                        DropDown.setDown(1);
+                        Arm.setArmAngle(Arm.getCurrentArmAngle() + 20);
                         return true;
                     }
                 })
-                .waitForSync()
-                .waitSeconds(0.1)
+                .waitSeconds(0.05)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Claw.open();
+                        Claw.closeAbit();
                         return true;
                     }
                 })
@@ -547,9 +578,13 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend(0);
 //                        return Localizer.getCurrentPosition().y < -200;
-                        return Localizer.getCurrentPosition().h > Math.toRadians(50) && Localizer.getCurrentPosition().y < -200;
+                        if(Localizer.getCurrentPosition().h >= Math.toRadians(65)){
+                            DropDown.setDown(1);
+                            ActiveIntake.powerOn();
+                            Extendo.Extend(720);
+                        }
+                        return Localizer.getCurrentPosition().h > Math.toRadians(80) && Localizer.getCurrentPosition().y < -200;
                     }
                 })
                 .addTask(new Retract())
@@ -557,20 +592,25 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        DropDown.setDown(0.2);
-                        Extendo.Extend(650);
                         return Localizer.getCurrentPosition().h > Math.toRadians(80);
                     }
                 })
-                .addTask(new TakeSample(850))
+                .addTask(new TakeSample(820))
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
-                .waitSeconds(0.1)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Claw.open();
+                        Arm.setArmAngle(Arm.getCurrentArmAngle() + 20);
+                        return true;
+                    }
+                })
+                .waitSeconds(0.05)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Claw.closeAbit();
                         return true;
                     }
                 })
@@ -579,26 +619,37 @@ public class Sample extends LinearOpMode {
                     @Override
                     public boolean Run() {
 //                        return Localizer.getCurrentPosition().y < -200;
-                        Extendo.Extend(500);
                         ActiveIntake.powerOn();
-                        DropDown.setDown(0.9);
-                        return Localizer.getCurrentPosition().h > Math.toRadians(80);
+//                        Extendo.Extend(600);
+                        if(Localizer.getCurrentPosition().h >= Math.toRadians(85)){
+                            ActiveIntake.powerOn();
+                            DropDown.setDown(1);
+                            Extendo.Extend(780);
+                        }
+                        return Localizer.getCurrentPosition().h > Math.toRadians(90);
                     }
                 })
                 .addTask(new Retract())
                 .waitForSync()
-                .addTask(new TakeSample(600))
+                .addTask(new TakeSample(850))
                 .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
-                .waitSeconds(0.1)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Arm.setArmAngle(Arm.getCurrentArmAngle() + 20);
+                        return true;
+                    }
+                })
+//                .waitSeconds(0.05)
 
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Claw.open();
+                        Claw.closeAbit();
                         Robot.telemetry.addData("time", (System.currentTimeMillis() - startTime) / 1000.f);
-                        Chassis.setProfiles(4000, 4000, 3000, 3000, 700, 700);
+                        Chassis.setProfiles(6000, 6000, 6000, 6000, 2000, 2000);
                         return true;
                     }
                 })
@@ -634,11 +685,25 @@ public class Sample extends LinearOpMode {
 
         while(opModeIsActive()){
             Robot.clearCache();
-            if(isRetracting && Elevator.getCurrentPosition() < 10) Elevator.PowerOnDownToTakeSample = false;
-            if(autoTimer >= 30 - f.getOutput(Math.abs((Math.abs(park.x) - Math.abs(Localizer.getCurrentPosition().x)) / Math.abs(park.x))) && !parked){
+            if(isRetracting && Elevator.getCurrentPosition() < 10) {
+                Elevator.PowerOnDownToTakeSample = false;
+                isRetracting = false;
+            }
+            if(autoTimer >= 30 - f.getOutput(Math.abs((Math.abs(park.x) - Math.abs(Localizer.getCurrentPosition().x)) / Math.abs(park.x))) && !parked &&
+                    Math.abs(Localizer.getCurrentPosition().y - basketPosition.y) < 700
+                    ){
                 parked = true;
                 scheduler = new Scheduler();
                 scheduler
+                        .addTask(new Task() {
+                            @Override
+                            public boolean Run() {
+                                if(Storage.hasWrongPice() && !Storage.isStorageEmpty()){
+                                    ActiveIntake.Reverse(0.4);
+                                }
+                                return Localizer.getCurrentPosition().y < -300;
+                            }
+                        })
                         .addTask(new Task() {
                             @Override
                             public boolean Run() {
@@ -665,7 +730,7 @@ public class Sample extends LinearOpMode {
             }
 
             Robot.telemetry.addData("timer", (System.currentTimeMillis() - auto) / 1000.f);
-            telemetry.addData("color", Storage.getStorageStatus().toString());
+//            telemetry.addData("color", Storage.getStorageStatus().toString());
             autoTimer = (System.currentTimeMillis() - auto) / 1000.f;
             if((System.currentTimeMillis() - auto) / 1000.f >= 30) requestOpModeStop();
             Extendo.update();

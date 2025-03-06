@@ -67,12 +67,13 @@ public class Elevator {
                 }
             return;
         } else dis = false;
-        Robot.telemetry.addData("Elevator Current Position", encoder.getCurrentPosition());
+//        Robot.telemetry.addData("Elevator Current Position", encoder.getCurrentPosition());
+//        Robot.telemetry.addData("Elevator power consumption", motor.getCurrent(CurrentUnit.AMPS) + motor2.getCurrent(CurrentUnit.AMPS));
 //        Robot.telemetry.addData("Elevator enabled", motor.isMotorEnabled());
 //        Robot.telemetry.addData("TargetPosition", targetPos);
 
         if (RESET) {
-            if (motor.getCurrent(CurrentUnit.AMPS) > 6.5 || was) {
+            if (motor.getCurrent(CurrentUnit.AMPS) + motor2.getCurrent(CurrentUnit.AMPS) >= 10 || was) {
                 was = true;
                 motor.setPower(0);
                 motor2.setPower(0);

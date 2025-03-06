@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 public class Extendo {
     public static CachedMotor motor;
     public static PIDController pidController = new PIDController(0.01, 0, -0.0004);
-    public static int MaxExtendoExtension = 850;
+    public static int MaxExtendoExtension = 840;
     private static double targetPosition = 0;
     static {
         pidController.setFreq(40);
@@ -77,7 +77,7 @@ public class Extendo {
             motor.setPower(12.f / Robot.VOLTAGE * pidController.calculatePower(motor.getCurrentPosition(), motor.getVelocity()));
             motor.setMotorEnable();
         }
-        Robot.telemetry.addData("Extendo pos", motor.getCurrentPosition());
+//        Robot.telemetry.addData("Extendo pos", motor.getCurrentPosition());
     }
     public static double extendoMass = 2, extendoF = 0.05, magicNumber = 23.83;
     public static void holdStill(double pitch){

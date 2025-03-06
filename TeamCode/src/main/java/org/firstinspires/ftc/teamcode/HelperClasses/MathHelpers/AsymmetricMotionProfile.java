@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 public class AsymmetricMotionProfile {
-    public double maxVelocity, acceleration, deceleration, initialVelocity;
+    public double maxVelocity, acceleration, deceleration, initialVelocity, endVelocity;
     private ElapsedTime time = new ElapsedTime();
     private double accelerationTime, deccelarationTime, constantTime,
             currentPosition, initialPosition, targetPosition, mvUsed,
@@ -19,10 +19,16 @@ public class AsymmetricMotionProfile {
         this.initialVelocity = initialVelocity;
         startMotion(initialPosition, targetPosition);
     }
+    public void startMotion(double initialPosition, double targetPosition, double initialVelocity, double endVelocity){
+        this.initialVelocity = initialVelocity;
+        this.endVelocity = endVelocity;
+        startMotion(initialPosition, targetPosition);
+    }
     public void startMotion(double initialPos, double targetPos){
         initialVelocity = 0;
+        endVelocity = 0;
         if(initialPos == targetPos){
-            RobotLog.e("(stub! - handled) Asymmetric Motion can't make a profile for a distance of 0 units");
+//            RobotLog.e("(stub! - handled) Asymmetric Motion can't make a profile for a distance of 0 units");
             return;
         }
         double dist = Math.abs(targetPos - initialPos);
@@ -31,14 +37,14 @@ public class AsymmetricMotionProfile {
         targetPosition = targetPos;
         currentPosition = initialPosition;
 
-        accelerationTime = (maxVelocity - initialVelocity) / acceleration;
+        accelerationTime = (maxVelocity) / acceleration;
         deccelarationTime = maxVelocity / deceleration;
 
         if(dist <= (accelerationTime + deccelarationTime) * maxVelocity / 2){
             constantTime = 0;
             mvUsed = Math.sqrt(2*dist / (1.0 / acceleration + 1.0 / deceleration));
-            accelerationTime = mvUsed / acceleration;
-            deccelarationTime = mvUsed / deceleration;
+            accelerationTime = (mvUsed - initialVelocity) / acceleration;
+            deccelarationTime = (mvUsed - endVelocity) / deceleration;
 
         } else {
             constantTime = dist / maxVelocity - accelerationTime / 2 - deccelarationTime / 2;

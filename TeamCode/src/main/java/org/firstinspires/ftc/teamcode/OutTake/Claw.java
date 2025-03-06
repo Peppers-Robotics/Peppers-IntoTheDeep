@@ -11,13 +11,14 @@ import java.util.concurrent.TimeUnit;
 @Config
 public class Claw {
     public static ServoPlus clawServo;
-    public static double OpenPosition = 120, ClosePosition = 50, mmClose = 70;
+    public static double OpenPosition = 90, ClosePosition = 45, mmClose = 70, interClose = 120;
     public static void open(){
         clawServo.setAngle(OpenPosition);
     }
     public static void close(){
         clawServo.setAngle(ClosePosition);
     }
+    public static void closeAbit(){ clawServo.setAngle(interClose); }
     public static boolean isClosed(){
         return clawServo.isEqualToAngle(ClosePosition);
     }

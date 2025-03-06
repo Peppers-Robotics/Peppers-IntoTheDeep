@@ -19,6 +19,7 @@ public class LocalizationTest extends LinearOpMode {
         while(opModeIsActive()){
             Robot.clearCache();
             Localizer.Update();
+            Robot.telemetry.addData("pinpoint freq", Localizer.pinPoint.getFrequency());
         }
     }
 }
