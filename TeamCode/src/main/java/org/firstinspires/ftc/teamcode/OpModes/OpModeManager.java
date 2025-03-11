@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.Autonomous.Specimen;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
@@ -25,6 +27,9 @@ import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogic;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
+
+import java.util.Arrays;
 
 public class OpModeManager {
     public HardwareMap hardwareMap;
@@ -62,7 +67,6 @@ public class OpModeManager {
         Chassis.Heading.setPidCoefficients(new PIDCoefficients(0.5, 0, 0));
         Rotation = 0;
         isClimbing = false;
-        b = false;
     }
     public static double getSquaredSigned(double h){
         return Math.signum(h) * (h * h);
@@ -75,19 +79,19 @@ public class OpModeManager {
         }
         return sgn * h;
     }
-    private static boolean b = false;
+    private static boolean resetPP = false;
     public static double Rotation = 0;
-    long s = 0;
     public static double getPowerConsumption(){
         double ret = Chassis.FR.getCurrent(CurrentUnit.AMPS) + Chassis.FL.getCurrent(CurrentUnit.AMPS) +
                 Chassis.BL.getCurrent(CurrentUnit.AMPS) + Chassis.BR.getCurrent(CurrentUnit.AMPS);
         return ret;
     }
+    private static Scheduler autoScore;
+    long freq = 0;
     public void update(){
-//        if(!b && Robot.isDisabled() && !gamepad1.atRest()) {
-//            Robot.enable();
-//            b = true;
-//        }
+        if(Robot.isDisabled() && (!gamepad1.atRest() || !gamepad2.atRest())){
+            Robot.enable();
+        }
 
         Robot.clearCache(gamepad1.options);
 
@@ -108,24 +112,49 @@ public class OpModeManager {
             Arm.update();
             return;
         }
+
+        if(gamepad1.dpad_left){
+            if(!resetPP){
+                Robot.imu.resetYaw();
+//                Localizer.setPosition(Specimen.humanTake);
+                Localizer.setPosition(new SparkFunOTOS.Pose2D(Specimen.humanTake.x, Specimen.humanTake.y, 0));
+            }
+            if(autoScore.done()){
+                autoScore = new Scheduler();
+                autoScore
+//                        .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(Specimen.humanTake.x - 100, Specimen.humanTake.y, 0), Specimen.humanTake))
+                        .lineToAsync(Specimen.humanTake)
+                        .addTask(new Specimen.SpecimenTake(true))
+                        .addTask(new Specimen.ScoreSpecimen());
+            }
+            autoScore.update();
+            Localizer.Update();
+            Chassis.Update();
+            Elevator.update();
+            Extendo.update();
+            Arm.update();
+            resetPP = true;
+            return;
+        } else {
+            resetPP = false;
+            autoScore = new Scheduler();
+            autoScore
+                    .lineToAsync(Specimen.humanTake)
+                    .addTask(new Specimen.SpecimenTake(true))
+                    .addTask(new Specimen.ScoreSpecimen());
+        }
+
         if(Elevator.getCurrentPosition() > 500) tSpeed = 0.6;
         else tSpeed = 1;
         double pow = (min - 1) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition() + 1;
-
-
-//        Rotation += getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot;
-//        Rotation = Localizer.normalizeRadians(Rotation);
-//            Chassis.holdOrientation(
-//                    getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
-//                    -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
-//                    Rotation
-//            );
 
         Chassis.drive(
                 getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
                 -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
                 getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
         );
+
+
         OutTakeLogic.update();
         IntakeLogic.update();
         Extendo.update();
@@ -133,9 +162,7 @@ public class OpModeManager {
         Arm.update();
         Controls.CleanCommands();
         Controls.Update();
-//        Localizer.Update();
 
-//        RobotLog.ii("freq", String.valueOf(1000.f / ((System.currentTimeMillis() - s))));
         if(gamepad1.options) {
             Storage.getStorageStatus();
             Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
@@ -156,6 +183,6 @@ public class OpModeManager {
                     Colors.getColorDistance(Colors.ColorType.NONE.getColor(),
                             new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
         }
-        s = System.currentTimeMillis();
+
     }
 }

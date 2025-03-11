@@ -19,7 +19,7 @@ public class Elevator {
     public static CachedMotor motor, motor2, encoder;
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
-    public static PIDCoefficients normal = new PIDCoefficients(0.008, 0, -0.00015);
+    public static PIDCoefficients normal = new PIDCoefficients(0.009, 0.001, -0.00015);
     public static double kfUp = 0.1, kfDown = 0.04, elevatorMin = 400, elevatorMax = 1080;
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(10000, 12000, 10000);
 

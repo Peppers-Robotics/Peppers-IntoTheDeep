@@ -11,7 +11,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class Scheduler implements Cloneable {
@@ -25,6 +30,18 @@ public class Scheduler implements Cloneable {
 
     public Scheduler addTask(Task t){
         tasks.addFirst(t);
+        return this;
+    }
+    public Scheduler addTaskAsync(Task t){
+        addTask(new Task() {
+            @Override
+            public boolean Run() {
+                new Thread(() -> {
+                    while(t.Run());
+                }).start();
+                return true;
+            }
+        }) ;
         return this;
     }
     public boolean done(){
@@ -74,7 +91,18 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
-                Chassis.profiledFollow(pose);
+//                Chassis.profiledFollow(pose);
+                Chassis.profiledCurve(Collections.singletonList(pose));
+                return true;
+            }
+        });
+        return this;
+    }
+    public Scheduler splineToAsync(List<SparkFunOTOS.Pose2D> points){
+        addTask(new Task() {
+            @Override
+            public boolean Run() {
+                Chassis.profiledCurve(points);
                 return true;
             }
         });

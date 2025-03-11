@@ -50,10 +50,9 @@ public class Localizer {
         );
     }
     public static double getAngleDifference(double h1, double h2){
-        double d = Math.abs(h1 - h2);
-        while(d < -Math.PI) d += 2 * Math.PI;
-        while(d > Math.PI) d -= 2 * Math.PI;
-        return d;
+        h1 = Localizer.normalizeRadians(h1);
+        h2 = Localizer.normalizeRadians(h2);
+        return Math.min(Math.abs(h1 - h2), Math.PI * 2 - Math.abs(h1 - h2));
     }
     private static long imuUpdate = 0;
     public static void Update(){
@@ -91,5 +90,10 @@ public class Localizer {
     */
     public static SparkFunOTOS.Pose2D getVelocity(){
         return velocity;
+    }
+
+    public static void setPosition(SparkFunOTOS.Pose2D humanTake) {
+        pinPoint.setPosition(new Pose2D(DistanceUnit.MM, humanTake.x, humanTake.y, AngleUnit.RADIANS, humanTake.h));
+        pinPoint.update();
     }
 }

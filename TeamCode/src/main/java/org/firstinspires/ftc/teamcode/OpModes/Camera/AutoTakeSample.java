@@ -48,6 +48,7 @@ public class AutoTakeSample extends LinearOpMode {
     public static boolean run = false;
     public static double pow = 0.004;
     public static double tx, ty;
+    public static int id = 2;
     @Override
     public void runOpMode() throws InterruptedException {
         Robot.InitializeHubs(hardwareMap);
@@ -69,17 +70,17 @@ public class AutoTakeSample extends LinearOpMode {
                     public boolean Run() {
                         run = true;
                         res = ll.getLatestResult();
-                        if(res != null && res.isValid()){
-                            tx = GetPositionSample.getOptimalResult(res, 2).getTargetXDegrees();
-                            ty = GetPositionSample.getOptimalResult(res, 2).getTargetYDegrees();
+                        if(res != null && res.isValid() && GetPositionSample.hasId(res, id)){
+                            tx = GetPositionSample.getOptimalResult(res, id).getTargetXDegrees();
+                            ty = GetPositionSample.getOptimalResult(res, id).getTargetYDegrees();
                         }
-                        return res != null && res.isValid();
+                        return res != null && res.isValid() && GetPositionSample.hasId(res, id);
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend((int) GetPositionSample.getExtendoRotPair(tx, ty).x - 100);
+                        Extendo.Extend((int) GetPositionSample.getExtendoRotPair(tx, ty).x);
                         Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, GetPositionSample.getExtendoRotPair(tx, ty).h));
                         return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 4;
                     }

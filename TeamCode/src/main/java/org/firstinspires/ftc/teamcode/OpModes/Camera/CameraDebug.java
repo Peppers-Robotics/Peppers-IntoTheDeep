@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.MJpegStreamDecoder;
 @Config
 public class CameraDebug extends LinearOpMode {
     public static boolean photo = false;
+    public static int id = 2;
     @Override
     public void runOpMode() throws InterruptedException {
         Limelight3A camera = hardwareMap.get(Limelight3A.class, "camera");
@@ -39,24 +40,13 @@ public class CameraDebug extends LinearOpMode {
         while (opModeIsActive()){
             Robot.clearCache();
             Localizer.Update();
-//            if(r == null || photo){
-                r = camera.getLatestResult();
-                if(r != null){
-                    p = GetPositionSample.getPositionRelativeToFiled(r.getTx(), r.getTy(), Localizer.getCurrentPosition());
-                    o = GetPositionSample.getPositionRelativeToRobot(r.getTx(), r.getTy());
-                }
-                photo = false;
-//            }
-            if(r != null) {
-//                Robot.telemetry.addData("samplePositionRelativeToRobot", GetPositionSample.getPositionRelativeToRobot(r.getTx(), r.getTy()));
-//                Robot.telemetry.addData("samplePositionRelativeToField", GetPositionSample.getPositionRelativeToFiled(r.getTx(), r.getTy()));
-//                SparkFunOTOS.Pose2D p = GetPositionSample.getPositionRelativeToRobot(r.getTx(), r.getTy());
-                Robot.telemetry.addData("field pos", "(" + p.x + ", " + p.y + ", " + Math.toDegrees(p.h) + " deg)");
+            r = camera.getLatestResult();
+            if(r != null && r.isValid() && GetPositionSample.hasId(r, id)){
+                double tx = GetPositionSample.getOptimalResult(r, id).getTargetXDegrees(), ty = GetPositionSample.getOptimalResult(r, id).getTargetYDegrees();
+                o = GetPositionSample.getPositionRelativeToRobot(tx, ty);
                 Robot.telemetry.addData("robot pos", "(" + o.x + ", " + o.y + ", " + Math.toDegrees(o.h) + " deg)");
             }
             telemetry.update();
         }
-//        FtcDashboard.getInstance().stopCameraStream();
-//        stream.close();
     }
 }

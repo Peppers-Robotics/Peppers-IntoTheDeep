@@ -30,6 +30,7 @@ public class MainOpMode extends LinearOpMode {
         return Math.signum(h) * (h * h);
     }
 
+
     @Override
     public void runOpMode() throws InterruptedException {
         Robot.InitializeFull(hardwareMap);

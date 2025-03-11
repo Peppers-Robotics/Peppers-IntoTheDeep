@@ -1,12 +1,16 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.hardware.bosch.BNO055IMUImpl;
+import com.qualcomm.hardware.bosch.BNO055IMUNew;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.Rev9AxisImuOrientationOnRobot;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.LynxModuleImuType;
@@ -18,9 +22,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Axis;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.IMUBNO085;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -37,7 +47,7 @@ public class Robot {
     public static List<LynxModule> hubs;
 
     public static Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-    public static IMU imu;
+    public static IMUBNO085 imu;
     public static DcMotorController ControlHubMotors, ExpansionHubMotors;
     public static ServoController ControlHubServos, ExpansionHubServos, ServoHub;
     public static double VOLTAGE = 12;
@@ -63,6 +73,7 @@ public class Robot {
     }
 
     public static void InitializeHubs(HardwareMap hm, boolean b){
+        if(hubs != null) return;
         hubs = hm.getAll(LynxModule.class);
 //        if(b)
 //            disable();
@@ -72,6 +83,8 @@ public class Robot {
 
         ControlHubServos = hm.get(ServoController.class, "Control Hub");
         ExpansionHubServos = hm.get(ServoController.class, "Expansion Hub 2");
+
+        IMUBNO085.controller = hm.get(DigitalChannelController.class, "Expansion Hub 2");
         try {
             ServoHub = hm.get(ServoController.class, "Servo Hub 1");
         } catch (Exception ignored){
@@ -92,12 +105,22 @@ public class Robot {
         }
 
 
-        imu = hm.get(IMU.class, "imuProst");
+        imu = hm.get(IMUBNO085.class, "extIMU");
+
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP
         )));
+//        Orientation o = new Orientation(
+//                AxesReference.EXTRINSIC,
+//                AxesOrder.ZXY,
+//                AngleUnit.DEGREES,
+//                0, 0, 0, 0
+//        );
+//        Robot.imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(o)));
+
         imu.resetYaw();
+
         VOLTAGE = hm.getAll(VoltageSensor.class).get(0).getVoltage();
 
         for(LynxModule l : hubs){
@@ -120,6 +143,14 @@ public class Robot {
             logFreq.reset();
         }
         loopTime = System.currentTimeMillis();
+    }
+
+    public static void InitializeFull(HardwareMap hm, boolean disable){
+        InitializeHubs(hm);
+        if(disable){
+            disable();
+        }
+        InitializeFull(hm);
     }
     public static void InitializeFull(HardwareMap hm){
         InitializeHubs(hm, true);

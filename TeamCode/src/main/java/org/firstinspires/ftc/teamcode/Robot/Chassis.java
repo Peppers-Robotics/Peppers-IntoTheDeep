@@ -11,7 +11,10 @@ import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
+import kotlin.collections.builders.ListBuilder;
 
 
 @Config
@@ -93,6 +96,9 @@ public class Chassis {
         xProfile = new AsymmetricMotionProfile(xMV, xA, xD);
         yProfile = new AsymmetricMotionProfile(yMV, yA, yD);
     }
+    public static void setHeadingProfiles(double a, double d, double mv){
+        hProfile = new AsymmetricMotionProfile(mv, a, d);
+    }
     public static boolean asyncFollow = false;
     public static boolean linearHeading = false;
     private static LinearFunction headingInterpolation;
@@ -101,11 +107,36 @@ public class Chassis {
 
     public static void profiledFollow(SparkFunOTOS.Pose2D pose){
         pose.h = Localizer.normalizeRadians(pose.h);
-        pointsToFollow.clear();
-        pointsToFollow.add(pose);
-        xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x, point == 0 ? 0 : xProfile.maxVelocity, point == pointsToFollow.size() - 1 ? 0 : xProfile.maxVelocity);
-        yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y, point == 0 ? 0 : yProfile.maxVelocity, point == pointsToFollow.size() - 1 ? 0 : yProfile.maxVelocity);
-        hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h, point == 0 ? 0 : hProfile.maxVelocity, point == pointsToFollow.size() - 1 ? 0 : hProfile.maxVelocity);
+//        pointsToFollow.clear();
+//        pointsToFollow.add(pose);
+        xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x, point == 0 ? xProfile.acceleration : 1e10, point == pointsToFollow.size() ? xProfile.deceleration : 1e10);
+        yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y, point == 0 ? yProfile.acceleration : 1e10, point == pointsToFollow.size() ? yProfile.deceleration : 1e10);
+        hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h, point == 0 ? hProfile.acceleration : 1e10, point == pointsToFollow.size() ? hProfile.deceleration : 1e10);
+        /*if(point == 0 && point == pointsToFollow.size()){
+            xProfile.changeInitialAndEndVelocity(0, 0);
+            yProfile.changeInitialAndEndVelocity(0, 0);
+            hProfile.changeInitialAndEndVelocity(0, 0);
+        }
+        if(point == 0) {
+//            Robot.telemetry.addLine("STARTPOINT");
+            xProfile.changeInitialAndEndVelocity(0, xProfile.maxVelocity / 2);
+            yProfile.changeInitialAndEndVelocity(0, yProfile.maxVelocity / 2);
+            hProfile.changeInitialAndEndVelocity(0, hProfile.maxVelocity / 2);
+        } else if(point == pointsToFollow.size()){
+//            Robot.telemetry.addLine("ENDPOINT");
+            xProfile.changeInitialAndEndVelocity(xProfile.maxVelocity / 2, 0);
+            yProfile.changeInitialAndEndVelocity(yProfile.maxVelocity / 2, 0);
+            hProfile.changeInitialAndEndVelocity(hProfile.maxVelocity / 2, 0);
+        } else {
+//            Robot.telemetry.addLine("INTERPOINT");
+            xProfile.changeInitialAndEndVelocity(xProfile.maxVelocity / 2, xProfile.maxVelocity / 2);
+            yProfile.changeInitialAndEndVelocity(yProfile.maxVelocity / 2, yProfile.maxVelocity / 2);
+            hProfile.changeInitialAndEndVelocity(hProfile.maxVelocity / 2, hProfile.maxVelocity / 2);
+        }*/
+//        xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x);
+//        yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y);
+//        hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h);
+
         totalDistanceToTravel = Math.sqrt((Localizer.getCurrentPosition().x - pose.x) * (Localizer.getCurrentPosition().x - pose.x) +
                                           (Localizer.getCurrentPosition().y - pose.y) * (Localizer.getCurrentPosition().y - pose.y));
         linearHeading = false;
@@ -123,12 +154,13 @@ public class Chassis {
         pose.h = Localizer.normalizeRadians(pose.h);
         headingInterpolation = new LinearFunction(Localizer.getCurrentPosition().h, pose.h);
 //        profiledFollow(pose);
-        profiledCurve(new ArrayList<SparkFunOTOS.Pose2D>((Collection) pose));
+        profiledCurve(new ArrayList<SparkFunOTOS.Pose2D>(Collections.singletonList(pose)));
         linearHeading = true;
     }
     public static void profiledCurve(List<SparkFunOTOS.Pose2D> points){
         pointsToFollow = points;
         point = 0;
+//        profiledFollow(points.get(0));
         asyncFollow = true;
     }
     public static void setHeading(double h){
@@ -136,24 +168,35 @@ public class Chassis {
     }
 
     public static void Update(){
-        if(asyncFollow){
-            xProfile.update();
-            yProfile.update();
-            hProfile.update();
-            double h = hProfile.getPosition();
-            if(linearHeading){
-                double soFar = Math.sqrt((xProfile.getPosition() - xProfile.getTargetPosition()) * (xProfile.getPosition() - xProfile.getTargetPosition()) +
-                                (yProfile.getPosition() - yProfile.getTargetPosition()) * (yProfile.getPosition() - yProfile.getTargetPosition()));
-                Robot.telemetry.addData("soFar", soFar);
-                h = headingInterpolation.getOutput((totalDistanceToTravel - soFar) / totalDistanceToTravel);
-            }
-            setTargetPosition(new SparkFunOTOS.Pose2D(xProfile.getPosition(), yProfile.getPosition(), h));
-            if(xProfile.motionEnded() && yProfile.motionEnded() && (linearHeading || hProfile.motionEnded())){
-                if(point >= pointsToFollow.size() - 1) asyncFollow = false;
-                else {
-                    profiledFollow(pointsToFollow.get(++point));
+        try {
+        Robot.telemetry.addLine(point + " / " + pointsToFollow.size() + " of motion done");
+            if (asyncFollow) {
+                xProfile.update();
+                yProfile.update();
+                hProfile.update();
+                double h = hProfile.getPosition();
+                if (linearHeading) {
+                    double soFar = Math.sqrt((xProfile.getPosition() - xProfile.getTargetPosition()) * (xProfile.getPosition() - xProfile.getTargetPosition()) +
+                            (yProfile.getPosition() - yProfile.getTargetPosition()) * (yProfile.getPosition() - yProfile.getTargetPosition()));
+//                Robot.telemetry.addData("soFar", soFar);
+                    h = headingInterpolation.getOutput((totalDistanceToTravel - soFar) / totalDistanceToTravel);
+                }
+                setTargetPosition(new SparkFunOTOS.Pose2D(xProfile.getPosition(), yProfile.getPosition(), h));
+//            Robot.telemetry.addData("x precent", xProfile.getPrecentOfMotion());
+//            Robot.telemetry.addData("y precent", yProfile.getPrecentOfMotion());
+                if (Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), new SparkFunOTOS.Pose2D(xProfile.getTargetPosition(), yProfile.getTargetPosition(), 0)) < 200 || point == 0) {
+                    if (point >= pointsToFollow.size()) {
+                        if (xProfile.motionEnded() && yProfile.motionEnded() && (linearHeading || hProfile.motionEnded())) {
+                            asyncFollow = false;
+                        }
+                    } else {
+//                    Robot.telemetry.addLine("FOLLOW NEXT");
+                        profiledFollow(pointsToFollow.get(point++));
+                    }
                 }
             }
+        } catch (Exception ignored){
+
         }
 
         SparkFunOTOS.Pose2D normal = new SparkFunOTOS.Pose2D(
@@ -185,6 +228,7 @@ public class Chassis {
         drive(yP * p, -xP * p, hP * p);
     }
     public static double getPrecentageOfMotionDone(){
+        if(point < pointsToFollow.size() - 1) return 0;
         double soFar = Math.sqrt((xProfile.getPosition() - xProfile.getTargetPosition()) * (xProfile.getPosition() - xProfile.getTargetPosition()) +
                 (yProfile.getPosition() - yProfile.getTargetPosition()) * (yProfile.getPosition() - yProfile.getTargetPosition()));
 
@@ -192,7 +236,9 @@ public class Chassis {
             soFar = Math.sqrt((Localizer.getCurrentPosition().x - xProfile.getTargetPosition()) * (Localizer.getCurrentPosition().x - xProfile.getTargetPosition()) +
                     (Localizer.getCurrentPosition().y - yProfile.getTargetPosition()) * (Localizer.getCurrentPosition().y - yProfile.getTargetPosition()));
         }
+//        double totalDistance
 
         return (1 - soFar / totalDistanceToTravel) * 100.f;
+//        return 0;
     }
 }

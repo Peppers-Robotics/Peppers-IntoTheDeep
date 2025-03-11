@@ -35,7 +35,8 @@ public class ServoPlus extends ServoImpl implements Servo, HardwareDevice {
     }
     private double thisAngle = 0;
     synchronized public void setAngle(double angle){
-//        if(!Initialization.hubs.get(0).isEngaged()) return;
+//        if(!Robot.hubs.get(0).isEngaged()) return;
+        if(isEqualToAngle(angle)) return;
         thisAngle = angle;
         double toSetPos = CutOffResolution.GetResolution(angle / MaxAngle, 2);
         setPosition(toSetPos);

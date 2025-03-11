@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 @Config
 public class Claw {
     public static ServoPlus clawServo;
-    public static double OpenPosition = 90, ClosePosition = 45, mmClose = 70, interClose = 120;
+    public static double OpenPosition = 90, ClosePosition = 45, mmClose = 70, interClose = 140;
     public static void open(){
         clawServo.setAngle(OpenPosition);
     }

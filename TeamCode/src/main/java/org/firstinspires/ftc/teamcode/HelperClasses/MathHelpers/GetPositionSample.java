@@ -9,6 +9,7 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OpModes.Camera.AutoTakeSample;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
@@ -22,42 +23,19 @@ public class GetPositionSample {
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
-    public static class Point2d{
-        private double x, y;
-        public Point2d(double xVal, double yVal){
-            x = xVal;
-            y = yVal;
-        }
-        public Point2d(){
-            x = 0;
-            y = 0;
-        }
 
-        public Point2d add(Point2d op){
-            return new Point2d(x + op.x, y + op.y);
-        }
-        public Point2d sub(Point2d op){
-            return new Point2d(x - op.x, y - op.y);
-        }
-        public Point2d mul(Point2d op){
-            return new Point2d(x * op.x, y * op.y);
-        }
-        public Point2d div(Point2d op){
-            return new Point2d(x / op.x, y / op.y);
-        }
+    public static Storage.SpecimenType getType(int type){
+        if(type == 0) return Storage.SpecimenType.BLUE;
+        if(type == 1) return  Storage.SpecimenType.RED;
+        if(type == 2) return Storage.SpecimenType.YELLOW;
+        return Storage.SpecimenType.NONE;
+    }
 
-        public static double getSlope(Point2d A, Point2d B){
-            return (A.y - B.y) / (A.x - B.x);
+    public static boolean hasId(LLResult res, int id){
+        for(LLResultTypes.DetectorResult r : res.getDetectorResults()){
+            if(r.getClassId() == id) return true;
         }
-        public static double getYintercept(Point2d A, Point2d B){
-            return A.y - getSlope(A, B) * A.x;
-        }
-        public static boolean isPointInsideParallelLines(double m1, double m2, double n1, double n2, Point2d point){
-            return m1 * point.x + n1 > point.y && point.y > m2 * point.x + n2;
-        }
-        public static double getDistance(Point2d A, Point2d B){
-            return Math.sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
-        }
+        return false;
     }
 
     public static double middleX = 630, middleY = -1000;
@@ -92,17 +70,27 @@ public class GetPositionSample {
         // split the list into two separate lists
         List<LLResultTypes.DetectorResult> targetSamples = detections.stream().filter(e -> e.getClassId() == targetID).collect(Collectors.toList());
         detections = detections.stream().filter(e -> e.getClassId() != targetID).collect(Collectors.toList());
-        for(LLResultTypes.DetectorResult detection : targetSamples){
+//        double score[] = new double[targetSamples.size()];
+        double min = 1e10;
+        int id = 0;
+//        for(LLResultTypes.DetectorResult detection : targetSamples){
+        for(int i = 0; i < targetSamples.size(); i ++){
+            LLResultTypes.DetectorResult detection = targetSamples.get(i);
             double distSampleRobot = getExtendoRotPair(detection.getTargetXDegreesNoCrosshair(), detection.getTargetYDegreesNoCrosshair()).x;
 //            double distRobotToBar = Math.abs(XBarSub - Localizer.getCurrentPosition().x);
             double distRobotToBar = 30;
             double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
 
-            if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo && distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) + centerToExtendo){
-                return detection;
+            if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) + centerToExtendo){
+                double score = Math.sqrt(detection.getTargetXPixels() * detection.getTargetXPixels() + detection.getTargetYPixels() * detection.getTargetYPixels());
+                if(score < min){
+                    id = i;
+                    min = score;
+                }
+//                return detection;
             }
         }
-        return targetSamples.get(0);
+        return targetSamples.get(id);
     }
 
     public static SparkFunOTOS.Pose2D getPositionRelativeToRobot(SparkFunOTOS.Pose2D fieldPos){

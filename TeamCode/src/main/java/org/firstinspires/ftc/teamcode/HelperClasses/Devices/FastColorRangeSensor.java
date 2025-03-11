@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.HelperClasses.Devices;
 
 
+import com.qualcomm.hardware.lynx.LynxNackException;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchSimple;
@@ -41,7 +42,7 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
         super(deviceClient, deviceClientIsOwned);
         timeDistance = System.currentTimeMillis();
         timeRGB = System.currentTimeMillis();
-        setFreqToUpdate(20);
+        setFreqToUpdate(10);
     }
     public void changeLEDsettings(LEDPulseModulation l, LEDCurrent c){
         setLEDParameters(l, c);
@@ -63,17 +64,21 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
     }
 
     public Colors.ColorType getColorSeenBySensor(){
-        if(System.currentTimeMillis() - timeRGB > freq) {
-            p.G = (int) (this.green() * this.lowPassFilter + p.G * (1 - lowPassFilter));
-            p.R = (int) (this.red() * this.lowPassFilter + p.R * (1 - lowPassFilter));
-            p.B = (int) (this.blue() * this.lowPassFilter + p.B * (1 - lowPassFilter));
-            p.A = Math.max(p.G, Math.max(p.R, p.B));
+        try {
+            if (System.currentTimeMillis() - timeRGB > freq) {
+                p.G = (int) (this.green() * this.lowPassFilter + p.G * (1 - lowPassFilter));
+                p.R = (int) (this.red() * this.lowPassFilter + p.R * (1 - lowPassFilter));
+                p.B = (int) (this.blue() * this.lowPassFilter + p.B * (1 - lowPassFilter));
+                p.A = Math.max(p.G, Math.max(p.R, p.B));
 
-            RGB.R = Range.clip((p.R) / p.A * 255 , 0, 255);
-            RGB.G = Range.clip((p.G) / p.A * 255, 0, 255);
-            RGB.B = Range.clip((p.B) / p.A * 255, 0, 255);
+                RGB.R = Range.clip((p.R) / p.A * 255, 0, 255);
+                RGB.G = Range.clip((p.G) / p.A * 255, 0, 255);
+                RGB.B = Range.clip((p.B) / p.A * 255, 0, 255);
 
-            timeRGB = System.currentTimeMillis();
+                timeRGB = System.currentTimeMillis();
+            }
+        } catch (Exception ignored){
+
         }
         return Colors.getColorFromRGB(new Colors.Color(RGB.R, RGB.G, RGB.B));
 

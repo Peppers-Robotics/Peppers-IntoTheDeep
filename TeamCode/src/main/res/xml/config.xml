@@ -3,12 +3,11 @@
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
             <FastColorRangeSensor name="Storage" port="0" bus="0" />
+            <bno085imu name="extIMU" port="1" bus="0" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
-            <MPU6050 name="imu" port="0" bus="3" />
             <goBILDAPinpoint name="pinpoint" port="0" bus="0" />
 <!--            <ExpansionHubImuBNO055 name="imuProst" port="1" bus="0" />-->
-            <LynxEmbeddedIMU name="imuProst" port="0" bus="0" />
         </LynxModule>
         <ServoHub name="Servo Hub 1" port="1">
         </ServoHub>

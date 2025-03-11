@@ -123,24 +123,32 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        DisengagePTO();
                         Elevator.Disable = false;
-                        Elevator.setTargetPosition(BAR2);
-                        Elevator.Disable = pitch < 3.5 && Elevator.getCurrentPosition() > BAR2 - 400;
-                        return Elevator.getCurrentPosition() >= BAR2 - 10;
-                    }
-                })
-                .addTask(new Task() {
-                    @Override
-                    public boolean Run() {
-                        Arm.setArmAngle(climbArmIntertia);
                         return true;
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(pitch < 3.5){
+                        DisengagePTO();
+                        Elevator.setTargetPosition(BAR2 + 150);
+                        Elevator.Disable = pitch < -1 && Elevator.getCurrentPosition() < 550;
+                        return Elevator.getCurrentPosition() >= BAR2 - 20;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Arm.setArmAngle(climbArmIntertia);
+                        Elevator.Disable = false;
+                        return true;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        if(pitch > -6){
+                            Elevator.Disable = false;
                             Elevator.setTargetPosition(BAR2 - 250);
                             return true;
                         }
@@ -150,6 +158,7 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
+                        Elevator.Disable = false;
                         return Elevator.getCurrentPosition() < BAR2 - 100;
                     }
                 })
@@ -198,7 +207,7 @@ public class Climb {
         ;
     }
     public static void Update(){
-        pitch = Robot.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES);
+        pitch = Robot.imu.getOrientation().getPitch(AngleUnit.DEGREES);
         Extendo.motor.setPower(-0.6);
         run.update();
 
@@ -207,5 +216,6 @@ public class Climb {
 
         Robot.telemetry.addData("tasks", Integer.valueOf(climb.tasks.size() - run.tasks.size()).toString() + "/" + climb);
         Robot.telemetry.addData("pitch", pitch);
+        Robot.telemetry.addData("elevator level", Elevator.getCurrentPosition());
     }
 }
