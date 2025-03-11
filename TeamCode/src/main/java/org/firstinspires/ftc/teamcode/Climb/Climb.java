@@ -132,7 +132,7 @@ public class Climb {
                     public boolean Run() {
                         DisengagePTO();
                         Elevator.setTargetPosition(BAR2 + 150);
-                        Elevator.Disable = pitch < -1 && Elevator.getCurrentPosition() < 550;
+                        Elevator.Disable = pitch < -2.3 && Elevator.getCurrentPosition() < 550;
                         return Elevator.getCurrentPosition() >= BAR2 - 20;
                     }
                 })
