@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
@@ -44,6 +45,7 @@ public class StorageTest extends LinearOpMode {
             Robot.telemetry.addData("nothing confidence",
                     Colors.getColorDistance(Colors.ColorType.NONE.getColor(),
                             new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+            Robot.telemetry.addData("sensorDistance", Storage.sensor.getDistance(DistanceUnit.CM));
 
         }
     }

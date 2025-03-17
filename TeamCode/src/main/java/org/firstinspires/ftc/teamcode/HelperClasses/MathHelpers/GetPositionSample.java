@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(15), h = 270.78 , cameraOffsetX = 91.053, cameraOffsetY = 140.148, centerToExtendo = 185;
+    public static double initialAngle = Math.toRadians(15), h = 270.78 , cameraOffsetX = 100, cameraOffsetY = 140.148, centerToExtendo = 185; // COY = 140
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
@@ -38,7 +38,7 @@ public class GetPositionSample {
         return false;
     }
 
-    public static double middleX = 630, middleY = -1000;
+    public static double middleX = 630, middleY = -1600;
 
     public static LLResultTypes.DetectorResult getOptimalResultSmort(LLResult camera, int targetID){
         List<LLResultTypes.DetectorResult> detections = camera.getDetectorResults();
@@ -81,8 +81,10 @@ public class GetPositionSample {
             double distRobotToBar = 30;
             double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
 
-            if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) + centerToExtendo){
+            if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) - centerToExtendo){
+                double lateralT = getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y;
                 double score = Math.sqrt(detection.getTargetXPixels() * detection.getTargetXPixels() + detection.getTargetYPixels() * detection.getTargetYPixels());
+                if(Localizer.getCurrentPosition().y + lateralT < middleY) score = 1e8;
                 if(score < min){
                     id = i;
                     min = score;

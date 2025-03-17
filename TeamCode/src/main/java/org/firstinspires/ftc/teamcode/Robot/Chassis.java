@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.internal.hardware.android.GpioPin;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
@@ -14,14 +16,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import kotlin.collections.builders.ListBuilder;
-
 
 @Config
 public class Chassis {
     public static CachedMotor FL, FR, BL, BR;
     public static double FLd = 1, FRd = -1, BLd = 1, BRd = -1;
     public static void drive(double x, double y, double r){
+        Robot.telemetry.addData("FL PC", FL.getCurrent(CurrentUnit.AMPS));
+        Robot.telemetry.addData("FR PC", FR.getCurrent(CurrentUnit.AMPS));
+        Robot.telemetry.addData("BL PC", BL.getCurrent(CurrentUnit.AMPS));
+        Robot.telemetry.addData("BR PC", BR.getCurrent(CurrentUnit.AMPS));
         double d = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
         double fl = (y + x + r) / d;
         double bl = (y - x + r) / d;
@@ -106,6 +110,7 @@ public class Chassis {
     private static int point = 0;
 
     public static void profiledFollow(SparkFunOTOS.Pose2D pose){
+        RobotLog.dd("targetPosition", pose.x + ", " + pose.y + ", " + Math.toRadians(pose.h));
         pose.h = Localizer.normalizeRadians(pose.h);
 //        pointsToFollow.clear();
 //        pointsToFollow.add(pose);
@@ -169,7 +174,7 @@ public class Chassis {
 
     public static void Update(){
         try {
-        Robot.telemetry.addLine(point + " / " + pointsToFollow.size() + " of motion done");
+            Robot.telemetry.addLine(point + " / " + pointsToFollow.size() + " of motion done");
             if (asyncFollow) {
                 xProfile.update();
                 yProfile.update();
@@ -195,8 +200,8 @@ public class Chassis {
                     }
                 }
             }
-        } catch (Exception ignored){
-
+        } catch (Exception e){
+            RobotLog.ee("Error during auton", e.getMessage());
         }
 
         SparkFunOTOS.Pose2D normal = new SparkFunOTOS.Pose2D(

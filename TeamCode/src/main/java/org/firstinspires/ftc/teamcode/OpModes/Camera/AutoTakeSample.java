@@ -56,6 +56,7 @@ public class AutoTakeSample extends LinearOpMode {
         Robot.enable();
         DropDown.setDown(0);
         Extendo.Extend(0);
+        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
 
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "camera");
 

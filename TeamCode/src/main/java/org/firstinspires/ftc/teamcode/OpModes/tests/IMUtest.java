@@ -56,9 +56,9 @@ public class IMUtest extends LinearOpMode {
                 Robot.imu.resetYaw();
                 resetYaw = false;
             }
-            telemetry.addData("yaw", Robot.imu.getOrientation().getYaw(AngleUnit.DEGREES));
-            telemetry.addData("pitch", Robot.imu.getOrientation().getPitch(AngleUnit.DEGREES));
-            telemetry.addData("roll", Robot.imu.getOrientation().getRoll(AngleUnit.DEGREES));
+            telemetry.addData("yaw", Robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+            telemetry.addData("pitch", Robot.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES));
+            telemetry.addData("roll", Robot.imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES));
             telemetry.addData("new data", IMUBNO085.controller.getDigitalChannelState(c));
             Robot.clearCache(true);
 //            telemetry.update();

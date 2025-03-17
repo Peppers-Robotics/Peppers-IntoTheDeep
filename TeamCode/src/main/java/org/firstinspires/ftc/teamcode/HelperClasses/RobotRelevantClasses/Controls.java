@@ -13,7 +13,7 @@ public class Controls {
     public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen, Climbing,
             Grab,
             Retract,
-                            DunkToScore, Transfer, Throw, SlowDown, ImogenDriver;
+                            DunkToScore, Transfer, Throw, SlowDown, ImogenDriver, Extension;
 
     public static void Initialize(Gamepad gamepadD1, Gamepad gamepadD2){
         gamepad1 = new AutoGamepad(gamepadD1);

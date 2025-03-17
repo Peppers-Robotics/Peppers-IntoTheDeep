@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Robot;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.bosch.BNO055IMUImpl;
 import com.qualcomm.hardware.bosch.BNO055IMUNew;
+import com.qualcomm.hardware.broadcom.BroadcomColorSensor;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.Rev9AxisImuOrientationOnRobot;
@@ -47,7 +48,7 @@ public class Robot {
     public static List<LynxModule> hubs;
 
     public static Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-    public static IMUBNO085 imu;
+    public static IMU imu;
     public static DcMotorController ControlHubMotors, ExpansionHubMotors;
     public static ServoController ControlHubServos, ExpansionHubServos, ServoHub;
     public static double VOLTAGE = 12;
@@ -105,10 +106,11 @@ public class Robot {
         }
 
 
-        imu = hm.get(IMUBNO085.class, "extIMU");
+//        imu = hm.get(IMUBNO085.class, "extIMU");
+        imu = hm.get(IMU.class, "imuProst");
 
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP
         )));
 //        Orientation o = new Orientation(
@@ -170,7 +172,7 @@ public class Robot {
         Extension.servo = new ServoPlus(ServoHub, 3, Servo.Direction.FORWARD);
     }
     public static void InitializeChassis(){
-        Chassis.FL = new CachedMotor(ExpansionHubMotors, 1, DcMotorSimple.Direction.FORWARD);
+        Chassis.FL = new CachedMotor(ExpansionHubMotors, 2, DcMotorSimple.Direction.FORWARD);
         Chassis.FR = new CachedMotor(ControlHubMotors, 0, DcMotorSimple.Direction.FORWARD);
         Chassis.BL = new CachedMotor(ExpansionHubMotors, 3, DcMotorSimple.Direction.FORWARD);
         Chassis.BR = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
@@ -191,15 +193,15 @@ public class Robot {
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void InitializeDropDown(){
-        DropDown.servo = new ServoPlus(ExpansionHubServos, 4, Servo.Direction.FORWARD);
+        DropDown.servo = new ServoPlus(ExpansionHubServos, 3, Servo.Direction.FORWARD);
     }
    public static void InitializeActiveIntake(){
         ActiveIntake.motor = new CachedMotor(ExpansionHubMotors, 0, DcMotorSimple.Direction.FORWARD);
         ActiveIntake.blocker = new ServoPlus(ExpansionHubServos, 2, Servo.Direction.FORWARD); // TODO: portul bun
     }
     public static void InitializeElevator(){
-        Elevator.motor = new CachedMotor(ExpansionHubMotors, 2, DcMotorSimple.Direction.FORWARD);
-        Elevator.motor2 = new CachedMotor(ControlHubMotors, 2, DcMotorSimple.Direction.FORWARD);
+        Elevator.motor = new CachedMotor(ExpansionHubMotors, 1, DcMotorSimple.Direction.REVERSE);
+        Elevator.motor2 = new CachedMotor(ControlHubMotors, 2, DcMotorSimple.Direction.REVERSE);
         Elevator.encoder = new CachedMotor(ControlHubMotors, 2, DcMotorSimple.Direction.REVERSE);
         Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Elevator.motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

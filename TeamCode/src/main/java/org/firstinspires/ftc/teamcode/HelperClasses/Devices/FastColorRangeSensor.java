@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.HelperClasses.Devices;
 
 
+import com.qualcomm.hardware.broadcom.BroadcomColorSensor;
 import com.qualcomm.hardware.lynx.LynxNackException;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
+import org.firstinspires.ftc.teamcode.Intake.Storage;
 
 import java.awt.font.NumericShaper;
 
@@ -40,6 +42,7 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
     public ColorRangeSensorPacket RGB = new ColorRangeSensorPacket();
     public FastColorRangeSensor(I2cDeviceSynchSimple deviceClient, boolean deviceClientIsOwned) {
         super(deviceClient, deviceClientIsOwned);
+        changeLEDsettings(BroadcomColorSensor.LEDPulseModulation.LED_PULSE_100kHz, BroadcomColorSensor.LEDCurrent.CURRENT_5mA);
         timeDistance = System.currentTimeMillis();
         timeRGB = System.currentTimeMillis();
         setFreqToUpdate(10);
@@ -71,9 +74,9 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
                 p.B = (int) (this.blue() * this.lowPassFilter + p.B * (1 - lowPassFilter));
                 p.A = Math.max(p.G, Math.max(p.R, p.B));
 
-                RGB.R = Range.clip((p.R) / p.A * 255, 0, 255);
-                RGB.G = Range.clip((p.G) / p.A * 255, 0, 255);
-                RGB.B = Range.clip((p.B) / p.A * 255, 0, 255);
+                RGB.R = Range.clip(p.R / p.A * 255, 0, 255);
+                RGB.G = Range.clip(p.G / p.A * 255, 0, 255);
+                RGB.B = Range.clip(p.B / p.A * 255, 0, 255);
 
                 timeRGB = System.currentTimeMillis();
             }

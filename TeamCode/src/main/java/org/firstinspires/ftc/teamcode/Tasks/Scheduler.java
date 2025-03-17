@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.Mutex;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -132,6 +133,10 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
+                if(!Chassis.asyncFollow){
+                    RobotLog.dd("headingError", Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) + "");
+                    RobotLog.dd("translationalError", Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), Chassis.getTargetPosition()) + "");
+                }
                 return !Chassis.asyncFollow;
             }
         });
@@ -141,7 +146,7 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
-                return Localizer.getVelocity().x < 5 && Localizer.getVelocity().y < 5;
+                return Localizer.getVelocity().x < 10 && Localizer.getVelocity().y < 10;
             }
         });
         return this;
@@ -150,6 +155,10 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
+                if(Chassis.getPrecentageOfMotionDone() > precent){
+                    RobotLog.d("headingError", Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h));
+                    RobotLog.d("translationalError", Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), Chassis.getTargetPosition()));
+                }
                 return Chassis.getPrecentageOfMotionDone() > precent;
             }
         });

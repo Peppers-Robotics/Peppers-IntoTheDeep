@@ -6,6 +6,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.GetPositionSample;
@@ -36,6 +37,7 @@ public class Specimen extends LinearOpMode {
                         @Override
                         public boolean Run() {
                             Claw.closeAbit();
+                            Arm.setArmAngle(Arm.getCurrentArmAngle() + 15);
                             samplesScored ++;
                             return true;
                         }
@@ -58,15 +60,15 @@ public class Specimen extends LinearOpMode {
             return s.done();
         }
     }
-    public static double scoredLine = -750;
+    public static double scoredLine = -760;
     public static SparkFunOTOS.Pose2D scoreSpecimen = new SparkFunOTOS.Pose2D(-800, -300, Math.toRadians(20)),
         scoreSpecimen1 = new SparkFunOTOS.Pose2D(-1000, -500, Math.toRadians(0)),
         sample1 = new SparkFunOTOS.Pose2D(-627, 130, Math.toRadians(-65)),
-        sample2 = new SparkFunOTOS.Pose2D(-530, 560, Math.toRadians(-47)),
+        sample2 = new SparkFunOTOS.Pose2D(-530, 560, Math.toRadians(-48)),
         sample3 = new SparkFunOTOS.Pose2D(-530, 580, Math.toRadians(-60)),
         humanReverse = new SparkFunOTOS.Pose2D(-530, 560, Math.toRadians(-120)),
         spitDetection = new SparkFunOTOS.Pose2D(-627, 130, Math.toRadians(-140)),
-        humanTake = new SparkFunOTOS.Pose2D(35, 450 ,0);
+        humanTake = new SparkFunOTOS.Pose2D(55, 465 ,0);
     public static int samplesScored = 0;
     public static int type = 2;
     private static int tries = 0;
@@ -85,7 +87,7 @@ public class Specimen extends LinearOpMode {
                             return true;
                         }
                     })
-                    .waitSeconds(0.1)
+                    .waitSeconds(0.12)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -115,13 +117,16 @@ public class Specimen extends LinearOpMode {
                             return Localizer.getCurrentPosition().x < -600; // TODO: change if needed
                         }
                     })
-                    .lineToAsync(new SparkFunOTOS.Pose2D(scoreSpecimen1.x, -500, Math.toRadians(0)))
+                    .lineToAsync(new SparkFunOTOS.Pose2D(-800, -500, Math.toRadians(0)))
                     .addTask(new retractAsyncHelper())
 //                    .waitForSync()
+//                    .waitForStill()
 //                    .addTask(new Sample.TakeSample(type, 0.5))
                     .addTask(new Task() {
+                        long time = -1;
                         @Override
                         public boolean Run() {
+                            if(time == -1) time = System.currentTimeMillis();
                             if(tries >= 2){
                                 r.clear();
                                 return true;
@@ -149,6 +154,10 @@ public class Specimen extends LinearOpMode {
                                             }
                                         });
                             }
+//                            if((System.currentTimeMillis() - time) / 1000.f >= 5){
+//                                tries = 10;
+//                                return true;
+//                            }
                             return s.done();
                         }
                     })
@@ -167,7 +176,7 @@ public class Specimen extends LinearOpMode {
                             return Localizer.getAngleDifference(Localizer.getCurrentPosition().h, spitDetection.h) < Math.toRadians(30);
                         }
                     })*/
-                    .addTask(new SpitToHP(850, 0.8))
+                    .addTask(new SpitToHP(850, 0.55))
             ;
         }
         @Override
@@ -181,7 +190,6 @@ public class Specimen extends LinearOpMode {
         private final Scheduler r;
         public ScoreSpecimen(){
             r = new Scheduler();
-
             r
                     .addTask(new Task() {
                         @Override
@@ -255,13 +263,17 @@ public class Specimen extends LinearOpMode {
                         @Override
                         public boolean Run() {
                             Claw.closeAbit();
-                            Arm.setArmAngle(OutTakeLogic.ArmTakeSpecimen);
+                            if(scoredSecond){
+                                Arm.setArmAngle(OutTakeLogic.ArmTakeSpecimen - 3);
+                            } else {
+                                Arm.setArmAngle(OutTakeLogic.ArmTakeSpecimen);
+                            }
                             Elevator.setTargetPosition(0);
                             Extension.Extend(OutTakeLogic.TakeSpecimenExtension);
                             return true;
                         }
                     })
-                    .waitForTrajDone(70)
+                    .waitForTrajDone(50)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -297,6 +309,7 @@ public class Specimen extends LinearOpMode {
             return r.done();
         }
     }
+    public static boolean scoredSecond = false;
     public static class TakeSample extends Task{
         private final Scheduler r;
         public TakeSample(int pos){
@@ -305,7 +318,7 @@ public class Specimen extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Claw.closeAbit();
+//                            Claw.closeAbit();
                             ActiveIntake.Unblock();
                             ActiveIntake.powerOn(1);
                             DropDown.setDown(1);
@@ -400,6 +413,7 @@ public class Specimen extends LinearOpMode {
         Robot.InitializeFull(hardwareMap);
         Robot.enable();
         Scheduler auto = new Scheduler();
+        scoredSecond = false;
 
         Elevator.setTargetPosition(0);
         Arm.setArmAngle(70);
@@ -412,10 +426,13 @@ public class Specimen extends LinearOpMode {
         Chassis.setHeadingProfiles(4*Math.PI, 2*Math.PI, 8*Math.PI);
 
         samplesScored = 0;
+        tries = 0;
 
         Sample.camera = hardwareMap.get(Limelight3A.class, "camera");
         Sample.camera.start();
         Sample.camera.pipelineSwitch(0);
+        Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         auto
 //                .addTask(new ScoreSpecimen())
@@ -426,6 +443,8 @@ public class Specimen extends LinearOpMode {
                     public boolean Run() {
                         Extendo.Extend(300);
                         ActiveIntake.powerOn();
+                        Arm.setArmAngle(Arm.getCurrentArmAngle() + 50);
+                        Claw.close();
                         DropDown.setDown(1);
                         return Localizer.getCurrentPosition().h >= Math.toRadians(-70);
                     }
@@ -442,6 +461,7 @@ public class Specimen extends LinearOpMode {
                     public boolean Run() {
                         Extendo.Extend(300);
                         ActiveIntake.powerOn();
+                        Arm.setArmAngle(270);
                         DropDown.setDown(1);
                         return Localizer.getCurrentPosition().h >= Math.toRadians(-58);
                     }
@@ -454,6 +474,10 @@ public class Specimen extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
+                        // if not work uncomment
+                        Claw.closeAbit();
+                        scoredSecond = true;
+                        Arm.setArmAngle(OutTakeLogic.ArmTakeSpecimen - 30);
                         return Localizer.getCurrentPosition().h > Math.toRadians(-90);
                     }
                 })
@@ -468,28 +492,36 @@ public class Specimen extends LinearOpMode {
                         Elevator.PowerOnDownToTakeSample = true;
                         Claw.closeAbit();
                         Extendo.Extend(0);
+//                        Arm.setArmAngle(OutTakeLogic.ArmTakeSpecimen);
                         return Localizer.getAngleDifference(Localizer.getCurrentPosition().h, 0) < Math.toRadians(10);
                     }
                 })
 //                .addTask(new SpecimenTake(false))
-                .lineToLinearHeadingAsync(new SparkFunOTOS.Pose2D(15, humanTake.y, 0))
+                .lineToLinearHeadingAsync(new SparkFunOTOS.Pose2D(20, humanTake.y + 15, 0))
                 .addTask(new SpecimenTake(true))
                 .addTask(new ScoreSpecimen())
-
-                .lineToAsync(humanTake)
-                .addTask(new SpecimenTake(true))
-                .addTask(new ScoreSpecimen())
-
-                .lineToAsync(humanTake)
-                .addTask(new SpecimenTake(true))
-                .addTask(new ScoreSpecimen())
-
-                .lineToAsync(humanTake)
-                .addTask(new SpecimenTake(tries < 3))
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(tries > 3) requestOpModeStop();
+                        scoredSecond = false;
+                        return true;
+                    }
+                })
+
+                .lineToAsync(humanTake)
+                .addTask(new SpecimenTake(true))
+                .addTask(new ScoreSpecimen())
+
+                .lineToAsync(humanTake)
+                .addTask(new SpecimenTake(true))
+                .addTask(new ScoreSpecimen())
+
+                .lineToAsync(humanTake)
+                .addTask(new SpecimenTake(tries <= 2))
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        if(tries > 2) requestOpModeStop();
                         return true;
                     }
                 })

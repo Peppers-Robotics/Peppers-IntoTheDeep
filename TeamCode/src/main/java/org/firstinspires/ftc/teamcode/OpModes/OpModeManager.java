@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -47,10 +48,13 @@ public class OpModeManager {
         Storage.team = team;
 
         Robot.InitializeFull(hardwareMap);
+        Robot.disable();
         Controls.Initialize(gamepad1, gamepad2);
         IntakeLogic.Initialize(gamepad1, gamepad2);
         Extendo.pidController.setFreq(40);
         Elevator.controller.setFreq(40);
+        Limelight3A c = hardwareMap.get(Limelight3A.class, "camera");
+        c.shutdown();
 
         Extendo.Extend(0);
 
@@ -61,6 +65,7 @@ public class OpModeManager {
 
 //        Extension.Retract();
         Extension.Extend(Extension.getPrecent());
+        Extendo.Extend(Extendo.getCurrentPosition());
         ActiveIntake.Unblock();
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Claw.open();
@@ -89,10 +94,6 @@ public class OpModeManager {
     private static Scheduler autoScore;
     long freq = 0;
     public void update(){
-        if(Robot.isDisabled() && (!gamepad1.atRest() || !gamepad2.atRest())){
-            Robot.enable();
-        }
-
         Robot.clearCache(gamepad1.options);
 
         if(Controls.Climbing && !isClimbing){
@@ -144,8 +145,12 @@ public class OpModeManager {
                     .addTask(new Specimen.ScoreSpecimen());
         }
 
-        if(Elevator.getCurrentPosition() > 500) tSpeed = 0.6;
-        else tSpeed = 1;
+        if(Elevator.getCurrentPosition() > 500){
+            tSpeed = 0.6;
+        }
+        else {
+            tSpeed = 1;
+        }
         double pow = (min - 1) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition() + 1;
 
         Chassis.drive(

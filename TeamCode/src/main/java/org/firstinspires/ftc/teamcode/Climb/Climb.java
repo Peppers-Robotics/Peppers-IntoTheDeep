@@ -123,16 +123,9 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.Disable = false;
-                        return true;
-                    }
-                })
-                .addTask(new Task() {
-                    @Override
-                    public boolean Run() {
                         DisengagePTO();
-                        Elevator.setTargetPosition(BAR2 + 150);
-                        Elevator.Disable = pitch < -2.3 && Elevator.getCurrentPosition() < 550;
+                        Elevator.setTargetPosition(BAR2);
+                        Elevator.Disable = pitch <= 3 && (Elevator.getCurrentPosition() <= BAR2 - 30 && Elevator.getCurrentPosition() >= 250);
                         return Elevator.getCurrentPosition() >= BAR2 - 20;
                     }
                 })
@@ -147,8 +140,7 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(pitch > -6){
-                            Elevator.Disable = false;
+                        if(pitch < 7){
                             Elevator.setTargetPosition(BAR2 - 250);
                             return true;
                         }
@@ -158,7 +150,6 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.Disable = false;
                         return Elevator.getCurrentPosition() < BAR2 - 100;
                     }
                 })
@@ -197,8 +188,8 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(Elevator.getCurrentPosition() <= 0) {
-                            Elevator.setTargetPosition(0);
+                        if(Elevator.getCurrentPosition() <= -15){
+                            Elevator.setTargetPosition(-40);
                             return true;
                         }
                         return false;
@@ -207,7 +198,7 @@ public class Climb {
         ;
     }
     public static void Update(){
-        pitch = Robot.imu.getOrientation().getPitch(AngleUnit.DEGREES);
+        pitch = Robot.imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES);
         Extendo.motor.setPower(-0.6);
         run.update();
 

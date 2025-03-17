@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
-import android.net.IpSecManager;
-
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -60,11 +58,19 @@ public class Localizer {
 
         if(1000.f / (System.currentTimeMillis() - imuUpdate) >= 10) {
             double h = Robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            while (h < 0) h += 2 * Math.PI;
-            while (h > 2 * Math.PI) h -= Math.PI * 2;
+            if(
+               getAngleDifference(0, h) <= Math.toRadians(0.03) &&
+               getAngleDifference(Math.PI, h) <= Math.toRadians(0.03) &&
+               getAngleDifference(-Math.PI, h) <= Math.toRadians(0.03) &&
+               getAngleDifference(Math.PI / 2, h) <= Math.toRadians(0.03) &&
+               getAngleDifference(-Math.PI / 2, h) <= Math.toRadians(0.03)
+            ){
+                while (h < 0) h += 2 * Math.PI;
+                while (h > 2 * Math.PI) h -= Math.PI * 2;
 
-            pinPoint.setPosition(new Pose2D(DistanceUnit.MM, getCurrentPosition().x, getCurrentPosition().y, AngleUnit.RADIANS, h));
-            imuUpdate = System.currentTimeMillis();
+                pinPoint.setPosition(new Pose2D(DistanceUnit.MM, getCurrentPosition().x, getCurrentPosition().y, AngleUnit.RADIANS, h));
+                imuUpdate = System.currentTimeMillis();
+            }
         }
 
         velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, getCurrentPosition().h - lastPose.h);
@@ -72,6 +78,7 @@ public class Localizer {
         velocity = Div(velocity, time.seconds());
 
         Robot.telemetry.addData("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");
+        RobotLog.dd("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");
         time.reset();
     }
     public static void Reset(){

@@ -21,15 +21,15 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 200, ElevatorScoreSample2 = 740; // 700
+    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 200, ElevatorScoreSample2 = 700; // 700
     public static double ElevatorScoreSpecimen = 250;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
-    public static double ArmScoreSample = 240, PivotScoreSample = 0; // 220
-    public static double ArmTakeSpecimen = 322, PivotTakeSpecimen = 0;
+    public static double ArmScoreSample = 235, PivotScoreSample = 0; // 220
+    public static double ArmTakeSpecimen = 340, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 105, PivotScoreSpecimen = 0;
-    public static double ArmIdle = 2, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = 2;
+    public static double ArmIdle = -1, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = -1;
     public static boolean save2 = false;
-    public static double coeff = 2;
+    public static double coeff = 5;
     public static double TakeSpecimenExtension = 0.31, TransferExtension = 0.3, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.7;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
@@ -60,7 +60,7 @@ public class OutTakeLogic {
                                         Claw.closeAbit();
                                         Elevator.setTargetPosition(ElevatorUp);
                                         if (Elevator.getCurrentPosition() > ElevatorUp - 80) {
-                                            Arm.setArmAngle(ArmTakeSpecimen);
+                                            Arm.setArmAngle(ArmTakeSpecimen - 5);
                                         }
                                         return Arm.getCurrentArmAngle() > 90;
                                     }
@@ -336,7 +336,7 @@ public class OutTakeLogic {
                                             Arm.setArmAngle(ArmScoreSpecimen);
                                             if (Arm.getCurrentArmAngle() < 250)
                                                 Arm.setPivotAngle(PivotScoreSpecimen);
-                                            if(Arm.getCurrentArmAngle() < 120) Extension.Extend(100);
+                                            if(Arm.getCurrentArmAngle() < 120) Extension.Extend(1);
                                             return Arm.motionCompleted() && Elevator.ReachedTargetPosition();
                                         }
                                     })
@@ -349,6 +349,10 @@ public class OutTakeLogic {
                     break;
                 case IDLE_SCORE_SPECIMEN:
                     Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * coeff);
+                    if(Controls.gamepad2.wasPressed.right_bumper){
+                        if(Extension.getPrecent() >= 0.2) Extension.Extend(0);
+                        else Extendo.Extend(1);
+                    }
                     if (Controls.GrabSpecimen || Controls.gamepad1.wasPressed.square) {
                         currentTask = new Scheduler();
                         {
@@ -374,7 +378,7 @@ public class OutTakeLogic {
                                         @Override
                                         public boolean Run() {
                                             Elevator.setTargetPosition(ElevatorUp);
-                                            Arm.setArmAngle(ArmTakeSpecimen);
+                                            Arm.setArmAngle(ArmTakeSpecimen - 5);
                                             return Elevator.getCurrentPosition() < ElevatorUp + 50;
                                         }
                                     })

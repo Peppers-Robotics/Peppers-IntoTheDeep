@@ -34,15 +34,18 @@ import java.util.Objects;
 public class CachedMotor extends DcMotorImplEx implements DcMotorEx, HardwareDevice {
     private double lastSetPower = 69;
     private static double MAX_VELOCITY;
+    private Direction direction;
     public CachedMotor(DcMotorController controller, int portNumber) {
 
         super(controller, portNumber);
     }
     public CachedMotor(DcMotorController controller, int portNumber, DcMotorSimple.Direction direction){
         super(controller, portNumber, direction);
+        this.direction = direction;
     }
     public CachedMotor(DcMotorController controller, int portNumber, DcMotorSimple.Direction direction, @NonNull MotorConfigurationType mct){
         super(controller, portNumber, direction, Objects.requireNonNull(mct));
+        this.direction = direction;
 
         mct.setAchieveableMaxRPMFraction(1.0);
         this.controller.setMotorType(portNumber, mct.clone());
@@ -70,7 +73,9 @@ public class CachedMotor extends DcMotorImplEx implements DcMotorEx, HardwareDev
         if(power != lastSetPower){
             power = ((int)(power * 100)) / 100.f;
             lastSetPower = power;
-            controller.setMotorPower(this.getPortNumber(), power);
+            int m = 1;
+            if(direction == Direction.REVERSE) m = -1;
+            controller.setMotorPower(this.getPortNumber(), power * m);
         }
     }
 
