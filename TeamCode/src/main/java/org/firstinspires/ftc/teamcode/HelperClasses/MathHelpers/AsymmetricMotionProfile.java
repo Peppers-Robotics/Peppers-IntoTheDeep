@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.RobotLog;
 
 public class AsymmetricMotionProfile {
     public double maxVelocity, acceleration, deceleration, initialVelocity, endVelocity;

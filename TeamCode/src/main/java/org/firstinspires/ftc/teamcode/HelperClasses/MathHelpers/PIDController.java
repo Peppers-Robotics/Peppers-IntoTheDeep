@@ -21,10 +21,6 @@ public class PIDController {
         this(new PIDCoefficients(p, i, d));
     }
 
-    public PIDController(com.acmerobotics.roadrunner.control.PIDCoefficients pid) {
-        pidCoefficients = new PIDCoefficients(pid.kP, pid.kI, pid.kD);
-    }
-
     public void setPidCoefficients(PIDCoefficients coeff){
         pidCoefficients = coeff;
     }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.ftc.bumblebee.Localizers.Pose2d;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -32,9 +33,14 @@ public class Localizer {
         return raw;
     }
 
+    public static com.ftc.bumblebee.Localizers.Localizer getObject(){
+        return new PinPointLocalizer(pinPoint);
+    }
+
     public static void Initialize(HardwareMap hm){
         pinPoint = hm.get(PinPoint.class, "pinpoint");
         pinPoint.setOffsets(X, Y);
+        pinPoint.setEncoderResolution(PinPoint.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 //        pinPoint.setYawScalar(yawScalar);
         pinPoint.setEncoderDirections(xPod, yPod);
 //        pinPoint.resetPosAndIMU();
