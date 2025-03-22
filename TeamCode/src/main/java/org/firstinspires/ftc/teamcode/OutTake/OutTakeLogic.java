@@ -22,15 +22,15 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 @Config
 public class OutTakeLogic {
     public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 200, ElevatorScoreSample2 = 700; // 700
-    public static double ElevatorScoreSpecimen = 250;
+    public static double ElevatorScoreSpecimen = 310;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 235, PivotScoreSample = 0; // 220
-    public static double ArmTakeSpecimen = 340, PivotTakeSpecimen = 0;
+    public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 105, PivotScoreSpecimen = 0;
     public static double ArmIdle = -1, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = -1;
     public static boolean save2 = false;
     public static double coeff = 5;
-    public static double TakeSpecimenExtension = 0.31, TransferExtension = 0.3, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.7;
+    public static double TakeSpecimenExtension = 0.31, TransferExtension = 0.3, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.3;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,

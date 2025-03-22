@@ -77,11 +77,9 @@ public class Elevator {
                 was = true;
                 motor.setPower(0);
                 motor2.setPower(0);
-                if (time.seconds() > 0.2) {
-                    motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                if (time.seconds() >= 0.2) {
+                    encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     RESET = false;
                 }
 
