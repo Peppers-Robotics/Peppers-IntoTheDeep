@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
@@ -100,8 +101,8 @@ public class Climb {
 //                        mct.setAchieveableMaxRPMFraction(0.7);
 //                        Elevator.motor.setMotorType(mct);
 //                        Elevator.motor2.setMotorType(mct);
-                        Elevator.setTargetPosition(-20);
-                        return Elevator.getCurrentPosition() < 5;
+                        Elevator.setTargetPosition(-100);
+                        return Elevator.getCurrentPosition() <= 4;
                     }
                 })
                 .addTask(new Task() {
@@ -208,5 +209,9 @@ public class Climb {
         Robot.telemetry.addData("tasks", Integer.valueOf(climb.tasks.size() - run.tasks.size()).toString() + "/" + climb);
         Robot.telemetry.addData("pitch", pitch);
         Robot.telemetry.addData("elevator level", Elevator.getCurrentPosition());
+//        Robot.telemetry.update();
+        if(Elevator.getCurrentPosition() < 50){
+            RobotLog.dd("Level", Elevator.getCurrentPosition() + "");
+        }
     }
 }

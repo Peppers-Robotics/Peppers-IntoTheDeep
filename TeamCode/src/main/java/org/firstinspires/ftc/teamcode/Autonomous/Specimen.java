@@ -407,6 +407,9 @@ public class Specimen extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Robot.InitializeFull(hardwareMap);
         Robot.enable();
+        Elevator.RESET = false;
+        Elevator.encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Elevator.encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         Scheduler auto = new Scheduler();
         scoredSecond = false;
 
@@ -584,6 +587,7 @@ public class Specimen extends LinearOpMode {
             telemetry.update();
 
             Elevator.update();
+            Elevator.setTargetPosition(0);
             Extendo.update();
             Arm.update();
             Robot.clearCache();
