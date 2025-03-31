@@ -125,7 +125,7 @@ public class OpModeManager {
                 autoScore
 //                        .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(Specimen.humanTake.x - 100, Specimen.humanTake.y, 0), Specimen.humanTake))
                         .lineToAsync(Specimen.humanTake)
-                        .addTask(new Specimen.SpecimenTake(true))
+                        .addTask(new Specimen.SpecimenTake(true, 1))
                         .addTask(new Specimen.ScoreSpecimen());
             }
             autoScore.update();
@@ -141,7 +141,7 @@ public class OpModeManager {
             autoScore = new Scheduler();
             autoScore
                     .lineToAsync(Specimen.humanTake)
-                    .addTask(new Specimen.SpecimenTake(true))
+                    .addTask(new Specimen.SpecimenTake(true, 1))
                     .addTask(new Specimen.ScoreSpecimen());
         }
 
@@ -158,6 +158,7 @@ public class OpModeManager {
                 -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
                 getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
         );
+        if(Controls.gamepad2.wasPressed.dpad_left) Claw.close();
 
 
         OutTakeLogic.update();

@@ -103,7 +103,8 @@ public class Sample extends LinearOpMode {
                             public boolean Run() {
                                 Elevator.PowerOnDownToTakeSample = false;
                                 Extendo.PowerOnToTransfer = false;
-                                Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
+//                                Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
+                                Elevator.setTargetPosition(400);
                                 if(Elevator.getTargetPosition() > 200)
                                     Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
                                 return true;
@@ -146,7 +147,7 @@ public class Sample extends LinearOpMode {
                         public boolean Run() {
 //                            Claw.close();
                             if(Extendo.getTargetPosition() < 200 && Extendo.getCurrentPosition() < 200)
-                                Extendo.Extend(200);
+                                Extendo.Extend(100);
                             Extension.Retract();
                             Arm.setArmAngle(OutTakeLogic.ArmIdle);
                             Elevator.PowerOnDownToTakeSample = true;
@@ -198,7 +199,8 @@ public class Sample extends LinearOpMode {
                         @Override
                         public boolean Run() {
                             Robot.telemetry.clearAll();
-                            return Localizer.getAngleDifference(Localizer.getVelocity().h, 0) <= Math.toRadians(2) && Localizer.getAngleDifference(Localizer.getCurrentPosition().h, park.h) < Math.toRadians(2);
+//                            return true;
+                            return Localizer.getAngleDifference(Localizer.getVelocity().h, 0) <= Math.toRadians(15) && Localizer.getAngleDifference(Localizer.getCurrentPosition().h, park.h) < Math.toRadians(15);
                         }
                     })
                     .addTask(new Task() {
@@ -248,7 +250,7 @@ public class Sample extends LinearOpMode {
                             Extendo.Extend(
                                     (int) GetPositionSample.getExtendoRotPair(
                                             tx, ty
-                                    ).x - 35 // 30
+                                    ).x - 30 // 30
                             );
                             return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 10 && Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) <= Math.toRadians(3);
                         }

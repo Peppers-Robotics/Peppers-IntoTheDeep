@@ -45,9 +45,9 @@ public class TestRotExt extends LinearOpMode {
             }
             else if(res != null) {
                 Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0,
-                        GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(res.getTx(), res.getTy(), capture)).h
+                        GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(res.getTx(), res.getTy(), capture), Localizer.getCurrentPosition()).h
                         ));
-                Extendo.Extend((int) GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(res.getTx(), res.getTy(), capture)).x);
+                Extendo.Extend((int) GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(res.getTx(), res.getTy(), capture), Localizer.getCurrentPosition()).x);
                 p = GetPositionSample.getPositionRelativeToFiled(res.getTx(), res.getTy(), capture);
                 o = GetPositionSample.getPositionRelativeToRobot(res.getTx(), res.getTy());
                 Robot.telemetry.addData("field pos", "(" + p.x + ", " + p.y + ", " + Math.toDegrees(p.h) + " deg)");

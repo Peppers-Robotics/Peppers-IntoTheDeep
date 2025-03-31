@@ -122,9 +122,11 @@ public class Climb {
                     }
                 })
                 .addTask(new Task() {
+                    long time = -1;
                     @Override
                     public boolean Run() {
                         DisengagePTO();
+                        if(time == -1) time = System.currentTimeMillis();
                         Elevator.setTargetPosition(BAR2);
                         Elevator.Disable = pitch <= 3 && (Elevator.getCurrentPosition() <= BAR2 - 30 && Elevator.getCurrentPosition() >= 250);
                         return Elevator.getCurrentPosition() >= BAR2 - 20;
@@ -139,8 +141,10 @@ public class Climb {
                     }
                 })
                 .addTask(new Task() {
+                    long time = -1;
                     @Override
                     public boolean Run() {
+                        if(time == -1) time = System.currentTimeMillis();
                         if(pitch < 7){
                             Elevator.setTargetPosition(BAR2 - 250);
                             return true;
@@ -189,8 +193,9 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        if(Elevator.getCurrentPosition() <= -15){
-                            Elevator.setTargetPosition(-40);
+                        Extendo.motor.setPower(0.2);
+                        if(Elevator.getCurrentPosition() <= 0){
+                            Elevator.setTargetPosition(0);
                             return true;
                         }
                         return false;

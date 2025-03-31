@@ -190,6 +190,7 @@ public class Robot {
     }
     public static void InitializeExtendo(){
         Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
+        Extendo.encoder = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void InitializeDropDown(){

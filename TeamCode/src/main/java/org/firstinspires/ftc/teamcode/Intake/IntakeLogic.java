@@ -20,8 +20,8 @@ public class IntakeLogic extends GenericController {
         IDLE,
         RESET
     }
-    public static States state = States.RETRACT;
-    public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime();
+    public static States state = States.IDLE;
+    public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime(), time2 = new ElapsedTime();
     public static boolean wasDriverActivated = false;
     private static boolean reset = false;
     private static int pos = 0;
@@ -62,6 +62,7 @@ public class IntakeLogic extends GenericController {
                     Extendo.motor.setPower(0);
                 }
                 Robot.telemetry.addData("tp", Extendo.getTargetPosition());
+                time2.reset();
                 break;
             case RETRACT:
                 Extendo.DISABLE = true;
@@ -72,13 +73,13 @@ public class IntakeLogic extends GenericController {
 
                 Extendo.motor.setPower(-1);
 //                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 4 && Math.abs(Extendo.motor.getVelocity()) < 3 && Extendo.getCurrentPosition() < 10)){
+                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 4 && Math.abs(Extendo.getCurrentVelocity()) < 3 && Extendo.getCurrentPosition() < 10 || gamepad2.wasPressed.left_bumper)){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;
                     if(time.seconds() > 0.1){
-                        Extendo.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        Extendo.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                        Extendo.encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        Extendo.encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                         Extendo.Extend(0);
                         pos = 0;
                         state = States.IDLE;
@@ -86,12 +87,15 @@ public class IntakeLogic extends GenericController {
                         ActiveIntake.powerOff();
                         ActiveIntake.Block();
                         reset = false;
-                        if(Storage.hasTeamPice())
+//                        if(Storage.hasTeamPice())
                             Controls.Transfer = true;
                     }
                 } else time.reset();
                 break;
 
+        }
+        if(gamepad2.wasPressed.circle){
+            wasDriverActivated = true;
         }
         if(wasDriverActivated && !ActiveIntake.isOff() && Math.abs(gamepad2.left_trigger) <= 0.05 && Math.abs(gamepad2.right_trigger) <= 0.05){
             ActiveIntake.powerOff();
@@ -101,7 +105,7 @@ public class IntakeLogic extends GenericController {
             wasDriverActivated = false;
         }
         if(gamepad2.right_trigger >= 0.05 && (ActiveIntake.isOff() || wasDriverActivated)){
-            if(Storage.hasTeamPice()) {
+            if(Storage.hasTeamPice() && false) {
                 if(blocker.seconds() >= 0.15) {
                     ActiveIntake.Block();
                     ActiveIntake.Reverse(0.5);

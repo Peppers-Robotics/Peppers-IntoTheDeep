@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 @SuppressWarnings("unused")
 @Config
 public class Extendo {
-    public static CachedMotor motor;
+    public static CachedMotor motor, encoder;
     public static PIDController pidController = new PIDController(0.01, 0, -0.0004);
     public static int MaxExtendoExtension = 840;
     private static double targetPosition = 0;
@@ -25,8 +25,9 @@ public class Extendo {
     }
 
     public static int getCurrentPosition(){
-        return motor.getCurrentPosition();
+        return encoder.getCurrentPosition();
     }
+    public static double getCurrentVelocity(){ return encoder.getVelocity(); }
 
     public synchronized static void Extend(int position, double afterMs){
         new Thread(() -> {
@@ -74,7 +75,7 @@ public class Extendo {
             motor.setMotorEnable();
             motor.setPower(-1);
         } else {
-            motor.setPower(12.f / Robot.VOLTAGE * pidController.calculatePower(motor.getCurrentPosition(), motor.getVelocity()));
+            motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
             motor.setMotorEnable();
         }
 //        Robot.telemetry.addData("Extendo pos", motor.getCurrentPosition());

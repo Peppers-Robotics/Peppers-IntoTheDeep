@@ -227,8 +227,8 @@ public class Chassis {
         Robot.telemetry.addData("yError", error.y);
         Robot.telemetry.addData("hError", Math.toDegrees(error.h));
         double p = 1;
-        if(Robot.VOLTAGE > 13.2){
-            p *= 13.2 / Robot.VOLTAGE;
+        if(Robot.VOLTAGE > 12.8){
+            p *= 12.8 / Robot.VOLTAGE;
         }
         drive(yP * p, -xP * p, hP * p);
     }

@@ -25,6 +25,7 @@ public class ExtendoPID extends LinearOpMode {
             DropDown.setDown(0);
             Robot.clearCache();
             Robot.telemetry.addData("Extendo powerConsumption", Extendo.motor.getCurrent(CurrentUnit.AMPS));
+            Robot.telemetry.addData("Extendo pos", Extendo.getCurrentPosition());
             Extendo.Extend(position);
             Extendo.update();
         }

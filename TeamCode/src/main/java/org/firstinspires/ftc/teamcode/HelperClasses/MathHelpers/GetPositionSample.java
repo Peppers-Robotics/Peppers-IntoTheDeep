@@ -40,6 +40,7 @@ public class GetPositionSample {
 
     public static double middleX = 630, middleY = -1600;
 
+    @Deprecated
     public static LLResultTypes.DetectorResult getOptimalResultSmort(LLResult camera, int targetID){
         List<LLResultTypes.DetectorResult> detections = camera.getDetectorResults();
 
@@ -54,7 +55,7 @@ public class GetPositionSample {
 
             if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo && // not close to a bar
                     distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) + centerToExtendo // not too far away
-                    && getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y + Localizer.getCurrentPosition().y < halfYTerrain
+                    /*&& getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y + Localizer.getCurrentPosition().y < halfYTerrain*/
                     //TODO: putini vecini aproape
 
             ){
@@ -84,7 +85,7 @@ public class GetPositionSample {
             if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) - centerToExtendo){
                 double lateralT = getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y;
                 double score = Math.sqrt(detection.getTargetXPixels() * detection.getTargetXPixels() + detection.getTargetYPixels() * detection.getTargetYPixels());
-                if(Localizer.getCurrentPosition().y + lateralT < middleY) score = 1e8;
+//                if(Localizer.getCurrentPosition().y + lateralT < middleY) score = 1e8;
                 if(score < min){
                     id = i;
                     min = score;
@@ -103,8 +104,7 @@ public class GetPositionSample {
         return new SparkFunOTOS.Pose2D(x, y, 0);
     }
 
-    public static SparkFunOTOS.Pose2D getExtendoRotPairByField(SparkFunOTOS.Pose2D s){
-        SparkFunOTOS.Pose2D R = Localizer.getCurrentPosition();
+    public static SparkFunOTOS.Pose2D getExtendoRotPairByField(SparkFunOTOS.Pose2D s, SparkFunOTOS.Pose2D R){
 //        s = new SparkFunOTOS.Pose2D(R.x - s.x, R.y - s.y, 0);
 //        double h = Math.atan2((s.y - R.y), (s.x - R.x));
         double r = Localizer.getDistanceFromTwoPoints(s, R);
@@ -133,21 +133,15 @@ public class GetPositionSample {
         return new SparkFunOTOS.Pose2D(extendoDist, fwd, rot);
     }
     public static SparkFunOTOS.Pose2D getPositionRelativeToFiled(double tx, double ty, SparkFunOTOS.Pose2D R){
-        if(Localizer.pinPoint == null){
-            RobotLog.e("Localizer not initialized, use `Localizer.Initialize(hardwareMap);`");
-        }
         SparkFunOTOS.Pose2D p = getPositionRelativeToRobot(tx, ty);
-        double omega = Math.PI + R.h - getExtendoRotPair(tx, ty).h;
+        double d = Math.hypot(p.x, p.y);
+        double t = Math.atan(p.y / p.x);
+        double A = Math.PI - R.h - t;
 
-        omega = Localizer.normalizeRadians(omega);
+        double x = d * Math.sin(A);
+        double y = d * Math.cos(A);
 
-        double d = Math.sqrt(p.x * p.x + p.y * p.y);
-        Robot.telemetry.addData("omega", Math.toDegrees(omega));
-
-        double x = -R.x + d * Math.cos(omega);
-        double y = -R.y - d * Math.sin(omega);
-
-        return new SparkFunOTOS.Pose2D(x, y, 0);
+        return new SparkFunOTOS.Pose2D(R.x - x, R.y - y, 0);
     }
 
 }

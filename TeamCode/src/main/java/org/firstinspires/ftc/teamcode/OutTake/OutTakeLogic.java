@@ -21,13 +21,13 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 200, ElevatorScoreSample2 = 700; // 700
+    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 200, ElevatorScoreSample2 = 750; // 700
     public static double ElevatorScoreSpecimen = 310;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 235, PivotScoreSample = 0; // 220
-    public static double ArmTakeSpecimen = 330, PivotTakeSpecimen = 0;
-    public static double ArmScoreSpecimen = 105, PivotScoreSpecimen = 0;
-    public static double ArmIdle = -1, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = -1;
+    public static double ArmTakeSpecimen = 324, PivotTakeSpecimen = 0;
+    public static double ArmScoreSpecimen = 95, PivotScoreSpecimen = 0;
+    public static double ArmIdle = -13, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = -13;
     public static boolean save2 = false;
     public static double coeff = 5;
     public static double TakeSpecimenExtension = 0.31, TransferExtension = 0.3, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.3;
@@ -94,7 +94,7 @@ public class OutTakeLogic {
                         Controls.GrabSpecimen = false;
                         CurrentState = States.IDLE_TAKE_SPECIMEN;
                     }
-                    if (Controls.Transfer && Storage.hasTeamPice()) {
+                    if (Controls.Transfer /*&& Storage.hasTeamPice()*/) {
 
                         currentTask = new Scheduler();
                         {
@@ -293,7 +293,13 @@ public class OutTakeLogic {
                                     public boolean Run() {
                                         Arm.setArmAngle(ArmScoreSample);
                                         Arm.setPivotAngle(PivotScoreSample);
-                                        return Arm.motionCompleted() && Elevator.getCurrentPosition() > ElevatorScoreSample - 200;
+                                        return /*Arm.motionCompleted() && */Elevator.getCurrentPosition() > ElevatorScoreSample - 200;
+                                    }
+                                })
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
+                                        return true;
                                     }
                                 });
                     }

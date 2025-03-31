@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 public class MainOpMode extends LinearOpMode {
     public static boolean isClimbing = false;
     public static final double tSlow = 0.5, rotSlow = 0.4;
-    public double rotSpeed = 0.8, tSpeed = 0.6;
+    public double rotSpeed = 0.8, tSpeed = 1;
 
     public static double getSquaredSigned(double h){
         return Math.signum(h) * (h * h);
