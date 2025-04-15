@@ -85,8 +85,8 @@ public class Controls {
         } else ClimbingHelp = false;
 
         if(gamepad1.wasPressed.ps){
-            if(Storage.sensor.isLightOn()) Storage.sensor.enableLed(false);
-            else Storage.sensor.enableLed(true);
+//            if(Storage.sensor.isLightOn()) Storage.sensor.enableLed(false);
+//            else Storage.sensor.enableLed(true);
         }
 
         gamepad1.update();

@@ -68,7 +68,7 @@ public class IntakeLogic extends GenericController {
                 Extendo.DISABLE = true;
                 DropDown.setDown(0);
 
-                ActiveIntake.Reverse(0.6);
+//                ActiveIntake.Reverse(0.6);
                 ActiveIntake.Block();
 
                 Extendo.motor.setPower(-1);
@@ -105,18 +105,18 @@ public class IntakeLogic extends GenericController {
             wasDriverActivated = false;
         }
         if(gamepad2.right_trigger >= 0.05 && (ActiveIntake.isOff() || wasDriverActivated)){
-            if(Storage.hasTeamPice() && false) {
-                if(blocker.seconds() >= 0.15) {
-                    ActiveIntake.Block();
-                    ActiveIntake.Reverse(0.5);
-                    DropDown.setDown(0);
-                }
-            } else {
+//            if(Storage.hasTeamPice() && false) {
+//                if(blocker.seconds() >= 0.15) {
+//                    ActiveIntake.Block();
+//                    ActiveIntake.Reverse(0.5);
+//                    DropDown.setDown(0);
+//                }
+//            } else {
                 blocker.reset();
                 ActiveIntake.powerOn(1);
                 ActiveIntake.Unblock();
                 DropDown.setDown(gamepad2.right_trigger);
-            }
+//            }
             //unblock
             wasDriverActivated = true;
         }
