@@ -36,18 +36,18 @@ public class Storage {
     }
 
     public static SpecimenType getStorageStatus(){
-        return SpecimenType.YELLOW;
-//        if(sensor.getDistance(DistanceUnit.CM) >= 4.2) return SpecimenType.NONE;
-//
-//        switch (sensor.getColorSeenBySensor()){
-//            case RED:
-//                return SpecimenType.RED;
-//            case BLUE:
-//                return SpecimenType.BLUE;
-//            case YELLOW:
-//                return SpecimenType.YELLOW;
-//            default:
-//                return SpecimenType.NONE;
-//        }
+//        return SpecimenType.YELLOW;
+        if(sensor.getDistance(DistanceUnit.CM) >= 4.2) return SpecimenType.NONE;
+
+        switch (sensor.getColorSeenBySensor()){
+            case RED:
+                return SpecimenType.RED;
+            case BLUE:
+                return SpecimenType.BLUE;
+            case YELLOW:
+                return SpecimenType.YELLOW;
+            default:
+                return SpecimenType.NONE;
+        }
     }
 }

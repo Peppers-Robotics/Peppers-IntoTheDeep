@@ -2,7 +2,7 @@
 <Robot type="FirstInspires-FTC">
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
-<!--            <FastColorRangeSensor name="Storage" port="0" bus="0" />-->
+            <FastColorRangeSensor name="Storage" port="0" bus="0" />
 <!--            <bno085imu name="extIMU" port="1" bus="0" />-->
             <LynxEmbeddedIMU name="imuProst" port="2" bus="0" />
         </LynxModule>

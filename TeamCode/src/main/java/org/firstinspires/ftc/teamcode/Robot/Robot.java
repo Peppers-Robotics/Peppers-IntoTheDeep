@@ -186,8 +186,8 @@ public class Robot {
         Localizer.Initialize(hm);
     }
     public static void InitializeStorage(HardwareMap hm){
-//        Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
-        Storage.sensor = null;
+        Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
+//        Storage.sensor = null;
     }
     public static void InitializeExtendo(){
         Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
