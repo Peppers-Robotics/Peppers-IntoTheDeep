@@ -134,14 +134,15 @@ public class GetPositionSample {
     }
     public static SparkFunOTOS.Pose2D getPositionRelativeToFiled(double tx, double ty, SparkFunOTOS.Pose2D R){
         SparkFunOTOS.Pose2D p = getPositionRelativeToRobot(tx, ty);
+        p.x *= -1;
         double d = Math.hypot(p.x, p.y);
         double t = Math.atan(p.y / p.x);
-        double A = Math.PI - R.h - t;
+        double A = R.h + t - Math.PI;
 
         double x = d * Math.sin(A);
         double y = d * Math.cos(A);
 
-        return new SparkFunOTOS.Pose2D(R.x - x, R.y - y, 0);
+        return new SparkFunOTOS.Pose2D(R.x + x, R.y + y, 0);
     }
 
 }

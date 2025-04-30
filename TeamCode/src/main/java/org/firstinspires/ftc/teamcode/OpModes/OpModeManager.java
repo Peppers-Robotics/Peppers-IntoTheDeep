@@ -59,7 +59,7 @@ public class OpModeManager {
         Extendo.Extend(0);
 
         Elevator.setTargetPosition(Elevator.getTargetPosition());
-        Climb.DeactivateWheelie();
+//        Climb.DeactivateWheelie();
         Climb.DisengagePTO();
         Arm.setArmAngle(Arm.getCurrentArmAngle());
 

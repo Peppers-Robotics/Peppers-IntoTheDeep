@@ -193,6 +193,9 @@ public class Robot {
         Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
         Extendo.encoder = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        MotorConfigurationType m = Extendo.motor.getMotorType();
+        m.setAchieveableMaxRPMFraction(1);
+        Extendo.motor.setMotorType(m);
     }
     public static void InitializeDropDown(){
         DropDown.servo = new ServoPlus(ExpansionHubServos, 3, Servo.Direction.FORWARD);
