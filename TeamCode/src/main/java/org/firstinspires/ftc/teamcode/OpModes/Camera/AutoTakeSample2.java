@@ -72,7 +72,7 @@ public class AutoTakeSample2 extends LinearOpMode {
                     @Override
                     public boolean Run() {
                         res = ll.getLatestResult();
-                        return res != null && res.isValid() && GetPositionSample.hasId(res, id);
+                        return res != null && res.isValid() && GetPositionSample.hasId(res, id) && gamepad1.circle;
                     }
                 })
                 .addTask(new Task() {
@@ -93,7 +93,7 @@ public class AutoTakeSample2 extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y, Localizer.getCurrentPosition().h +
+                        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y,
                                 GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(tx, ty, capture), Localizer.getCurrentPosition()).h
                         ));
                         run = true;
@@ -103,7 +103,8 @@ public class AutoTakeSample2 extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return Localizer.getAngleDifference(Chassis.getTargetPosition().h, Localizer.getCurrentPosition().h) < Math.toRadians(5);
+                        return Localizer.getAngleDifference(Chassis.getTargetPosition().h, Localizer.getCurrentPosition().h) < Math.toRadians(5) &&
+                                Localizer.getAngleDifference(Localizer.getVelocity().h, 0) < Math.toRadians(3);
                     }
                 })
                 .addTask(new Task() {
@@ -112,6 +113,7 @@ public class AutoTakeSample2 extends LinearOpMode {
                         Extendo.Extend(
                                 (int) GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(tx, ty, capture), Localizer.getCurrentPosition()).x - 35
                         );
+                        Robot.telemetry.addData("Extendo TP", Extendo.getTargetPosition());
                         return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 10;
                     }
                 })

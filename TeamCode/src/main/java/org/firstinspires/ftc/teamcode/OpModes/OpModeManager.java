@@ -171,23 +171,23 @@ public class OpModeManager {
 
         if(gamepad1.options) {
             Storage.getStorageStatus();
-//            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
-//
-//            Robot.telemetry.addData("yellow confidence",
-//                    Colors.getColorDistance(Colors.ColorType.YELLOW.getColor(),
-//                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-//
-//            Robot.telemetry.addData("red confidence",
-//                    Colors.getColorDistance(Colors.ColorType.RED.getColor(),
-//                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-//
-//            Robot.telemetry.addData("blue confidence",
-//                    Colors.getColorDistance(Colors.ColorType.BLUE.getColor(),
-//                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-//
-//            Robot.telemetry.addData("nothing confidence",
-//                    Colors.getColorDistance(Colors.ColorType.NONE.getColor(),
-//                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
+
+            Robot.telemetry.addData("yellow confidence",
+                    Colors.getColorDistance(Colors.ColorType.YELLOW.getColor(),
+                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+
+            Robot.telemetry.addData("red confidence",
+                    Colors.getColorDistance(Colors.ColorType.RED.getColor(),
+                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+
+            Robot.telemetry.addData("blue confidence",
+                    Colors.getColorDistance(Colors.ColorType.BLUE.getColor(),
+                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+
+            Robot.telemetry.addData("nothing confidence",
+                    Colors.getColorDistance(Colors.ColorType.NONE.getColor(),
+                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
         }
 
     }
