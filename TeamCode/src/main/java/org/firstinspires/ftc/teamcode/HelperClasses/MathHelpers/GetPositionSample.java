@@ -19,7 +19,10 @@ import java.util.stream.Collectors;
 
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(15), h = 270.78 , cameraOffsetX = 100, cameraOffsetY = 140.148, centerToExtendo = 185; // COY = 140
+    public static double initialAngle = Math.toRadians(15), h = 270.78, centerToExtendo = 185;// COY = 140
+            public static double cameraOffsetX = 140.148, cameraOffsetY = 100; //schimba la punctul cel mai indepartat dreapta jos a robotului
+            public static double centerOffsetToDownRightX = -135.64,centerOffsetToDownRightY = 158.502;
+            public static double CameraAngleFromCenterPoint = Math.atan(cameraOffsetY/cameraOffsetX);//de schimbat
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
@@ -142,6 +145,67 @@ public class GetPositionSample {
         double y = d * Math.cos(A);
 
         return new SparkFunOTOS.Pose2D(R.x - x, R.y - y, 0);
+    }
+
+    /* vlad */
+
+    public static SparkFunOTOS.Pose2D getSampleRelativeToField(SparkFunOTOS.Pose2D cameraPos, double angleRobot, SparkFunOTOS.Pose2D samplePos) {
+        double angleTotal = angleRobot - Math.tan(samplePos.x / samplePos.y);
+        if(angleTotal < 0)
+            angleTotal += 2*Math.PI;
+        else if(angleTotal > Math.PI * 2)
+            angleTotal -= Math.PI * 2;
+        double ipo = Math.sqrt(samplePos.x*samplePos.x + samplePos.y*samplePos.y);
+        SparkFunOTOS.Pose2D translatedToCameraPos;
+
+        if(angleTotal > 0 && angleTotal <= Math.PI/2)
+            translatedToCameraPos = new SparkFunOTOS.Pose2D(ipo*Math.cos(angleTotal),ipo*Math.sin(angleTotal),0);
+        else if(angleTotal > Math.PI/2 && angleTotal <= Math.PI)
+            translatedToCameraPos = new SparkFunOTOS.Pose2D(-1*ipo*Math.sin(angleTotal-Math.PI/2),ipo*Math.cos(angleTotal-Math.PI/2),0);
+        else if(angleTotal > Math.PI && angleTotal <= Math.PI*3/2)
+            translatedToCameraPos = new SparkFunOTOS.Pose2D(-1*ipo*Math.cos(angleTotal-Math.PI),-1*ipo*Math.sin(angleTotal-Math.PI),0);
+        else
+            translatedToCameraPos = new SparkFunOTOS.Pose2D(ipo*Math.sin(angleTotal-Math.PI*3/2),-1*ipo*Math.cos(angleTotal-Math.PI*3/2),0);
+
+        //double x_sample_global = cameraPos.x + (samplePos.x * Math.cos(angleRobot) - samplePos.y * Math.sin(angleRobot));
+        //double y_sample_global = cameraPos.y + (samplePos.x * Math.sin(angleRobot) + samplePos.y * Math.cos(angleRobot));
+
+        return new SparkFunOTOS.Pose2D(translatedToCameraPos.x + cameraPos.x,translatedToCameraPos.y + cameraPos.y,0);
+    }
+
+    public static SparkFunOTOS.Pose2D getSamplePositionRelativeToCamera(double tx, double ty){
+
+        double Y = h * Math.tan(Math.PI / 2 - initialAngle + Math.toRadians(ty));//doesnt work
+        double X = Math.tan(Math.toRadians(tx)) * Y;
+        return new SparkFunOTOS.Pose2D(X, Y, 0);
+    }
+
+    public static SparkFunOTOS.Pose2D normalize_pos(SparkFunOTOS.Pose2D posRobot){
+        double normalizedDegrees = 0;
+        if(Math.signum(posRobot.h) == 1)
+            normalizedDegrees =  posRobot.h;
+        else
+            normalizedDegrees =  Math.PI*2 + posRobot.h;
+
+        /*double NaturalDisplacement = Math.PI/2;
+
+        normalizedDegrees += NaturalDisplacement;
+        if(normalizedDegrees > Math.PI*2)
+            normalizedDegrees -= Math.PI*2;
+*/
+        return new SparkFunOTOS.Pose2D(-posRobot.x,-posRobot.y, normalizedDegrees) ;
+    }
+
+    public static SparkFunOTOS.Pose2D CameraRelativeToField(SparkFunOTOS.Pose2D positionRobot){
+
+        SparkFunOTOS.Pose2D NormalizepositionRobot = normalize_pos(positionRobot);
+
+        double z = Math.sqrt(cameraOffsetX*cameraOffsetX + cameraOffsetY*cameraOffsetY);
+
+        double XcameraField = NormalizepositionRobot.x + z * Math.cos((positionRobot.h + CameraAngleFromCenterPoint)%(2*Math.PI));
+        double YcameraField = NormalizepositionRobot.y + z * Math.sin((positionRobot.h + CameraAngleFromCenterPoint)%(2*Math.PI));
+
+        return new SparkFunOTOS.Pose2D(XcameraField,YcameraField,0);
     }
 
 }

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.GetPositionSample;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -54,9 +55,9 @@ public class AutoTakeSample extends LinearOpMode {
         Robot.InitializeHubs(hardwareMap);
         Robot.InitializeFull(hardwareMap);
         Robot.enable();
-        DropDown.setDown(0);
-        Extendo.Extend(0);
-        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
+        //DropDown.setDown(0);
+        //Extendo.Extend(0);
+        //Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
 
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "camera");
 
@@ -144,22 +145,51 @@ public class AutoTakeSample extends LinearOpMode {
 
         while(opModeIsActive()){
             Robot.clearCache();
-            task.update();
-            if(res != null) {
-//                Robot.telemetry.addData("rot", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h);
-//                Robot.telemetry.addData("ext", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);
-                Robot.telemetry.addData("pos forward", GetPositionSample.getPositionRelativeToRobot(tx, ty).x);
-                Robot.telemetry.addData("pos lateral", GetPositionSample.getPositionRelativeToRobot(tx, ty).y);
-                 SparkFunOTOS.Pose2D r = GetPositionSample.getPositionRelativeToFiled(tx, ty, capture);
-                Robot.telemetry.addData("field pos", r.x + ", " + r.y );
+            //task.update();
+            run = true;
+            res = ll.getLatestResult();
+            Robot.telemetry.addData("camera results isValid", res!=null && res.isValid());
+            if(res != null && res.isValid() && GetPositionSample.hasId(res, id)){
+                LLResultTypes.DetectorResult result = GetPositionSample.getOptimalResult(res, id);
+                tx = result.getTargetXDegrees();
+                ty = result.getTargetYDegrees();
             }
 
-            hz = 1 / t.seconds();
-            Extendo.update();
-            if(run)
-                Chassis.Update();
+            Robot.telemetry.addData("tx", tx);
+            Robot.telemetry.addData("ty", ty);
+
+            SparkFunOTOS.Pose2D pos = Localizer.getCurrentPosition();
+            SparkFunOTOS.Pose2D normalizedPos = GetPositionSample.normalize_pos(pos);
+            Robot.telemetry.addData("x robot", normalizedPos.x);
+            Robot.telemetry.addData("y robot", normalizedPos.y);
+            Robot.telemetry.addData("h robot", normalizedPos.h);
+            SparkFunOTOS.Pose2D poscamera = GetPositionSample.CameraRelativeToField(pos);
+            Robot.telemetry.addData("x camera", poscamera.x);
+            Robot.telemetry.addData("y camera", poscamera.y);
+
+
+            if(res != null) {
+                SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
+                    Robot.telemetry.addData("pos sample x", pos_sample.x);
+                    Robot.telemetry.addData("pos sample y", pos_sample.y);
+                SparkFunOTOS.Pose2D pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
+                Robot.telemetry.addData("pos sample x relevant to field", pos_sample_field.x);
+                Robot.telemetry.addData("pos sample y relevant to field", pos_sample_field.y);
+                }
+
+
+
+
+
+                //hz = 1 / t.seconds();
+                //Extendo.update();
+                //if(run)
+                //    Chassis.Update();
+                //Localizer.Update();
+                //Robot.telemetry.addData("rot tp", Math.toDegrees(Chassis.getTargetPosition().h));
+
+            Robot.telemetry.update();
             Localizer.Update();
-            Robot.telemetry.addData("rot tp", Math.toDegrees(Chassis.getTargetPosition().h));
 
         }
 
