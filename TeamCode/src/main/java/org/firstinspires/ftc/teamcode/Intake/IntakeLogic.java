@@ -73,7 +73,7 @@ public class IntakeLogic extends GenericController {
 
                 Extendo.motor.setPower(-1);
 //                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 4 && Math.abs(Extendo.getCurrentVelocity()) < 3 && Extendo.getCurrentPosition() < 10 || gamepad2.wasPressed.left_bumper)){
+                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 0.5 && Math.abs(Extendo.getCurrentVelocity()) < 3 && Extendo.getCurrentPosition() < 10 || gamepad2.wasPressed.left_bumper)){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;

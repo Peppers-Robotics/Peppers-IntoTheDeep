@@ -194,6 +194,7 @@ public class Robot {
         Extendo.encoder = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         MotorConfigurationType m = Extendo.motor.getMotorType();
+        Extendo.motor.setMotorEnable();
         m.setAchieveableMaxRPMFraction(1);
         Extendo.motor.setMotorType(m);
     }
