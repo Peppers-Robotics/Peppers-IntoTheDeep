@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers;
 import android.graphics.Point;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.ftc.bumblebee.Localizers.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -106,14 +105,18 @@ public class GetPositionSample {
     }
 
     public static SparkFunOTOS.Pose2D getExtendoRotPairByField(SparkFunOTOS.Pose2D s, SparkFunOTOS.Pose2D R){
-        Pose2d n = new Pose2d(s.x - R.x, s.y - R.y);
-        double rot = Math.atan2(n.y, n.x);
-        double dist = Localizer.getDistanceFromTwoPoints(s, R);
+//        s = new SparkFunOTOS.Pose2D(R.x - s.x, R.y - s.y, 0);
+//        double h = Math.atan2((s.y - R.y), (s.x - R.x));
+        double r = Localizer.getDistanceFromTwoPoints(s, R);
+        double h = Math.PI - Math.acos((s.x - R.x) / r);
+        if(s.y - R.y < 0) h = Math.PI * 2 - h;
 
-        double extendiDist = MMToEncoderTicks(dist);
+        h = Localizer.normalizeRadians(h);
 
-        double off = Extendo.getMaxPosition();
-        return new SparkFunOTOS.Pose2D(extendiDist, 0, rot + Math.PI);
+        double e = Localizer.getDistanceFromTwoPoints(s, R) - centerToExtendo;
+        double forward = e - AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition());
+        if(forward < 0) forward = 0;
+        return new SparkFunOTOS.Pose2D(e, forward, -h);
     }
     public static SparkFunOTOS.Pose2D getPositionRelativeToRobot(double tx, double ty){
         double Y = h * Math.tan(Math.PI / 2 - initialAngle + Math.toRadians(ty));
@@ -131,28 +134,14 @@ public class GetPositionSample {
     }
     public static SparkFunOTOS.Pose2D getPositionRelativeToFiled(double tx, double ty, SparkFunOTOS.Pose2D R){
         SparkFunOTOS.Pose2D p = getPositionRelativeToRobot(tx, ty);
-        double alphaC = R.h;
-        if(alphaC < 0) alphaC += 2*Math.PI;
-        double A = 0, x = 0, y = 0;
+        p.x *= -1;
         double d = Math.hypot(p.x, p.y);
-        Robot.telemetry.addData("alpchaC", alphaC);
-        if(alphaC >= 0 && alphaC < Math.PI / 2){
-            A = Math.abs(R.h) + Math.atan(p.y / p.x);
-            x = -Math.cos(A) * d;
-            y = -Math.sin(A) * d;
-        } else if(alphaC >= Math.PI / 2 && alphaC < Math.PI){
-            A = Math.PI - Math.abs(R.h) + Math.atan(p.y / p.x);
-            x = Math.cos(A) * d;
-            y = -Math.sin(A) * d;
-        } else if(alphaC >= Math.PI && alphaC < 3*Math.PI / 2.f){
-            A = Math.PI - Math.abs(R.h) - Math.atan(p.y / p.x);
-            x = Math.cos(A) * d;
-            y = Math.sin(A) * d;
-        } else {
-            A = Math.abs(R.h) - Math.atan(p.y / p.x);
-            x = -Math.cos(A) * d;
-            y = Math.sin(A) * d;
-        }
+        double t = Math.atan(p.y / p.x);
+        double A = R.h + t - Math.PI;
+
+        double x = d * Math.sin(A);
+        double y = d * Math.cos(A);
+
         return new SparkFunOTOS.Pose2D(R.x + x, R.y + y, 0);
     }
 
