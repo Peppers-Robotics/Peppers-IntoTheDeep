@@ -2,6 +2,7 @@ repositories {
     mavenCentral()
     google() // Needed for androidx
     maven { url = 'https://maven.brott.dev/' }
+    maven { url = 'https://jitpack.io' }
 }
 dependencies {
     implementation 'org.firstinspires.ftc:Inspection:10.1.0'
@@ -21,5 +22,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
     implementation 'org.json:json:20240303'
+//    implementation 'com.googlecode.soundlibs:mp3spi:1.9.5-1'
+//    implementation 'com.googlecode.soundlibs:jl:1.0.1-1'
+//    implementation 'com.googlecode.soundlibs:tritonus-share:0.3.7-1'
+//    implementation ''
 }
 

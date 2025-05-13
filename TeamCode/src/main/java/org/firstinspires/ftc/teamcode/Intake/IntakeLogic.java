@@ -48,7 +48,7 @@ public class IntakeLogic extends GenericController {
                     Extendo.DISABLE = true;
 //                Extendo.Extend((int) (Extendo.getTargetPosition() + 35 * (gamepad1.right_stick_y * gamepad1.right_stick_y)));
 //                Extendo.update();
-                    if (Extendo.getCurrentPosition() < 0 && gamepad1.right_stick_y > 0){
+                    if (Extendo.getCurrentPosition() < 10 && gamepad1.right_stick_y > 0){
                         Extendo.motor.setPower(0);
                         break;
                     }
@@ -61,7 +61,7 @@ public class IntakeLogic extends GenericController {
                 } else {
                     Extendo.motor.setPower(0);
                 }
-                Robot.telemetry.addData("tp", Extendo.getTargetPosition());
+                Robot.telemetry.addData("tp", Extendo.getCurrentPosition());
                 time2.reset();
                 break;
             case RETRACT:
@@ -73,7 +73,7 @@ public class IntakeLogic extends GenericController {
 
                 Extendo.motor.setPower(-1);
 //                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 4 && Math.abs(Extendo.getCurrentVelocity()) < 3 && Extendo.getCurrentPosition() < 10 || gamepad2.wasPressed.left_bumper)){
+                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 2 && Math.abs(Extendo.getCurrentVelocity()) < 3 && Extendo.getCurrentPosition() < 10 || gamepad2.wasPressed.left_bumper)){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;
