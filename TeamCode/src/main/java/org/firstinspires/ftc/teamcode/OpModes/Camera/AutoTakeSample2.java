@@ -87,6 +87,12 @@ public class AutoTakeSample2 extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
+                        return gamepad1.square;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
                         Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y,
                                 GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(tx, ty, capture), Localizer.getCurrentPosition()).h
                         ));
@@ -97,16 +103,10 @@ public class AutoTakeSample2 extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return gamepad1.square;
+                        return Localizer.getAngleDifference(Chassis.getTargetPosition().h, Localizer.getCurrentPosition().h) < Math.toRadians(5) &&
+                                Localizer.getAngleDifference(Localizer.getVelocity().h, 0) < Math.toRadians(3);
                     }
                 })
-//                .addTask(new Task() {
-//                    @Override
-//                    public boolean Run() {
-//                        return Localizer.getAngleDifference(Chassis.getTargetPosition().h, Localizer.getCurrentPosition().h) < Math.toRadians(5) &&
-//                                Localizer.getAngleDifference(Localizer.getVelocity().h, 0) < Math.toRadians(3);
-//                    }
-//                })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {

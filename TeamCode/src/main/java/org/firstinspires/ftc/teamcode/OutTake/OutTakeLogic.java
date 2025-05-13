@@ -119,9 +119,10 @@ public class OutTakeLogic {
                                         Elevator.power = 1;
                                         Extendo.PowerOnToTransfer = true;
                                         Extendo.Extend(0);
-                                        return Elevator.getCurrentPosition() <= 5 && Extendo.getCurrentPosition() <= 3;
+                                        return true;
                                     }
                                 })
+                                .waitSeconds(0.15)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
@@ -129,6 +130,7 @@ public class OutTakeLogic {
                                         return true;
                                     }
                                 })
+                                .waitSeconds(0.1)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
@@ -148,6 +150,7 @@ public class OutTakeLogic {
                                         return true;
                                     }
                                 })
+                                .waitSeconds(0.1)
 
                         ;
                     }

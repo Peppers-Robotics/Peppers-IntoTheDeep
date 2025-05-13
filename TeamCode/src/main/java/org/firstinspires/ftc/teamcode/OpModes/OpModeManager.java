@@ -188,7 +188,6 @@ public class OpModeManager {
             Robot.telemetry.addData("nothing confidence",
                     Colors.getColorDistance(Colors.ColorType.NONE.getColor(),
                             new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-            Robot.telemetry.addData("Extendo Pos", Extendo.getCurrentPosition());
         }
 
     }
