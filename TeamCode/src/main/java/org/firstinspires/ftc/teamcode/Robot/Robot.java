@@ -191,7 +191,7 @@ public class Robot {
     }
     public static void InitializeExtendo(){
         Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.REVERSE);
-        Extendo.encoder = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.REVERSE);
+        Extendo.encoder = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         MotorConfigurationType m = Extendo.motor.getMotorType();
         m.setAchieveableMaxRPMFraction(1);

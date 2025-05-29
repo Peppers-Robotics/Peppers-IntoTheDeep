@@ -48,7 +48,7 @@ public class IntakeLogic extends GenericController {
                     Extendo.DISABLE = true;
 //                Extendo.Extend((int) (Extendo.getTargetPosition() + 35 * (gamepad1.right_stick_y * gamepad1.right_stick_y)));
 //                Extendo.update();
-                    if (Extendo.getCurrentPosition() < 0 && gamepad1.right_stick_y > 0){
+                    if (Extendo.getCurrentPosition() < 10 && gamepad1.right_stick_y > 0){
                         Extendo.motor.setPower(0);
                         break;
                     }
@@ -61,19 +61,19 @@ public class IntakeLogic extends GenericController {
                 } else {
                     Extendo.motor.setPower(0);
                 }
-                Robot.telemetry.addData("tp", Extendo.getTargetPosition());
+                Robot.telemetry.addData("tp", Extendo.getCurrentPosition());
                 time2.reset();
                 break;
             case RETRACT:
                 Extendo.DISABLE = true;
                 DropDown.setDown(0);
 
-//                ActiveIntake.Reverse(0.6);
+                ActiveIntake.Reverse(0.6);
                 ActiveIntake.Block();
 
                 Extendo.motor.setPower(-1);
 //                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 4 && Math.abs(Extendo.getCurrentVelocity()) < 3 && Extendo.getCurrentPosition() < 10 || gamepad2.wasPressed.left_bumper)){
+                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 2 && Math.abs(Extendo.getCurrentVelocity()) < 3 && Extendo.getCurrentPosition() < 10 || gamepad2.wasPressed.left_bumper)){
                     Extendo.motor.setPower(0);
                     ActiveIntake.powerOff();
                     reset = true;
@@ -87,7 +87,7 @@ public class IntakeLogic extends GenericController {
                         ActiveIntake.powerOff();
                         ActiveIntake.Block();
                         reset = false;
-//                        if(Storage.hasTeamPice())
+                        if(Storage.hasTeamPice())
                             Controls.Transfer = true;
                     }
                 } else time.reset();
@@ -105,18 +105,18 @@ public class IntakeLogic extends GenericController {
             wasDriverActivated = false;
         }
         if(gamepad2.right_trigger >= 0.05 && (ActiveIntake.isOff() || wasDriverActivated)){
-//            if(Storage.hasTeamPice() && false) {
+            if(Storage.hasTeamPice()) {
 //                if(blocker.seconds() >= 0.15) {
-//                    ActiveIntake.Block();
-//                    ActiveIntake.Reverse(0.5);
-//                    DropDown.setDown(0);
+                    ActiveIntake.Block();
+                    ActiveIntake.Reverse(0.5);
+                    DropDown.setDown(0);
 //                }
-//            } else {
+            } else {
                 blocker.reset();
                 ActiveIntake.powerOn(1);
                 ActiveIntake.Unblock();
                 DropDown.setDown(gamepad2.right_trigger);
-//            }
+            }
             //unblock
             wasDriverActivated = true;
         }
@@ -130,10 +130,10 @@ public class IntakeLogic extends GenericController {
         if(!Controls.ImogenDriver) {
             gamepad2.update();
         }
-//        if(Storage.hasTeamPice() && ActiveIntake.motor.getPower() < 0.2){
-//            ActiveIntake.Block();
-//        } else
-//            ActiveIntake.Unblock();
+        if(Storage.hasTeamPice() && ActiveIntake.motor.getPower() >= 0){
+            ActiveIntake.Block();
+        } else
+            ActiveIntake.Unblock();
         Robot.telemetry.addData("Intake State", state.toString());
 //        RobotLog.ii("Intake State", state.toString());
     }

@@ -70,6 +70,7 @@ public class OpModeManager {
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Claw.open();
         Chassis.Heading.setPidCoefficients(new PIDCoefficients(0.5, 0, 0));
+        Arm.setArmAngle(OutTakeLogic.ArmIdle);
         Rotation = 0;
         isClimbing = false;
     }

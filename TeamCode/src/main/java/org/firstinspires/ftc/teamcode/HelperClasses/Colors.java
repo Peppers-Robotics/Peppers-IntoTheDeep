@@ -13,13 +13,13 @@ public class Colors {
 
     }
     public enum ColorType {
-        BLUE(new Color(50, 110, 255)),
+        BLUE(new Color(105, 250, 440)),
 
-        RED(new Color(255, 116, 50)),
+        RED(new Color(375, 229, 114)),
 
-        YELLOW(new Color(200, 255, 50)),
+        YELLOW(new Color(600, 890, 237)),
 
-        NONE(new Color(160, 255, 180));
+        NONE(new Color(59, 100, 80));
 
         private final Color color;
 
