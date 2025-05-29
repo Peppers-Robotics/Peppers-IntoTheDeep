@@ -25,7 +25,7 @@ public class Climb {
     public static double pitch = 0;
     public static ElapsedTime time = new ElapsedTime();
     public static double EngagePTO1 = 180, EngagePTO2 = 200, DisengagePTO1 = 300, DisengagePTO2 = 170,
-                         EngageWheelie1 = 260, DisengageWheelie1 = 173, EngageWheelie2 = 100, DisengageWheelie2 = 195, climbArmIntertia = 310;
+                         EngageWheelie1 = 260, DisengageWheelie1 = 150, EngageWheelie2 = 100, DisengageWheelie2 = 228, climbArmIntertia = 310;
 
     public static void EngagePTO(){
         PTO1.setAngle(EngagePTO1);
@@ -97,6 +97,7 @@ public class Climb {
                     @Override
                     public boolean Run() {
                         Elevator.Disable = false;
+                        DeactivateWheelie();
                         MotorConfigurationType mct = Elevator.motor.getMotorType();
 //                        mct.setAchieveableMaxRPMFraction(0.7);
 //                        Elevator.motor.setMotorType(mct);
@@ -193,9 +194,9 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.motor.setPower(0.2);
+                        Extendo.motor.setPower(0.1);
                         if(Elevator.getCurrentPosition() <= 0){
-                            Elevator.setTargetPosition(0);
+                            Elevator.setTargetPosition(-20);
                             return true;
                         }
                         return false;

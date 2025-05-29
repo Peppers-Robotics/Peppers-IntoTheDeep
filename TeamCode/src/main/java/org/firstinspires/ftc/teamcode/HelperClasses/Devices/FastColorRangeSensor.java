@@ -72,11 +72,12 @@ public class FastColorRangeSensor extends RevColorSensorV3 implements HardwareDe
                 p.G = (int) (this.green() * this.lowPassFilter + p.G * (1 - lowPassFilter));
                 p.R = (int) (this.red() * this.lowPassFilter + p.R * (1 - lowPassFilter));
                 p.B = (int) (this.blue() * this.lowPassFilter + p.B * (1 - lowPassFilter));
-                p.A = Math.max(Math.max(p.G, p.R), p.B);
+                RGB = p;
+//                p.A = Math.max(Math.max(p.G, p.R), p.B);
 
-                RGB.R = Range.clip(p.R / p.A * 255, 0, 255);
-                RGB.G = Range.clip(p.G / p.A * 255, 0, 255);
-                RGB.B = Range.clip(p.B / p.A * 255, 0, 255);
+//                RGB.R = Range.clip(p.R / p.A * 255, 0, 255);
+//                RGB.G = Range.clip(p.G / p.A * 255, 0, 255);
+//                RGB.B = Range.clip(p.B / p.A * 255, 0, 255);
 
 //                RGB.R = Range.scale(p.R, 0, 1024, 0, 255);
 //                RGB.G = Range.scale(p.G, 0, 1024, 0, 255);

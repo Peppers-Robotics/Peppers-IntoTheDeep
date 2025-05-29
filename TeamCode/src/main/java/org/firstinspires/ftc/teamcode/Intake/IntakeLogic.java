@@ -106,11 +106,11 @@ public class IntakeLogic extends GenericController {
         }
         if(gamepad2.right_trigger >= 0.05 && (ActiveIntake.isOff() || wasDriverActivated)){
             if(Storage.hasTeamPice()) {
-                if(blocker.seconds() >= 0.15) {
+//                if(blocker.seconds() >= 0.15) {
                     ActiveIntake.Block();
                     ActiveIntake.Reverse(0.5);
                     DropDown.setDown(0);
-                }
+//                }
             } else {
                 blocker.reset();
                 ActiveIntake.powerOn(1);
@@ -130,7 +130,7 @@ public class IntakeLogic extends GenericController {
         if(!Controls.ImogenDriver) {
             gamepad2.update();
         }
-        if(Storage.hasTeamPice() && ActiveIntake.motor.getPower() < 0.2){
+        if(Storage.hasTeamPice() && ActiveIntake.motor.getPower() >= 0){
             ActiveIntake.Block();
         } else
             ActiveIntake.Unblock();

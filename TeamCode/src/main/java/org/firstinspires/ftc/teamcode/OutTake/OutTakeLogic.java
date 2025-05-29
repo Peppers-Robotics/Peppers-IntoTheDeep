@@ -26,7 +26,7 @@ public class OutTakeLogic {
     public static double ArmScoreSample = 235, PivotScoreSample = 0; // 220
     public static double ArmTakeSpecimen = 324, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 95, PivotScoreSpecimen = 0;
-    public static double ArmIdle = -5, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = -5;
+    public static double ArmIdle = -10, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = -10;
     public static boolean save2 = false;
     public static double coeff = 5;
     public static double TakeSpecimenExtension = 0.31, TransferExtension = 0.3, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.3;
@@ -353,7 +353,7 @@ public class OutTakeLogic {
                     }
                     break;
                 case IDLE_SCORE_SPECIMEN:
-                    Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * coeff);
+//                    Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * coeff);
                     if(Controls.gamepad2.wasPressed.right_bumper){
                         if(Extension.getPrecent() >= 0.2) Extension.Extend(0);
                         else Extendo.Extend(1);
