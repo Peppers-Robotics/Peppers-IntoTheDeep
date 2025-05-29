@@ -24,11 +24,15 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 @TeleOp
 @Config
 public class AutoTakeSample extends LinearOpMode {
-//    public static double initialLimeLightAngle = 25, h = 170, distanceFromCameraToExtendoY = 75, distanceFromCameraToExtendoX = 80;
+    //    public static double initialLimeLightAngle = 25, h = 170, distanceFromCameraToExtendoY = 75, distanceFromCameraToExtendoX = 80;
 //    public static final double h35 = 269.1, h30 = 272.19, h25 = 275.214, h20 = 278.157, h15 = 281.043, h10 = 283.7, h5 = 286.2526, h0 = 288.638;
     public static final double spool = 16, RA = 4.75;
     public static final int CPR = 28;
     public static double hz = 1;
+    public static boolean startgetsample = false;
+    public static boolean starttakeserios = false;
+    public static int limit_readings = 20;
+    public int readings = 0;
 
     public static int DistanceToExtendo(double d){
         return (int) (d / (2 * Math.PI * spool / RA)) * CPR;
@@ -52,13 +56,13 @@ public class AutoTakeSample extends LinearOpMode {
     public static int id = 2;
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot.InitializeHubs(hardwareMap);
         Robot.InitializeFull(hardwareMap);
         Robot.enable();
         //DropDown.setDown(0);
         //Extendo.Extend(0);
         //Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
 
+        SparkFunOTOS.Pose2D pos_sample_field = new SparkFunOTOS.Pose2D(0,0,0);
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "camera");
 
         run = false;
@@ -134,7 +138,7 @@ public class AutoTakeSample extends LinearOpMode {
                         return true;
                     }
                 })
-                ;
+        ;
         res = null;
 
 
@@ -155,38 +159,49 @@ public class AutoTakeSample extends LinearOpMode {
                 ty = result.getTargetYDegrees();
             }
 
-            Robot.telemetry.addData("tx", tx);
-            Robot.telemetry.addData("ty", ty);
+            //Robot.telemetry.addData("tx", tx);
+            //Robot.telemetry.addData("ty", ty);
 
             SparkFunOTOS.Pose2D pos = Localizer.getCurrentPosition();
             SparkFunOTOS.Pose2D normalizedPos = GetPositionSample.normalize_pos(pos);
             Robot.telemetry.addData("x robot", normalizedPos.x);
             Robot.telemetry.addData("y robot", normalizedPos.y);
+            Robot.telemetry.addData("abnormal heading", pos.h);
             Robot.telemetry.addData("h robot", normalizedPos.h);
             SparkFunOTOS.Pose2D poscamera = GetPositionSample.CameraRelativeToField(pos);
-            Robot.telemetry.addData("x camera", poscamera.x);
-            Robot.telemetry.addData("y camera", poscamera.y);
+            //Robot.telemetry.addData("x camera", poscamera.x);
+            //Robot.telemetry.addData("y camera", poscamera.y);
 
 
-            if(res != null) {
+            if(res != null && !startgetsample && (tx != 0 || ty != 0) && starttakeserios) {
                 SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
-                    Robot.telemetry.addData("pos sample x", pos_sample.x);
-                    Robot.telemetry.addData("pos sample y", pos_sample.y);
-                SparkFunOTOS.Pose2D pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
+                //Robot.telemetry.addData("pos sample x", pos_sample.x);
+                //Robot.telemetry.addData("pos sample y", pos_sample.y);
+                pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
                 Robot.telemetry.addData("pos sample x relevant to field", pos_sample_field.x);
                 Robot.telemetry.addData("pos sample y relevant to field", pos_sample_field.y);
-                }
 
+                SparkFunOTOS.Pose2D pleaseDo = GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(normalizedPos,pos_sample_field);
 
+                Robot.telemetry.addData("extendo ticks", pleaseDo.x);
+                Robot.telemetry.addData("mm to travel", pleaseDo.y);
+                Robot.telemetry.addData("abnormal angle", pleaseDo.h);
 
+                if(limit_readings == readings)
+                    startgetsample = true;
+                readings++;
+            }
+            SparkFunOTOS.Pose2D pleaseDo = GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(normalizedPos,pos_sample_field);
+            Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(pos.x,pos.y, pleaseDo.h));
+            Extendo.Extend((int)pleaseDo.x);
+            //hz = 1 / t.seconds();
 
-
-                //hz = 1 / t.seconds();
+            if(startgetsample) {
+                Chassis.Update();
                 //Extendo.update();
-                //if(run)
-                //    Chassis.Update();
-                //Localizer.Update();
-                //Robot.telemetry.addData("rot tp", Math.toDegrees(Chassis.getTargetPosition().h));
+            }
+            //Localizer.Update();
+            //Robot.telemetry.addData("rot tp", Math.toDegrees(Chassis.getTargetPosition().h));
 
             Robot.telemetry.update();
             Localizer.Update();

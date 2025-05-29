@@ -8,6 +8,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.teamcode.Autonomous.Sample;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.OpModes.Camera.AutoTakeSample;
@@ -20,9 +21,9 @@ import java.util.stream.Collectors;
 @Config
 public class GetPositionSample {
     public static double initialAngle = Math.toRadians(15), h = 270.78, centerToExtendo = 185;// COY = 140
-            public static double cameraOffsetX = 140.148, cameraOffsetY = 100; //schimba la punctul cel mai indepartat dreapta jos a robotului
-            public static double centerOffsetToDownRightX = -135.64,centerOffsetToDownRightY = 158.502;
-            public static double CameraAngleFromCenterPoint = Math.atan(cameraOffsetY/cameraOffsetX);//de schimbat
+    public static double cameraOffsetX = 140.148, cameraOffsetY = 100;
+    public static double centerOffsetToDownRightX = 135.64,centerOffsetToDownRightY = 158.502;
+    public static double CameraAngleFromCenterPoint = Math.atan(cameraOffsetY/cameraOffsetX);//de schimbat
     public static int MMToEncoderTicks(double distance){
         return (int)(distance / (2 * Math.PI * 16 / 4.75)) * 28;
     }
@@ -58,8 +59,8 @@ public class GetPositionSample {
 
             if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo && // not close to a bar
                     distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) + centerToExtendo // not too far away
-                    /*&& getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y + Localizer.getCurrentPosition().y < halfYTerrain*/
-                    //TODO: putini vecini aproape
+                /*&& getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y + Localizer.getCurrentPosition().y < halfYTerrain*/
+                //TODO: putini vecini aproape
 
             ){
                 return detection;
@@ -167,10 +168,7 @@ public class GetPositionSample {
         else
             translatedToCameraPos = new SparkFunOTOS.Pose2D(ipo*Math.sin(angleTotal-Math.PI*3/2),-1*ipo*Math.cos(angleTotal-Math.PI*3/2),0);
 
-        //double x_sample_global = cameraPos.x + (samplePos.x * Math.cos(angleRobot) - samplePos.y * Math.sin(angleRobot));
-        //double y_sample_global = cameraPos.y + (samplePos.x * Math.sin(angleRobot) + samplePos.y * Math.cos(angleRobot));
-
-        return new SparkFunOTOS.Pose2D(translatedToCameraPos.x + cameraPos.x,translatedToCameraPos.y + cameraPos.y,0);
+        return new SparkFunOTOS.Pose2D(/*centerOffsetToDownRightX +*/ translatedToCameraPos.x + cameraPos.x,/*centerOffsetToDownRightY +*/ translatedToCameraPos.y + cameraPos.y,0);
     }
 
     public static SparkFunOTOS.Pose2D getSamplePositionRelativeToCamera(double tx, double ty){
@@ -187,13 +185,14 @@ public class GetPositionSample {
         else
             normalizedDegrees =  Math.PI*2 + posRobot.h;
 
-        /*double NaturalDisplacement = Math.PI/2;
+        //to change if wrong
+        double NaturalDisplacement = Math.PI/2;
 
         normalizedDegrees += NaturalDisplacement;
         if(normalizedDegrees > Math.PI*2)
             normalizedDegrees -= Math.PI*2;
-*/
-        return new SparkFunOTOS.Pose2D(-posRobot.x,-posRobot.y, normalizedDegrees) ;
+
+        return new SparkFunOTOS.Pose2D(posRobot.y,-posRobot.x, normalizedDegrees) ;
     }
 
     public static SparkFunOTOS.Pose2D CameraRelativeToField(SparkFunOTOS.Pose2D positionRobot){
@@ -202,10 +201,51 @@ public class GetPositionSample {
 
         double z = Math.sqrt(cameraOffsetX*cameraOffsetX + cameraOffsetY*cameraOffsetY);
 
-        double XcameraField = NormalizepositionRobot.x + z * Math.cos((positionRobot.h + CameraAngleFromCenterPoint)%(2*Math.PI));
-        double YcameraField = NormalizepositionRobot.y + z * Math.sin((positionRobot.h + CameraAngleFromCenterPoint)%(2*Math.PI));
+        double XcameraField = NormalizepositionRobot.x + -z * Math.sin((positionRobot.h + CameraAngleFromCenterPoint)%(2*Math.PI));
+        double YcameraField = NormalizepositionRobot.y + z * Math.cos((positionRobot.h + CameraAngleFromCenterPoint)%(2*Math.PI));
 
         return new SparkFunOTOS.Pose2D(XcameraField,YcameraField,0);
+    }
+
+    public static SparkFunOTOS.Pose2D GetExtendoTicksToTravelAndNeededAngle(SparkFunOTOS.Pose2D RobotPos, SparkFunOTOS.Pose2D SampleFieldPos) {
+
+        double delta_x = SampleFieldPos.x - RobotPos.x;
+        double delta_y = SampleFieldPos.y - RobotPos.y;
+        double angle = Math.atan2(delta_y,delta_x);
+        if(angle < 0)
+            angle = 2*Math.PI + angle;
+
+        double e = Localizer.getDistanceFromTwoPoints(SampleFieldPos, RobotPos) - centerToExtendo;
+        double forward = e - AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition());
+
+
+        return new SparkFunOTOS.Pose2D(MMToEncoderTicks(e),forward,FromNormalizedToAbnormalAngle(angle));
+    }
+
+    private static double fromRadsToDegrees(double rads){
+        return rads * 180 / Math.PI;
+    }
+
+    public static double FromNormalizedToAbnormalAngle(double angle){
+        double startingAngles = Math.PI / 2; // Start of the positive interval
+        //-pi -> pi
+
+        if (angle >= 0 && angle <= startingAngles) {
+            // Positive interval (from 0 to PI/2)
+            return -(Math.PI/2 - angle);
+        } else if (angle >= 3*Math.PI/2 && angle < 2*Math.PI) {
+            // Positive interval (from PI/2 to PI)
+            return -(Math.PI - (angle - Math.PI*3/2));
+        } else{
+            //pi/2 -> 2*pi/3
+            return angle - startingAngles;
+        }
+
+    }
+
+    public static int GetTicksDistanceFromTwoGlobals(SparkFunOTOS.Pose2D robotPos,SparkFunOTOS.Pose2D SamplePos){
+        double distance = Math.sqrt((robotPos.x - SamplePos.x)*(robotPos.x - SamplePos.x) + (robotPos.y - SamplePos.y)*(robotPos.y - SamplePos.y));
+        return MMToEncoderTicks(distance);
     }
 
 }
