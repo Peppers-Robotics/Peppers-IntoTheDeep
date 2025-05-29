@@ -157,17 +157,17 @@ public class GetPositionSample {
             angleTotal += 2*Math.PI;
         else if(angleTotal > Math.PI * 2)
             angleTotal -= Math.PI * 2;
-        double ipo = Math.sqrt(samplePos.x*samplePos.x + samplePos.y*samplePos.y);
+        double ipo = Math.hypot(samplePos.x, samplePos.y);
         SparkFunOTOS.Pose2D translatedToCameraPos;
 
         if(angleTotal > 0 && angleTotal <= Math.PI/2)
             translatedToCameraPos = new SparkFunOTOS.Pose2D(ipo*Math.cos(angleTotal),ipo*Math.sin(angleTotal),0);
         else if(angleTotal > Math.PI/2 && angleTotal <= Math.PI)
-            translatedToCameraPos = new SparkFunOTOS.Pose2D(-1*ipo*Math.sin(angleTotal-Math.PI/2),ipo*Math.cos(angleTotal-Math.PI/2),0);
+            translatedToCameraPos = new SparkFunOTOS.Pose2D(-ipo*Math.sin(angleTotal-Math.PI/2),ipo*Math.cos(angleTotal-Math.PI/2),0);
         else if(angleTotal > Math.PI && angleTotal <= Math.PI*3/2)
-            translatedToCameraPos = new SparkFunOTOS.Pose2D(-1*ipo*Math.cos(angleTotal-Math.PI),-1*ipo*Math.sin(angleTotal-Math.PI),0);
+            translatedToCameraPos = new SparkFunOTOS.Pose2D(-ipo*Math.cos(angleTotal-Math.PI),-ipo*Math.sin(angleTotal-Math.PI),0);
         else
-            translatedToCameraPos = new SparkFunOTOS.Pose2D(ipo*Math.sin(angleTotal-Math.PI*3/2),-1*ipo*Math.cos(angleTotal-Math.PI*3/2),0);
+            translatedToCameraPos = new SparkFunOTOS.Pose2D(ipo*Math.sin(angleTotal-Math.PI*3/2),-ipo*Math.cos(angleTotal-Math.PI*3/2),0);
 
         return new SparkFunOTOS.Pose2D(/*centerOffsetToDownRightX +*/ translatedToCameraPos.x + cameraPos.x,/*centerOffsetToDownRightY +*/ translatedToCameraPos.y + cameraPos.y,0);
     }

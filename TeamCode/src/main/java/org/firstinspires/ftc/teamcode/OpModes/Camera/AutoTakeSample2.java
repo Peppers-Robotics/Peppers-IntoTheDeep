@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.Camera;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.ftc.bumblebee.Localizers.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -93,10 +94,11 @@ public class AutoTakeSample2 extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y, Localizer.getCurrentPosition().h +
-                                GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(tx, ty, capture), Localizer.getCurrentPosition()).h
-                        ));
-                        run = true;
+                        SparkFunOTOS.Pose2D tp = GetPositionSample.getSampleRelativeToField(
+                                Localizer.getCurrentPosition(), Localizer.getCurrentPosition().h,
+                                GetPositionSample.getSamplePositionRelativeToCamera(tx, ty)
+                        );
+                        Chassis.setHeading(GetPositionSample.getExtendoRotPairByField(tp, Localizer.getCurrentPosition()).h);
                         return true;
                     }
                 })
@@ -147,12 +149,9 @@ public class AutoTakeSample2 extends LinearOpMode {
                         return true;
                     }
                 })
-
-
-                ;
+        ;
 
         res = null;
-
 
         waitForStart();
         ll.start();
@@ -178,6 +177,5 @@ public class AutoTakeSample2 extends LinearOpMode {
             Robot.telemetry.addData("rot tp", Math.toDegrees(Chassis.getTargetPosition().h));
 
         }
-
     }
 }
