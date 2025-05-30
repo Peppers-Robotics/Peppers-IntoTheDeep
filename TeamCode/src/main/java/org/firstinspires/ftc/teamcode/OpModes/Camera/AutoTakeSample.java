@@ -31,8 +31,10 @@ public class AutoTakeSample extends LinearOpMode {
     public static double hz = 1;
     public static boolean startgetsample = false;
     public static boolean starttakeserios = false;
-    public static int limit_readings = 20;
+    public static int limit_readings = 1;
     public int readings = 0;
+
+
 
     public static int DistanceToExtendo(double d){
         return (int) (d / (2 * Math.PI * spool / RA)) * CPR;
@@ -172,25 +174,47 @@ public class AutoTakeSample extends LinearOpMode {
             //Robot.telemetry.addData("x camera", poscamera.x);
             //Robot.telemetry.addData("y camera", poscamera.y);
 
+            if(gamepad1.cross)
+                starttakeserios = true;
+            if(gamepad1.circle)
+            {
+                starttakeserios = false;
+                startgetsample = false;
+                readings = 0;
+                pos_sample_field = new SparkFunOTOS.Pose2D(0,0,0);
+                Chassis.setTargetPosition(pos_sample_field);
+            }
+
 
             if(res != null && !startgetsample && (tx != 0 || ty != 0) && starttakeserios) {
                 SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
                 //Robot.telemetry.addData("pos sample x", pos_sample.x);
                 //Robot.telemetry.addData("pos sample y", pos_sample.y);
-                pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
+                SparkFunOTOS.Pose2D temp_pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
+
+                pos_sample_field.x += temp_pos_sample_field.x;
+                pos_sample_field.y += temp_pos_sample_field.y;
+
                 Robot.telemetry.addData("pos sample x relevant to field", pos_sample_field.x);
                 Robot.telemetry.addData("pos sample y relevant to field", pos_sample_field.y);
 
-                SparkFunOTOS.Pose2D pleaseDo = GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(normalizedPos,pos_sample_field);
-
-                Robot.telemetry.addData("extendo ticks", pleaseDo.x);
-                Robot.telemetry.addData("mm to travel", pleaseDo.y);
-                Robot.telemetry.addData("abnormal angle", pleaseDo.h);
-
-                if(limit_readings == readings)
+                if(limit_readings == readings) {
                     startgetsample = true;
+                    pos_sample_field.x /= limit_readings;
+                    pos_sample_field.y /= limit_readings;
+                }
                 readings++;
             }
+
+            if(res != null)
+            {
+                SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
+                SparkFunOTOS.Pose2D temp_pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
+                Robot.telemetry.addData("pos sample x relevant to field", temp_pos_sample_field.x);
+                Robot.telemetry.addData("pos sample y relevant to field", temp_pos_sample_field.y);
+
+            }
+
             SparkFunOTOS.Pose2D pleaseDo = GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(normalizedPos,pos_sample_field);
             Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(pos.x,pos.y, pleaseDo.h));
             Extendo.Extend((int)pleaseDo.x);
@@ -200,8 +224,13 @@ public class AutoTakeSample extends LinearOpMode {
                 Chassis.Update();
                 //Extendo.update();
             }
+
+
             //Localizer.Update();
             //Robot.telemetry.addData("rot tp", Math.toDegrees(Chassis.getTargetPosition().h));
+
+            Robot.telemetry.addData("sample pos x", pos_sample_field.x);
+            Robot.telemetry.addData("sample pos y", pos_sample_field.y);
 
             Robot.telemetry.update();
             Localizer.Update();
