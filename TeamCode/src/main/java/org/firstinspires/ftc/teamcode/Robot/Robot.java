@@ -205,7 +205,7 @@ public class Robot {
         ActiveIntake.blocker = new ServoPlus(ExpansionHubServos, 2, Servo.Direction.FORWARD); // TODO: portul bun
     }
     public static void InitializeElevator(){
-        Elevator.motor = new CachedMotor(ExpansionHubMotors, 1, DcMotorSimple.Direction.REVERSE);
+        Elevator.motor = new CachedMotor(ExpansionHubMotors, 1, DcMotorSimple.Direction.FORWARD);
         Elevator.motor2 = new CachedMotor(ControlHubMotors, 2, DcMotorSimple.Direction.REVERSE);
         Elevator.encoder = new CachedMotor(ControlHubMotors, 2, DcMotorSimple.Direction.REVERSE);
         Elevator.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

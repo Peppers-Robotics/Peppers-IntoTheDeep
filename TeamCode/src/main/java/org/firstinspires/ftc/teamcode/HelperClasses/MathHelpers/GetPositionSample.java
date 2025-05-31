@@ -201,7 +201,7 @@ public class GetPositionSample {
 
         SparkFunOTOS.Pose2D NormalizepositionRobot = normalize_pos(positionRobot);
 
-        double z = Math.sqrt(cameraOffsetX*cameraOffsetX + cameraOffsetY*cameraOffsetY);
+        double z = Math.hypot(cameraOffsetX,cameraOffsetY);
 
         double XcameraField = NormalizepositionRobot.x + -z * Math.sin((positionRobot.h + CameraAngleFromCenterPoint)%(2*Math.PI));
         double YcameraField = NormalizepositionRobot.y + z * Math.cos((positionRobot.h + CameraAngleFromCenterPoint)%(2*Math.PI));
@@ -209,45 +209,74 @@ public class GetPositionSample {
         return new SparkFunOTOS.Pose2D(XcameraField,YcameraField,0);
     }
 
-    public static SparkFunOTOS.Pose2D GetExtendoTicksToTravelAndNeededAngle(SparkFunOTOS.Pose2D RobotPos, SparkFunOTOS.Pose2D SampleFieldPos) {
+    public static SparkFunOTOS.Pose2D GetExtendoTicksToTravelAndNeededAngle(double tx,double ty) {
 
-        double delta_x = SampleFieldPos.x - RobotPos.x;
-        double delta_y = SampleFieldPos.y - RobotPos.y;
-        double angle = Math.atan2(delta_y,delta_x);
-        if(angle < 0)
-            angle = 2*Math.PI + angle;
+        SparkFunOTOS.Pose2D pos = Localizer.getCurrentPosition();
+        SparkFunOTOS.Pose2D normalizedPos = GetPositionSample.normalize_pos(pos);
 
-        double e = Localizer.getDistanceFromTwoPoints(SampleFieldPos, RobotPos) - centerToExtendo;
+        SparkFunOTOS.Pose2D poscamera = GetPositionSample.CameraRelativeToField(pos);
+
+        SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
+
+        SparkFunOTOS.Pose2D SampleFieldPos = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
+
+        double delta_x = SampleFieldPos.x - normalizedPos.x;
+        double delta_y = SampleFieldPos.y - normalizedPos.y;
+        double angle = Math.atan2(delta_y,delta_x) - Math.PI/2.f;
+        angle = Localizer.normalizeRadians(angle);
+
+        double e = Localizer.getDistanceFromTwoPoints(SampleFieldPos, normalizedPos) - centerToExtendo;
         double forward = e - AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition());
+        if(forward < 0) forward = 0;
 
 
-        return new SparkFunOTOS.Pose2D(MMToEncoderTicks(e),forward,FromNormalizedToAbnormalAngle(angle));
+        return new SparkFunOTOS.Pose2D(MMToEncoderTicks(e),forward,angle);
     }
 
-    private static double fromRadsToDegrees(double rads){
-        return rads * 180 / Math.PI;
+    public static SparkFunOTOS.Pose2D GetExtendoTicksToTravelAndNeededAngleFromSample(SparkFunOTOS.Pose2D SampleFieldPos){
+
+        SparkFunOTOS.Pose2D pos = Localizer.getCurrentPosition();
+        SparkFunOTOS.Pose2D normalizedPos = GetPositionSample.normalize_pos(pos);
+
+        double delta_x = SampleFieldPos.x - normalizedPos.x;
+        double delta_y = SampleFieldPos.y - normalizedPos.y;
+        double angle = Math.atan2(delta_y,delta_x) - Math.PI/2.f;
+        angle = Localizer.normalizeRadians(angle);
+
+        double e = Localizer.getDistanceFromTwoPoints(SampleFieldPos, normalizedPos) - centerToExtendo;
+        double forward = e - AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition());
+        if(forward < 0) forward = 0;
+
+
+        return new SparkFunOTOS.Pose2D(MMToEncoderTicks(e),forward,angle);
     }
 
-    public static double FromNormalizedToAbnormalAngle(double angle){
-        double startingAngles = Math.PI / 2; // Start of the positive interval
-        //-pi -> pi
+    public static SparkFunOTOS.Pose2D getContinuosTrackingData(SparkFunOTOS.Pose2D SampleFieldPos){
+        SparkFunOTOS.Pose2D pos = Localizer.getCurrentPosition();
+        SparkFunOTOS.Pose2D normalizedPos = GetPositionSample.normalize_pos(pos);
 
-        if (angle >= 0 && angle <= startingAngles) {
-            // Positive interval (from 0 to PI/2)
-            return -(Math.PI/2 - angle);
-        } else if (angle >= 3*Math.PI/2 && angle < 2*Math.PI) {
-            // Positive interval (from PI/2 to PI)
-            return -(Math.PI - (angle - Math.PI*3/2));
-        } else{
-            //pi/2 -> 2*pi/3
-            return angle - startingAngles;
-        }
+        double delta_x = SampleFieldPos.x - normalizedPos.x;
+        double delta_y = SampleFieldPos.y - normalizedPos.y;
+        double angle = Math.atan2(delta_y,delta_x) - Math.PI/2.f;
+        angle = Localizer.normalizeRadians(angle);
 
+        double e = Localizer.getDistanceFromTwoPoints(SampleFieldPos, normalizedPos) - centerToExtendo;
+        double forward = e - AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition());
+        if(forward < 0) forward = 0;
+
+        return new SparkFunOTOS.Pose2D(MMToEncoderTicks(e),forward,angle);
     }
 
-    public static int GetTicksDistanceFromTwoGlobals(SparkFunOTOS.Pose2D robotPos,SparkFunOTOS.Pose2D SamplePos){
-        double distance = Math.sqrt((robotPos.x - SamplePos.x)*(robotPos.x - SamplePos.x) + (robotPos.y - SamplePos.y)*(robotPos.y - SamplePos.y));
-        return MMToEncoderTicks(distance);
+    public static SparkFunOTOS.Pose2D GetGlobalSamplePosition(double tx,double ty){
+        SparkFunOTOS.Pose2D pos = Localizer.getCurrentPosition();
+        SparkFunOTOS.Pose2D normalizedPos = GetPositionSample.normalize_pos(pos);
+
+        SparkFunOTOS.Pose2D poscamera = GetPositionSample.CameraRelativeToField(pos);
+
+        SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
+
+        return GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
+
     }
 
     public static SparkFunOTOS.Pose2D CalculatePosFromMultipleScreenShots(Vector<SparkFunOTOS.Pose2D> Poses){
@@ -261,7 +290,7 @@ public class GetPositionSample {
             median.x /= Poses.size();
             median.y /= Poses.size();
 
-            int ind = -1;
+
             double mini = 1e9;
 
             SparkFunOTOS.Pose2D best = new SparkFunOTOS.Pose2D(0,0,0);

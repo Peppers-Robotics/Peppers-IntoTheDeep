@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.Camera;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.ftc.bumblebee.Localizers.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -9,9 +8,11 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.GetPositionSample;
+import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
@@ -73,46 +74,49 @@ public class AutoTakeSample2 extends LinearOpMode {
                     @Override
                     public boolean Run() {
                         res = ll.getLatestResult();
-                        return res != null && res.isValid() && GetPositionSample.hasId(res, id);
+                        return res != null && res.isValid() && GetPositionSample.hasId(res, id) && gamepad1.square;
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
+                        ll.shutdown();
                         capture = Localizer.getCurrentPosition();
                         tx = GetPositionSample.getOptimalResult(res, id).getTargetXDegrees();
                         ty = GetPositionSample.getOptimalResult(res, id).getTargetYDegrees();
+
+
+                        return true;
+                    }
+                })
+//                .addTask(new Task() {
+//                    @Override
+//                    public boolean Run() {
+//                        return gamepad1.square;
+//                    }
+//                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Chassis.Heading = new PIDController(new PIDCoefficients(1.8, 0.3, 0.05));
+                        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y,
+                                GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(tx,ty).h
+                        ));
                         return true;
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return gamepad1.square;
-                    }
-                })
-                .addTask(new Task() {
-                    @Override
-                    public boolean Run() {
-                        SparkFunOTOS.Pose2D tp = GetPositionSample.getSampleRelativeToField(
-                                Localizer.getCurrentPosition(), Localizer.getCurrentPosition().h,
-                                GetPositionSample.getSamplePositionRelativeToCamera(tx, ty)
-                        );
-                        Chassis.setHeading(GetPositionSample.getExtendoRotPairByField(tp, Localizer.getCurrentPosition()).h);
-                        return true;
-                    }
-                })
-                .addTask(new Task() {
-                    @Override
-                    public boolean Run() {
-                        return Localizer.getAngleDifference(Chassis.getTargetPosition().h, Localizer.getCurrentPosition().h) < Math.toRadians(5);
+                        run = true;
+                        return Localizer.getAngleDifference(Chassis.getTargetPosition().h, Localizer.getCurrentPosition().h) < Math.toRadians(2) && Math.abs(Localizer.getVelocity().h) < Math.toRadians(5);
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
                         Extendo.Extend(
-                                (int) GetPositionSample.getExtendoRotPairByField(GetPositionSample.getPositionRelativeToFiled(tx, ty, capture), Localizer.getCurrentPosition()).x - 35
+                                (int) GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(tx,ty).x - 30
                         );
                         return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 10;
                     }
@@ -149,9 +153,12 @@ public class AutoTakeSample2 extends LinearOpMode {
                         return true;
                     }
                 })
-        ;
+
+
+                ;
 
         res = null;
+
 
         waitForStart();
         ll.start();
@@ -164,7 +171,10 @@ public class AutoTakeSample2 extends LinearOpMode {
             if(res != null) {
 //                Robot.telemetry.addData("rot", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).h);
 //                Robot.telemetry.addData("ext", GetPositionSample.getExtendoRotPair(res.getTx(), res.getTy()).x);
-                 SparkFunOTOS.Pose2D r = GetPositionSample.getPositionRelativeToFiled(tx, ty, capture);
+                SparkFunOTOS.Pose2D normaPos = GetPositionSample.normalize_pos(Localizer.getCurrentPosition());
+                SparkFunOTOS.Pose2D cam_pos = GetPositionSample.CameraRelativeToField(normaPos);
+                SparkFunOTOS.Pose2D sample_to_cam = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
+                 SparkFunOTOS.Pose2D r = GetPositionSample.getSampleRelativeToField(cam_pos,normaPos.h,sample_to_cam);
                 Robot.telemetry.addData("field pos", r.x + ", " + r.y );
             }
 
@@ -177,5 +187,6 @@ public class AutoTakeSample2 extends LinearOpMode {
             Robot.telemetry.addData("rot tp", Math.toDegrees(Chassis.getTargetPosition().h));
 
         }
+
     }
 }
