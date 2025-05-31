@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 200, ElevatorScoreSample2 = 750; // 700
+    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 200, ElevatorScoreSample2 = 800; // 700
     public static double ElevatorScoreSpecimen = 310;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 235, PivotScoreSample = 0; // 220

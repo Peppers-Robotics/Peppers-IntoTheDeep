@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
+import static org.firstinspires.ftc.teamcode.HelperClasses.Colors.getColorFromRGB;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,6 +9,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
 import org.firstinspires.ftc.teamcode.OpModes.OpModeManager;
@@ -121,9 +124,18 @@ public class IntakeLogic extends GenericController {
             wasDriverActivated = true;
         }
         if(gamepad2.left_trigger >= 0.05 && (ActiveIntake.isOff() || wasDriverActivated)){
-            ActiveIntake.Reverse(Math.min(OpModeManager.getPowerSigned(gamepad2.left_trigger, 4), 0.6));
-            //unblock
-            ActiveIntake.Unblock();
+
+            if(Storage.hasTeamPice() || Storage.sensor.getColorSeenBySensor() == Colors.ColorType.YELLOW)
+            {
+                ActiveIntake.Block();
+                ActiveIntake.Reverse(0.4);
+                DropDown.setDown(0);
+            }
+            else {
+                ActiveIntake.Reverse(Math.min(OpModeManager.getPowerSigned(gamepad2.left_trigger, 4), 0.6));
+                //unblock
+                ActiveIntake.Unblock();
+            }
             wasDriverActivated = true;
         }
         gamepad1.update();

@@ -21,6 +21,8 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 import org.firstinspires.ftc.teamcode.Tasks.Task;
 
+import java.util.Vector;
+
 @TeleOp
 @Config
 public class AutoTakeSample extends LinearOpMode {
@@ -32,6 +34,7 @@ public class AutoTakeSample extends LinearOpMode {
     public static boolean startgetsample = false;
     public static boolean starttakeserios = false;
     public static int limit_readings = 1;
+    public Vector<SparkFunOTOS.Pose2D>poses;
     public int readings = 0;
 
 
@@ -191,19 +194,18 @@ public class AutoTakeSample extends LinearOpMode {
                 //Robot.telemetry.addData("pos sample x", pos_sample.x);
                 //Robot.telemetry.addData("pos sample y", pos_sample.y);
                 SparkFunOTOS.Pose2D temp_pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
-
-                pos_sample_field.x += temp_pos_sample_field.x;
-                pos_sample_field.y += temp_pos_sample_field.y;
+                poses.add(temp_pos_sample_field);
 
                 Robot.telemetry.addData("pos sample x relevant to field", pos_sample_field.x);
                 Robot.telemetry.addData("pos sample y relevant to field", pos_sample_field.y);
 
+                readings++;
+
                 if(limit_readings == readings) {
                     startgetsample = true;
-                    pos_sample_field.x /= limit_readings;
-                    pos_sample_field.y /= limit_readings;
+                    pos_sample_field = GetPositionSample.CalculatePosFromMultipleScreenShots(poses);
                 }
-                readings++;
+
             }
 
             if(res != null)
