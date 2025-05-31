@@ -189,7 +189,7 @@ public class AutoTakeSample extends LinearOpMode {
             }
 
 
-            if(res != null && !startgetsample && (tx != 0 || ty != 0) && starttakeserios) {
+            /*if(res != null && !startgetsample && (tx != 0 || ty != 0) && starttakeserios) {
                 SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
                 //Robot.telemetry.addData("pos sample x", pos_sample.x);
                 //Robot.telemetry.addData("pos sample y", pos_sample.y);
@@ -206,20 +206,7 @@ public class AutoTakeSample extends LinearOpMode {
                     pos_sample_field = GetPositionSample.CalculatePosFromMultipleScreenShots(poses);
                 }
 
-            }
-
-            if(res != null)
-            {
-                SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
-                SparkFunOTOS.Pose2D temp_pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
-                Robot.telemetry.addData("pos sample x relevant to field", temp_pos_sample_field.x);
-                Robot.telemetry.addData("pos sample y relevant to field", temp_pos_sample_field.y);
-
-            }
-
-            SparkFunOTOS.Pose2D pleaseDo = GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(normalizedPos,pos_sample_field);
-            Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(pos.x,pos.y, pleaseDo.h));
-            Extendo.Extend((int)pleaseDo.x);
+            }*/
             //hz = 1 / t.seconds();
 
             if(startgetsample) {

@@ -21,6 +21,8 @@ import java.util.List;
 public class Chassis {
     public static CachedMotor FL, FR, BL, BR;
     public static double FLd = 1, FRd = -1, BLd = 1, BRd = -1;
+    public static double SplineDoneNess = 0;
+
     public static void drive(double x, double y, double r){
         Robot.telemetry.addData("FL PC", FL.getCurrent(CurrentUnit.AMPS));
         Robot.telemetry.addData("FR PC", FR.getCurrent(CurrentUnit.AMPS));
@@ -163,6 +165,7 @@ public class Chassis {
         linearHeading = true;
     }
     public static void profiledCurve(List<SparkFunOTOS.Pose2D> points){
+        SplineDoneNess = 0;
         pointsToFollow = points;
         point = 0;
 //        profiledFollow(points.get(0));
@@ -196,6 +199,7 @@ public class Chassis {
                         }
                     } else {
 //                    Robot.telemetry.addLine("FOLLOW NEXT");
+                        SplineDoneNess += 100.0 / pointsToFollow.size();
                         profiledFollow(pointsToFollow.get(point++));
                     }
                 }
@@ -233,6 +237,9 @@ public class Chassis {
         drive(yP * p, -xP * p, hP * p);
     }
     public static double getPrecentageOfMotionDone(){
+
+        final double maxContributedProcentage = 100.0 / pointsToFollow.size();
+
         if(point < pointsToFollow.size() - 1) return 0;
         double soFar = Math.sqrt((xProfile.getPosition() - xProfile.getTargetPosition()) * (xProfile.getPosition() - xProfile.getTargetPosition()) +
                 (yProfile.getPosition() - yProfile.getTargetPosition()) * (yProfile.getPosition() - yProfile.getTargetPosition()));
@@ -243,7 +250,7 @@ public class Chassis {
         }
 //        double totalDistance
 
-        return (1 - soFar / totalDistanceToTravel) * 100.f;
+        return SplineDoneNess + (1 - soFar / totalDistanceToTravel) * maxContributedProcentage;
 //        return 0;
     }
 }

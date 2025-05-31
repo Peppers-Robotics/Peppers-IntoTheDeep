@@ -122,7 +122,13 @@ public class OutTakeLogic {
                                         return true;
                                     }
                                 })
-                                .waitSeconds(0.15)
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
+                                        return Elevator.getCurrentPosition() < 10 && Extendo.getCurrentPosition() < 10;
+                                    }
+                                })
+//                                .waitSeconds(0.05)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
@@ -130,7 +136,7 @@ public class OutTakeLogic {
                                         return true;
                                     }
                                 })
-                                .waitSeconds(0.1)
+                                .waitSeconds(0.05)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {

@@ -78,7 +78,7 @@ public class Elevator {
             RESET = true;
         }
         if (RESET) {
-            if (motor.getCurrent(CurrentUnit.AMPS) + motor2.getCurrent(CurrentUnit.AMPS) >= 10 || was) {
+            if (motor.getCurrent(CurrentUnit.AMPS) + motor2.getCurrent(CurrentUnit.AMPS) >= 7 || was) {
                 was = true;
                 encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
