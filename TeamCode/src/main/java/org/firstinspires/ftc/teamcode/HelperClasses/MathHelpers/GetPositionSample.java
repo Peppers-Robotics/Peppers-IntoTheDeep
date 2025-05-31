@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 import java.util.List;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 @Config
@@ -249,4 +250,31 @@ public class GetPositionSample {
         return MMToEncoderTicks(distance);
     }
 
+    public static SparkFunOTOS.Pose2D CalculatePosFromMultipleScreenShots(Vector<SparkFunOTOS.Pose2D> Poses){
+
+            SparkFunOTOS.Pose2D median = new SparkFunOTOS.Pose2D(0,0,0);
+            for(SparkFunOTOS.Pose2D pos:Poses){
+                median.x+=pos.x;
+                median.y+=pos.y;
+            }
+
+            median.x /= Poses.size();
+            median.y /= Poses.size();
+
+            int ind = -1;
+            double mini = 1e9;
+
+            SparkFunOTOS.Pose2D best = new SparkFunOTOS.Pose2D(0,0,0);
+
+            for(SparkFunOTOS.Pose2D pos:Poses){
+                double temp = Localizer.getDistanceFromTwoPoints(pos,median);
+                if(temp < mini)
+                {
+                    mini = temp;
+                    best = pos;
+                }
+            }
+
+        return best;
+    }
 }
