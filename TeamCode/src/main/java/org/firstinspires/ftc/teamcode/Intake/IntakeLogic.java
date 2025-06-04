@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.LimitSwitch;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
 import org.firstinspires.ftc.teamcode.OpModes.OpModeManager;
@@ -26,8 +27,8 @@ public class IntakeLogic extends GenericController {
     public static States state = States.IDLE;
     public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime(), time2 = new ElapsedTime();
     public static boolean wasDriverActivated = false;
-    private static boolean reset = false;
     private static int pos = 0;
+    public static int offset = 0;
     public static void update(){
         if(Controls.ImogenDriver) {
 //            gamepad2.left_trigger = -Math.min(0, gamepad1.right_stick_x);
@@ -76,23 +77,15 @@ public class IntakeLogic extends GenericController {
 
                 Extendo.motor.setPower(-1);
 //                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(reset || (Extendo.motor.getCurrent(CurrentUnit.AMPS) >= 2 && Math.abs(Extendo.getCurrentVelocity()) < 3 && Extendo.getCurrentPosition() < 10 || gamepad2.wasPressed.left_bumper)){
-                    Extendo.motor.setPower(0);
+                if(Extendo.lm.getState()){
+                    Extendo.encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    Extendo.encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     ActiveIntake.powerOff();
-                    reset = true;
-                    if(time.seconds() > 0.1){
-                        Extendo.encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        Extendo.encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                        Extendo.Extend(0);
-                        pos = 0;
-                        state = States.IDLE;
-                        Extendo.DISABLE = false;
-                        ActiveIntake.powerOff();
-                        ActiveIntake.Block();
-                        reset = false;
-                        if(Storage.hasTeamPice())
-                            Controls.Transfer = true;
-                    }
+                    Extendo.Extend(0);
+                    Extendo.motor.setPower(0);
+                    if(Storage.hasTeamPice())
+                        Controls.Transfer = true;
+                    state = States.IDLE;
                 } else time.reset();
                 break;
 

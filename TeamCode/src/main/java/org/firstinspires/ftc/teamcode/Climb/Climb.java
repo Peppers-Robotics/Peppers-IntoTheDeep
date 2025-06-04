@@ -25,7 +25,9 @@ public class Climb {
     public static double pitch = 0;
     public static ElapsedTime time = new ElapsedTime();
     public static double EngagePTO1 = 180, EngagePTO2 = 200, DisengagePTO1 = 300, DisengagePTO2 = 170,
-                         EngageWheelie1 = 260, DisengageWheelie1 = 150, EngageWheelie2 = 100, DisengageWheelie2 = 228, climbArmIntertia = 310;
+                         DisengageWheelie2 = 145,EngageWheelie2 = 40,EngageWheelie1  = 260,DisengageWheelie1 = 140,climbArmIntertia = 310;
+
+
 
     public static void EngagePTO(){
         PTO1.setAngle(EngagePTO1);

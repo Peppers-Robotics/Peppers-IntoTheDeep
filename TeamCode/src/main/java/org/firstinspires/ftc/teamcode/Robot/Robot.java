@@ -11,6 +11,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -32,6 +33,7 @@ import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.IMUBNO085;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.LimitSwitch;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -51,6 +53,7 @@ public class Robot {
     public static IMU imu;
     public static DcMotorController ControlHubMotors, ExpansionHubMotors;
     public static ServoController ControlHubServos, ExpansionHubServos, ServoHub;
+    public static DigitalChannelController ControlHubDigital;
     public static double VOLTAGE = 12;
     public static boolean isDisabled(){
         return !hubs.get(0).isEngaged();
@@ -84,6 +87,8 @@ public class Robot {
 
         ControlHubServos = hm.get(ServoController.class, "Control Hub");
         ExpansionHubServos = hm.get(ServoController.class, "Expansion Hub 2");
+
+        ControlHubDigital = hm.get(DigitalChannelController.class,"Control Hub");
 
         IMUBNO085.controller = hm.get(DigitalChannelController.class, "Expansion Hub 2");
         try {
@@ -189,10 +194,12 @@ public class Robot {
         Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
 //        Storage.sensor = null;
     }
+
     public static void InitializeExtendo(){
         Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.REVERSE);
         Extendo.encoder = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Extendo.lm = new LimitSwitch(ControlHubDigital,0);
         MotorConfigurationType m = Extendo.motor.getMotorType();
         m.setAchieveableMaxRPMFraction(1);
         Extendo.motor.setMotorType(m);

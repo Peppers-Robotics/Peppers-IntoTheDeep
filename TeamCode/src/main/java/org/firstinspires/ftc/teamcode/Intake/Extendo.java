@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
+import org.firstinspires.ftc.teamcode.HelperClasses.Devices.LimitSwitch;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
@@ -14,6 +16,9 @@ public class Extendo {
     public static PIDController pidController = new PIDController(0.01, 0, -0.0004);
     public static int MaxExtendoExtension = 840;
     private static double targetPosition = 0;
+    public static int offset = 0;
+    public static LimitSwitch lm;
+
     static {
         pidController.setFreq(40);
     }
@@ -25,7 +30,8 @@ public class Extendo {
     }
 
     public static int getCurrentPosition(){
-        return encoder.getCurrentPosition();
+        //offset = Extendo.getCurrentPosition() + offset;
+        return encoder.getCurrentPosition();// - offset;
     }
     public static double getCurrentVelocity(){ return encoder.getVelocity(); }
 
@@ -72,8 +78,8 @@ public class Extendo {
 //        }
 
         if(PowerOnToTransfer) {
+            motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
             motor.setMotorEnable();
-            motor.setPower(-1);
         } else {
             motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
             motor.setMotorEnable();

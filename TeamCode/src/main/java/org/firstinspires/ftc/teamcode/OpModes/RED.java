@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
+import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
@@ -23,6 +24,8 @@ public class RED extends LinearOpMode {
 
         while (opModeIsActive()){
             opmode.update();
+            Robot.telemetry.addData("extendo pos", Extendo.motor.getCurrentPosition());
+            Robot.telemetry.update();
         }
     }
 }

@@ -24,12 +24,12 @@ public class OutTakeLogic {
     public static double ElevatorScoreSpecimen = 310;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 235, PivotScoreSample = 0; // 220
-    public static double ArmTakeSpecimen = 324, PivotTakeSpecimen = 0;
+    public static double ArmTakeSpecimen = 335, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 95, PivotScoreSpecimen = 0;
     public static double ArmIdle = -10, PivotIdle = 0, ElevatorIdle = -69, DropDownTransfer = 0, ArmTransfer = -10;
     public static boolean save2 = false;
     public static double coeff = 5;
-    public static double TakeSpecimenExtension = 0.31, TransferExtension = 0.3, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.3;
+    public static double TakeSpecimenExtension = 0.31, TransferExtension = 0.26, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.3;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,
@@ -56,6 +56,7 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
+                                        Arm.ShouldDoOffset = true;
                                         Claw.closeAbit();
                                         Elevator.setTargetPosition(ElevatorUp);
                                         if (Elevator.getCurrentPosition() > ElevatorUp - 80) {
@@ -101,6 +102,7 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
+                                        Arm.ShouldDoOffset = true;
                                         Transfering = true;
                                         ActiveIntake.powerOn();
                                         Extension.Extend(TransferExtension);
@@ -186,6 +188,7 @@ public class OutTakeLogic {
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
+                                            Arm.ShouldDoOffset = false;
                                             Localizer.Update();
                                             scoredSample = Localizer.getCurrentPosition();
                                             Claw.open();
@@ -263,6 +266,7 @@ public class OutTakeLogic {
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
+                                            Arm.ShouldDoOffset = false;
                                             Elevator.setTargetPosition(ElevatorScoreSample);
                                             return Elevator.getCurrentPosition() >= ElevatorUp - 100;
                                         }

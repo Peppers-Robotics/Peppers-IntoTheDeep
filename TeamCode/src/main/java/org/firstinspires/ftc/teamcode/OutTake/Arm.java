@@ -9,10 +9,14 @@ import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
+import java.time.OffsetTime;
+
 @Config
 public class Arm {
     public static double s1Offset = 345, s2Offset = 345;
     private static double armPrevPos = 0, pivotPrevPos = 0;
+    public static boolean ShouldDoOffset = false;
+    public static double offsetAngle = 5;
     public static ServoPlus servo1, servo2;
     public static AsymmetricMotionProfile armProfile, pivotProfile;
     private static final DifferentialHelper diffy;
@@ -31,6 +35,7 @@ public class Arm {
         armProfile.startMotion(armPrevPos, angle);
         armPrevPos = angle;
     }
+
     public static double getArmTargetPosition(){
         return -armProfile.getTargetPosition();
     }
@@ -41,7 +46,7 @@ public class Arm {
         diffy.setAngleToSecondJoint(armProfile.getPosition());
         diffy.setAngleToFirstJoint(pivotProfile.getPosition());
 
-        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset);
+        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset + (ShouldDoOffset?offsetAngle : 0));
         servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
 
 //        Robot.telemetry.addData("profiled arm angle", armProfile.getPosition());
