@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -22,22 +23,40 @@ public class Chassis {
     public static CachedMotor FL, FR, BL, BR;
     public static double FLd = 1, FRd = -1, BLd = 1, BRd = -1;
     public static double SplineDoneNess = 0;
+    public static boolean PuttingSpecimens = false;
+    public static boolean Autonomous = false;
+    public static boolean DoingSpecimens = false;
 
     public static void drive(double x, double y, double r){
+        if(PuttingSpecimens) {
+            r *= 0.7;
+            x *= 0.8;
+            y *= 0.8;
+        }
         Robot.telemetry.addData("FL PC", FL.getCurrent(CurrentUnit.AMPS));
         Robot.telemetry.addData("FR PC", FR.getCurrent(CurrentUnit.AMPS));
         Robot.telemetry.addData("BL PC", BL.getCurrent(CurrentUnit.AMPS));
         Robot.telemetry.addData("BR PC", BR.getCurrent(CurrentUnit.AMPS));
         double d = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
-        double fl = (y + x + r) / d;
-        double bl = (y - x + r) / d;
-        double fr = (y - x - r) / d;
-        double br = (y + x - r) / d;
+        double fl,bl,fr,br;
 
+        if(!Autonomous) {
+                fl = (-y - x + r) / d;
+                bl = (-y + x + r) / d;
+                fr = (-y + x - r) / d;
+                br = (-y - x - r) / d;
+        }
+        else {
+            fl = (y + x + r) / d;
+            bl = (y - x + r) / d;
+            fr = (y - x - r) / d;
+            br = (y + x - r) / d;
+        }
         FL.setPower(fl * FLd);
         FR.setPower(fr * FRd);
         BL.setPower(bl * BLd);
         BR.setPower(br * BRd);
+
     }
     public static double holdHeading(){
         double err = getTargetPosition().h - Localizer.getCurrentPosition().h;
@@ -54,7 +73,8 @@ public class Chassis {
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
     public static PIDController Strafe = new PIDController(0.01, 0.05, 0.002),
                                 Forward = new PIDController(-0.012, -0.02, -0.002),
-                                Heading       = new PIDController(0.85, 0.5, 0.07);
+                                Heading = new PIDController(0.85, 0.5, 0.07);
+    public static PIDCoefficients FullExtendoHeading = new PIDCoefficients(0.3,0.0015,0.06);
     private static List<SparkFunOTOS.Pose2D> pointsToFollow;
 
     public static void setTargetPosition(SparkFunOTOS.Pose2D pose){
@@ -199,7 +219,7 @@ public class Chassis {
                         }
                     } else {
 //                    Robot.telemetry.addLine("FOLLOW NEXT");
-                        SplineDoneNess += 100.0 / pointsToFollow.size();
+                        SplineDoneNess = point * (100.0 / pointsToFollow.size());
                         profiledFollow(pointsToFollow.get(point++));
                     }
                 }

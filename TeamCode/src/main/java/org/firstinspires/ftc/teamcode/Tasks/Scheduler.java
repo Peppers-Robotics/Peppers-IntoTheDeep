@@ -9,8 +9,10 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.Intake.Storage;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
+import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,6 +101,20 @@ public class Scheduler implements Cloneable {
         });
         return this;
     }
+
+    public Scheduler lineToAsyncIfGoodStorageColor(SparkFunOTOS.Pose2D pose){
+        addTask(new Task() {
+            @Override
+            public boolean Run() {
+//                Chassis.profiledFollow(pose);
+                if(!Storage.isStorageEmpty())
+                    Chassis.profiledCurve(Collections.singletonList(pose));
+                return true;
+            }
+        });
+        return this;
+    }
+
     public Scheduler splineToAsync(List<SparkFunOTOS.Pose2D> points){
         addTask(new Task() {
             @Override
@@ -155,11 +171,11 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
-                if(Chassis.getPrecentageOfMotionDone() > precent){
+                if(Chassis.getPrecentageOfMotionDone() >= precent){
                     RobotLog.d("headingError", Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h));
                     RobotLog.d("translationalError", Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), Chassis.getTargetPosition()));
                 }
-                return Chassis.getPrecentageOfMotionDone() > precent;
+                return Chassis.getPrecentageOfMotionDone() >= precent;
             }
         });
         return this;

@@ -21,11 +21,11 @@ public class Climb {
     public static final Scheduler climb = new Scheduler();
     public static Scheduler run = new Scheduler();
     public static ServoPlus W1, W2, PTO1;
-    public static double BAR1 = 190, BAR2 = 700;
+    public static double BAR1 = 210, BAR2 = 700;
     public static double pitch = 0;
     public static ElapsedTime time = new ElapsedTime();
     public static double EngagePTO1 = 180, EngagePTO2 = 200, DisengagePTO1 = 300, DisengagePTO2 = 170,
-                         DisengageWheelie2 = 145,EngageWheelie2 = 40,EngageWheelie1  = 260,DisengageWheelie1 = 140,climbArmIntertia = 310;
+                         DisengageWheelie2 = 25,EngageWheelie2 = 135,EngageWheelie1  = 170,DisengageWheelie1 = 265 ,climbArmIntertia = 310;
 
 
 
@@ -59,6 +59,7 @@ public class Climb {
                 addTask(new Task() {
                     @Override
                     public boolean Run() {
+                        Chassis.Autonomous = true;
                         ActivateWheelie();
                         DisengagePTO();
 //                        Extendo.motor.setPower(-0.4);
@@ -76,11 +77,12 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.setTargetPosition(BAR1 + 80);
+                        Elevator.setTargetPosition(BAR1);
 //                        return Elevator.getCurrentPosition() <= BAR1 + 100;
                         return true;
                     }
                 })
+                .waitSeconds(0.2)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -132,7 +134,7 @@ public class Climb {
                         if(time == -1) time = System.currentTimeMillis();
                         Elevator.setTargetPosition(BAR2);
                         Elevator.Disable = pitch <= 3 && (Elevator.getCurrentPosition() <= BAR2 - 30 && Elevator.getCurrentPosition() >= 250);
-                        return Elevator.getCurrentPosition() >= BAR2 - 20;
+                        return Elevator.getCurrentPosition() >= BAR2 - 35;
                     }
                 })
                 .addTask(new Task() {

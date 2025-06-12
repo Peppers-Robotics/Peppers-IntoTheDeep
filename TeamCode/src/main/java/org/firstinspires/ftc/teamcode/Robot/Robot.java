@@ -174,7 +174,7 @@ public class Robot {
         InitializeExtension();
     }
     public static void InitializeExtension(){
-        Extension.servo = new ServoPlus(ServoHub, 3, Servo.Direction.FORWARD);
+        Extension.servo = new ServoPlus(ServoHub, 2, Servo.Direction.FORWARD);
     }
     public static void InitializeChassis(){
         Chassis.FL = new CachedMotor(ExpansionHubMotors, 2, DcMotorSimple.Direction.FORWARD);
@@ -197,9 +197,9 @@ public class Robot {
 
     public static void InitializeExtendo(){
         Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.REVERSE);
-        Extendo.encoder = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
+        Extendo.encoder = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Extendo.lm = new LimitSwitch(ControlHubDigital,0);
+        Extendo.lm = new LimitSwitch(ControlHubDigital,1);
         MotorConfigurationType m = Extendo.motor.getMotorType();
         m.setAchieveableMaxRPMFraction(1);
         Extendo.motor.setMotorType(m);
@@ -219,16 +219,16 @@ public class Robot {
         Elevator.motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void InitializeArm(){
-        Arm.servo2 = new ServoPlus(ServoHub, 2, Servo.Direction.FORWARD);
-        Arm.servo1 = new ServoPlus(ServoHub, 5, Servo.Direction.FORWARD);
+        Arm.servo2 = new ServoPlus(ServoHub, 0, Servo.Direction.FORWARD);
+        Arm.servo1 = new ServoPlus(ServoHub, 1, Servo.Direction.FORWARD);
     }
     public static void InitializeClaw(){
         Claw.clawServo = new ServoPlus(ExpansionHubServos, 0, Servo.Direction.FORWARD);
     }
     public static void InitializeClimb(){
-        Climb.W1 = new ServoPlus(ServoHub, 1, Servo.Direction.FORWARD);
+        Climb.W1 = new ServoPlus(ServoHub, 3, Servo.Direction.FORWARD);
         Climb.W2 = new ServoPlus(ServoHub, 4, Servo.Direction.FORWARD);
-        Climb.PTO1 = new ServoPlus(ServoHub, 0, Servo.Direction.FORWARD);
+        Climb.PTO1 = new ServoPlus(ServoHub, 5, Servo.Direction.FORWARD);
 //        Climb.PTO2 = new ServoPlus(ControlHubServos, 0, Servo.Direction.FORWARD);
         Climb.run = Climb.climb;
     }

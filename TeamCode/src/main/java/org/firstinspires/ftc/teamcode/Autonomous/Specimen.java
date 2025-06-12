@@ -622,6 +622,7 @@ public class Specimen extends LinearOpMode {
                 ;
         type = 1;
         Storage.team = Storage.Team.RED;
+        Chassis.Autonomous = true;
 
         while(opModeInInit()){
 

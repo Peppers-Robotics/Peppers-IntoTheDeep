@@ -22,6 +22,7 @@ public class BackAndForth extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Chassis.Autonomous = true;
         Robot.InitializeHubs(hardwareMap);
         Robot.InitializeChassis();
         Robot.InitializeLocalizer(hardwareMap);

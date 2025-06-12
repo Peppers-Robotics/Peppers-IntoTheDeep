@@ -14,8 +14,11 @@ import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 @TeleOp
 public class BadAngleExample extends LinearOpMode {
     public static double A1 = 20, A2 = 292;
+    static public  int freq = 40;
     @Override
     public void runOpMode() throws InterruptedException {
+
+
         Robot.InitializeFull(hardwareMap);
         Robot.enable();
 
@@ -26,6 +29,7 @@ public class BadAngleExample extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()){
+            Chassis.Heading.setFreq(freq);
             Robot.clearCache();
 
             if(r.done()) r = s.clone();

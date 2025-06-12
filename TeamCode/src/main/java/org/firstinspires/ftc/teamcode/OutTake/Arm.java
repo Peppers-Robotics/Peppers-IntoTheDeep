@@ -46,7 +46,7 @@ public class Arm {
         diffy.setAngleToSecondJoint(armProfile.getPosition());
         diffy.setAngleToFirstJoint(pivotProfile.getPosition());
 
-        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset + (ShouldDoOffset?offsetAngle : 0));
+        servo1.setAngle(diffy.getRawAngles()[1] + s1Offset - (ShouldDoOffset?offsetAngle : 0));
         servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);
 
 //        Robot.telemetry.addData("profiled arm angle", armProfile.getPosition());

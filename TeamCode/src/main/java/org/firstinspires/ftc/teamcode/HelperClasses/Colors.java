@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.HelperClasses;
 
 
+import com.acmerobotics.dashboard.config.Config;
 
+@Config
 public class Colors {
+    public static double ColorMaxDifference = 120;
     public static class Color{
         public double r, g, b;
         public Color(double r, double g, double b){
@@ -13,13 +16,13 @@ public class Colors {
 
     }
     public enum ColorType {
-        BLUE(new Color(105, 250, 440)),
+        BLUE(new Color(60, 120, 200)),
 
-        RED(new Color(375, 229, 114)),
+        RED(new Color(177, 133, 72)),
 
-        YELLOW(new Color(600, 890, 237)),
+        YELLOW(new Color(288, 383, 94)),
 
-        NONE(new Color(59, 100, 80));
+        NONE(new Color(44, 76, 52));
 
         private final Color color;
 
@@ -34,19 +37,19 @@ public class Colors {
         double rDiff = c1.r - c2.r;
         double gDiff = c1.g - c2.g;
         double bDiff = c1.b - c2.b;
-        return Math.cbrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+        return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
     }
 
 
     public static ColorType getColorFromRGB(Color input){
         ColorType detected = ColorType.NONE;
-        double minDist = Double.MAX_VALUE;
+        double mini = 1e9;
         for(ColorType ct : ColorType.values()){
             if(ct == ColorType.NONE) continue;
             double dist = getColorDistance(input, ct.getColor());
-            if(dist < minDist){
+            if(mini > dist){
                 detected = ct;
-                minDist = dist;
+                mini = dist;
             }
         }
         return detected;
