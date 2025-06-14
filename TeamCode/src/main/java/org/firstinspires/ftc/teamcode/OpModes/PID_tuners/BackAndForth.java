@@ -17,8 +17,8 @@ import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 @Config
 public class BackAndForth extends LinearOpMode {
 //    public static double DISTANCE = 1500;
-    public static SparkFunOTOS.Pose2D pose = new SparkFunOTOS.Pose2D(0, 0, 0);
-    public static double h = 10;
+    public static SparkFunOTOS.Pose2D pose = new SparkFunOTOS.Pose2D(1000, 0, 0);
+    public static double h = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {

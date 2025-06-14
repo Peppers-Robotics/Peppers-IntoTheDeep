@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import android.annotation.SuppressLint;
 import android.widget.TabHost;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -51,87 +52,87 @@ public class Sample extends LinearOpMode {
         private Scheduler transfer;
         public Transfer(){
             transfer = new Scheduler();
-                transfer
-                        .addTask(new Task() {
-                            @Override
-                            public boolean Run() {
-                                DropDown.setDown(0);
-                                Claw.open();
-                                Extendo.PowerOnToTransfer = true;
-                                Extension.Retract();
-                                Arm.setArmAngle(OutTakeLogic.ArmIdle);
-                                if(Extendo.getCurrentPosition() < 40){
-                                    Elevator.PowerOnDownToTakeSample = true;
-                                }
-                                return Extendo.getCurrentPosition() < 20;
-                            }
-                        })
-                        .addTask(new Task() {
-                            @Override
-                            public boolean Run() {
-                                ActiveIntake.powerOn();
-                                DropDown.setDown(0);
-                                Elevator.PowerOnDownToTakeSample = true;
-                                Extension.Extend(OutTakeLogic.TransferExtension);
-                                return Extendo.getCurrentPosition() < 20;
-                            }
-                        })
-                        .addTask(new Task() {
-                            @Override
-                            public boolean Run() {
-                                Claw.open();
-                                ActiveIntake.Block();
-                                Arm.setArmAngle(OutTakeLogic.ArmIdle);
-                                DropDown.setDown(0);
-                                Elevator.PowerOnDownToTakeSample = true;
-                                Elevator.power = 1;
-                                Extendo.PowerOnToTransfer = true;
-                                Extendo.Extend(0);
-                                return Elevator.getCurrentPosition() < 20;
-                            }
-                        })
-                        .waitSeconds(0.05)
-                        .addTask(new Task() {
-                            @Override
-                            public boolean Run() {
-                                Claw.close();
-                                return true;
-                            }
-                        })
-                        .waitSeconds(0.05)
-                        .addTask(new Task() {
-                            @Override
-                            public boolean Run() {
-                                Elevator.PowerOnDownToTakeSample = false;
-                                Extendo.PowerOnToTransfer = false;
+            transfer
+            .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        DropDown.setDown(0);
+                        Claw.open();
+                        Extendo.PowerOnToTransfer = true;
+                        Extension.Retract();
+                        Arm.setArmAngle(OutTakeLogic.ArmIdle);
+                        if(Extendo.getCurrentPosition() < 40){
+                            Elevator.PowerOnDownToTakeSample = true;
+                        }
+                        return Extendo.getCurrentPosition() < 20;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        ActiveIntake.powerOn();
+                        DropDown.setDown(0);
+                        Elevator.PowerOnDownToTakeSample = true;
+                        Extension.Extend(OutTakeLogic.TransferExtension);
+                        return Extendo.getCurrentPosition() < 20;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Claw.open();
+                        ActiveIntake.Block();
+                        Arm.setArmAngle(OutTakeLogic.ArmIdle);
+                        DropDown.setDown(0);
+                        Elevator.PowerOnDownToTakeSample = true;
+                        Elevator.power = 1;
+                        Extendo.PowerOnToTransfer = true;
+                        Extendo.Extend(0);
+                        return Elevator.getCurrentPosition() < 20;
+                    }
+                })
+                .waitSeconds(0.05)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Claw.close();
+                        return true;
+                    }
+                })
+                .waitSeconds(0.05)
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Elevator.PowerOnDownToTakeSample = false;
+                        Extendo.PowerOnToTransfer = false;
 //                                Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
-                                Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
-                                if(Elevator.getCurrentPosition() >= 5)
-                                    Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
-                                return true;
-                            }
-                        })
-                        .addTask(new Task() {
-                            @Override
-                            public boolean Run() {
-                                ActiveIntake.powerOff();
-                                if(Elevator.getCurrentPosition() >= 20)
-                                    Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
-                                return Math.abs(Elevator.getCurrentPosition() - Elevator.getTargetPosition()) < 700;
-                            }
-                        })
-                        .addTask(new Task() {
-                            @Override
-                            public boolean Run() {
-                                Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
-                                if(Arm.getCurrentArmAngle() >= 190){
-                                    Extension.Extend(0.2);
-                                }
-                                DropDown.setDown(0);
-                                return Arm.motionCompleted();
-                            }
-                        })
-                ;
+                        Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
+                        if(Elevator.getCurrentPosition() >= 5)
+                            Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
+                        return true;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        ActiveIntake.powerOff();
+                        if(Elevator.getCurrentPosition() >= 20)
+                            Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
+                        return Math.abs(Elevator.getCurrentPosition() - Elevator.getTargetPosition()) < 700;
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
+                        if(Arm.getCurrentArmAngle() >= 190){
+                            Extension.Extend(0.2);
+                        }
+                        DropDown.setDown(0);
+                        return Arm.motionCompleted();
+                    }
+                })
+        ;
 
         }
         @Override
@@ -186,20 +187,16 @@ public class Sample extends LinearOpMode {
                         public boolean Run() {
                             camera.start();
                             camera.pipelineSwitch(0);
-//                            Claw.open();
                             Claw.closeAbit();
                             ActiveIntake.Unblock();
                             Extendo.Extend(0);
-//                            Chassis.setHeading(park.h);
-//                            Chassis.asyncFollow = false;
                             result = null;
                             return true;
                         }
                     })
-//                    .waitForSync()
+                    .waitForSync()
 //                    .waitForStill()
 //                    .waitSeconds(0.2)
-                    .waitForTrajDone(99)
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
@@ -208,7 +205,7 @@ public class Sample extends LinearOpMode {
                             if(result != null && result.isValid() && GetPositionSample.hasId(result, id)){
                                 camera.captureSnapshot("image" + cnt++);
                                 headingCoeff = Chassis.Heading.getCoeff();
-                                Chassis.Heading.setPidCoefficients(Chassis.FullExtendoHeading);
+//                                Chassis.Heading.setPidCoefficients(Chassis.FullExtendoHeading);
 
                             }
 //                            Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y, park.h));
@@ -224,29 +221,16 @@ public class Sample extends LinearOpMode {
                             ty = res.getTargetYDegrees();
 
 
-                              Chassis.Heading = new PIDController(new PIDCoefficients(1.8, 0.3, 0.05));
-                            /*Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(Localizer.getCurrentPosition().x, Localizer.getCurrentPosition().y,
-                                    GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(tx,ty).h
-                            ));*/
-//                            tx = result.getTx();
-//                            ty = result.getTy();
-//                            Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(
-//                                    took.x,
-//                                    took.y,
-//                                   GetPositionSample.GetExtendoTicksToTravelAndNeededAngle(tx,ty).h
-//                            ));
-
-                            //GlobalSample = GetPositionSample.GetGlobalSamplePosition(tx,ty);
-
-                            Chassis.setHeading(GetPositionSample.getExtendoRotPair(tx,ty).h);
+//                            Chassis.Heading = new PIDController(new PIDCoefficients(1.8, 0.3, 0.05));
+                            Chassis.setHeading(GetPositionSample.getExtendoRotPair(tx, ty).h);
                             return true;
                         }
                     })
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Chassis.setHeading(GetPositionSample.getExtendoRotPair(tx,ty).h);
-                            return Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) <= Math.toRadians(5);
+                            Chassis.setHeading(GetPositionSample.getExtendoRotPair(tx, ty).h);
+                            return Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) <= Math.toRadians(2);
                         }
                     })
                     .addTask(new Task() {
@@ -254,9 +238,8 @@ public class Sample extends LinearOpMode {
                         public boolean Run() {
                             SparkFunOTOS.Pose2D extendandRotData = GetPositionSample.getExtendoRotPair(tx,ty);
 
-                            Chassis.setHeading(extendandRotData.h);
                             Extendo.Extend(
-                                    (int) extendandRotData.x - 30 // 30
+                                    (int) extendandRotData.x - 18 // 30
                             );
                             return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 10 && Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) <= Math.toRadians(3);
                         }

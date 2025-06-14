@@ -45,6 +45,7 @@ public class OpModeManager {
         gamepad1 = g1;
         gamepad2 = g2;
         telemetry = t;
+        IntakeLogic.IgnoreUntilNext = false;
 
         Storage.team = team;
 
@@ -156,9 +157,9 @@ public class OpModeManager {
         double pow = (min - 1) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition() + 1;
 
         Chassis.drive(
-                getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
-                -getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
-                getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
+                -getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
+                getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
+                -getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
         );
         if(Controls.gamepad2.wasPressed.dpad_left) Claw.close();
 

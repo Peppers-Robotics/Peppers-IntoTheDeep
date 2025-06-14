@@ -546,6 +546,8 @@ public class OutTakeLogic {
                         @Override
                         public boolean Run() {
                             Chassis.DoingSpecimens = false;
+                            if(Elevator.getCurrentPosition() < 30)
+                                IntakeLogic.IgnoreUntilNext = true;
                             Claw.open();
                             Extension.Retract();
 //                            if(Elevator.getCurrentPosition() > ElevatorUp)

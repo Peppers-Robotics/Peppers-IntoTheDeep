@@ -20,6 +20,7 @@ public class IntakeLogic extends GenericController {
     public static States state = States.IDLE;
     public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime(), time2 = new ElapsedTime();
     public static boolean wasDriverActivated = false;
+    public static boolean IgnoreUntilNext = false;
     private static int pos = 0;
     public static int offset = 0;
     public static void update(){
@@ -61,8 +62,11 @@ public class IntakeLogic extends GenericController {
                 } else {
                     Extendo.motor.setPower(0);
                 }
-                if(Storage.hasTeamPice() ){
+                if(Storage.hasTeamPice() && !IgnoreUntilNext){
                     Controls.RetractExtendo = true;
+                }
+                if(!Storage.hasTeamPice() && IgnoreUntilNext){
+                    IgnoreUntilNext = false;
                 }
                 Robot.telemetry.addData("tp", Extendo.getCurrentPosition());
                 time2.reset();

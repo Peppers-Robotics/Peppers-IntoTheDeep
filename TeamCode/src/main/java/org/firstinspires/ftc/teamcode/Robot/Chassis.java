@@ -38,20 +38,13 @@ public class Chassis {
         Robot.telemetry.addData("BL PC", BL.getCurrent(CurrentUnit.AMPS));
         Robot.telemetry.addData("BR PC", BR.getCurrent(CurrentUnit.AMPS));
         double d = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
-        double fl,bl,fr,br;
+        double fl, bl, fr, br;
 
-        if(!Autonomous) {
-                fl = (-y - x + r) / d;
-                bl = (-y + x + r) / d;
-                fr = (-y + x - r) / d;
-                br = (-y - x - r) / d;
-        }
-        else {
-            fl = (y + x + r) / d;
-            bl = (y - x + r) / d;
-            fr = (y - x - r) / d;
-            br = (y + x - r) / d;
-        }
+        fl = (y + x + r) / d;
+        bl = (y - x + r) / d;
+        fr = (y - x - r) / d;
+        br = (y + x - r) / d;
+
         FL.setPower(fl * FLd);
         FR.setPower(fr * FRd);
         BL.setPower(bl * BLd);
@@ -71,7 +64,7 @@ public class Chassis {
     // Autonomous implementation
 
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
-    public static PIDController Strafe = new PIDController(0.01, 0.05, 0.002),
+    public static PIDController Strafe = new PIDController(0.01, 0.0, 0.001),
                                 Forward = new PIDController(-0.012, -0.02, -0.002),
                                 Heading = new PIDController(0.85, 0.5, 0.07);
     public static PIDCoefficients FullExtendoHeading = new PIDCoefficients(0.3,0.0015,0.06);
@@ -88,6 +81,11 @@ public class Chassis {
         Strafe.setFreq(30);
         Forward.setFreq(30);
         Heading.setFreq(30);
+
+        Strafe.kS = 0.0;
+        Forward.kS = -0.04;
+        Heading.kS = 0.02;
+
     }
 
     public static SparkFunOTOS.Pose2D getTargetPosition(){

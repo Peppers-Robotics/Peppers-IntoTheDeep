@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class PIDController {
     public PIDCoefficients pidCoefficients;
+    public double kS = 0;
     private double targetPosition = 0;
     public double error, lastError, maxActuatorOutput, Isum = 0;
     private final ElapsedTime et = new ElapsedTime();
@@ -55,8 +56,8 @@ public class PIDController {
         et.reset();
 
         lastError = error;
-        lastReturn = r;
-        return r;
+        lastReturn = r - kS * Math.signum(error);
+        return lastReturn;
     }
     public void setTargetPosition(double pos, boolean resetIsum){
         targetPosition = pos;

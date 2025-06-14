@@ -30,6 +30,7 @@ public class AutoTakeSample extends LinearOpMode {
 //    public static final double h35 = 269.1, h30 = 272.19, h25 = 275.214, h20 = 278.157, h15 = 281.043, h10 = 283.7, h5 = 286.2526, h0 = 288.638;
     public static final double spool = 16, RA = 4.75;
     public static final int CPR = 28;
+    public static int offset = 18;
     public static double hz = 1;
     public static boolean startgetsample = false;
     public static boolean starttakeserios = false;
@@ -63,11 +64,10 @@ public class AutoTakeSample extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Robot.InitializeFull(hardwareMap);
         Robot.enable();
-        //DropDown.setDown(0);
-        //Extendo.Extend(0);
-        //Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
-
-        SparkFunOTOS.Pose2D pos_sample_field = new SparkFunOTOS.Pose2D(0,0,0);
+        DropDown.setDown(0);
+        Extendo.Extend(0);
+        Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
+        Chassis.Autonomous = true;
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "camera");
 
         run = false;
@@ -78,7 +78,6 @@ public class AutoTakeSample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        run = true;
                         res = ll.getLatestResult();
                         if(res != null && res.isValid() && GetPositionSample.hasId(res, id)){
                             tx = GetPositionSample.getOptimalResult(res, id).getTargetXDegrees();
@@ -90,9 +89,16 @@ public class AutoTakeSample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend((int) GetPositionSample.getExtendoRotPair(tx, ty).x);
                         Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, GetPositionSample.getExtendoRotPair(tx, ty).h));
-                        return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 4;
+                        run = true;
+                        return Localizer.getAngleDifference(Chassis.getTargetPosition().h, Localizer.getCurrentPosition().h) < Math.toRadians(2);
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Extendo.Extend((int) GetPositionSample.getExtendoRotPair(tx, ty).x - offset);
+                        return Math.abs(Extendo.getCurrentPosition() - Extendo.getTargetPosition()) < 20;
                     }
                 })
                 .waitSeconds(0.1)
@@ -150,76 +156,16 @@ public class AutoTakeSample extends LinearOpMode {
         waitForStart();
         ll.start();
         ll.pipelineSwitch(0);
-        ElapsedTime t = new ElapsedTime();
 
         while(opModeIsActive()){
             Robot.clearCache();
-            //task.update();
-            run = true;
+            task.update();
             res = ll.getLatestResult();
-            Robot.telemetry.addData("camera results isValid", res!=null && res.isValid());
-            if(res != null && res.isValid() && GetPositionSample.hasId(res, id)){
-                LLResultTypes.DetectorResult result = GetPositionSample.getOptimalResult(res, id);
-                tx = result.getTargetXDegrees();
-                ty = result.getTargetYDegrees();
-            }
 
-            //Robot.telemetry.addData("tx", tx);
-            //Robot.telemetry.addData("ty", ty);
-
-            SparkFunOTOS.Pose2D pos = Localizer.getCurrentPosition();
-            SparkFunOTOS.Pose2D normalizedPos = GetPositionSample.normalize_pos(pos);
-            Robot.telemetry.addData("x robot", normalizedPos.x);
-            Robot.telemetry.addData("y robot", normalizedPos.y);
-            Robot.telemetry.addData("abnormal heading", pos.h);
-            Robot.telemetry.addData("h robot", normalizedPos.h);
-            SparkFunOTOS.Pose2D poscamera = GetPositionSample.CameraRelativeToField(pos);
-            //Robot.telemetry.addData("x camera", poscamera.x);
-            //Robot.telemetry.addData("y camera", poscamera.y);
-
-            if(gamepad1.cross)
-                starttakeserios = true;
-            if(gamepad1.circle)
-            {
-                starttakeserios = false;
-                startgetsample = false;
-                readings = 0;
-                pos_sample_field = new SparkFunOTOS.Pose2D(0,0,0);
-                Chassis.setTargetPosition(pos_sample_field);
-            }
-
-
-            /*if(res != null && !startgetsample && (tx != 0 || ty != 0) && starttakeserios) {
-                SparkFunOTOS.Pose2D pos_sample = GetPositionSample.getSamplePositionRelativeToCamera(tx,ty);
-                //Robot.telemetry.addData("pos sample x", pos_sample.x);
-                //Robot.telemetry.addData("pos sample y", pos_sample.y);
-                SparkFunOTOS.Pose2D temp_pos_sample_field = GetPositionSample.getSampleRelativeToField(poscamera,normalizedPos.h,pos_sample);
-                poses.add(temp_pos_sample_field);
-
-                Robot.telemetry.addData("pos sample x relevant to field", pos_sample_field.x);
-                Robot.telemetry.addData("pos sample y relevant to field", pos_sample_field.y);
-
-                readings++;
-
-                if(limit_readings == readings) {
-                    startgetsample = true;
-                    pos_sample_field = GetPositionSample.CalculatePosFromMultipleScreenShots(poses);
-                }
-
-            }*/
-            //hz = 1 / t.seconds();
-
-            if(startgetsample) {
+            if(run){
                 Chassis.Update();
-                //Extendo.update();
             }
-
-
-            //Localizer.Update();
-            //Robot.telemetry.addData("rot tp", Math.toDegrees(Chassis.getTargetPosition().h));
-
-            Robot.telemetry.addData("sample pos x", pos_sample_field.x);
-            Robot.telemetry.addData("sample pos y", pos_sample_field.y);
+            Extendo.update();
 
             Robot.telemetry.update();
             Localizer.Update();

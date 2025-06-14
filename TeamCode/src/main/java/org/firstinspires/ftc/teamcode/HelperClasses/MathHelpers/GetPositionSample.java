@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Config
 public class GetPositionSample {
-    public static double initialAngle = Math.toRadians(15), h = 270.78, centerToExtendo = 185;// COY = 140
+    public static double initialAngle = Math.toRadians(15), h = 270.78, centerToExtendo = 140;// COY = 140
     public static double cameraOffsetX = 140.148, cameraOffsetY = 100;
     public static double centerOffsetToDownRightX = 135.64,centerOffsetToDownRightY = 158.502;
     public static double CameraAngleFromCenterPoint = Math.atan(cameraOffsetY/cameraOffsetX);//de schimbat

@@ -60,7 +60,6 @@ public class Controls {
             if(gamepad1.wasPressed.dpad_up)     ScoreLevel2  = true;
             if(gamepad1.wasPressed.square){      Grab         = true; RetractExtendo = true;}
             if(gamepad1.wasPressed.circle)      {Retract      = true; Chassis.DoingSpecimens = false;
-                OutTakeLogic.ForcedAction = true;
             }
             if(gamepad1.wasPressed.triangle)    {GrabSpecimen = true; Chassis.DoingSpecimens = true;}
             if(gamepad1.wasPressed.dpad_right)  Throw        = true;

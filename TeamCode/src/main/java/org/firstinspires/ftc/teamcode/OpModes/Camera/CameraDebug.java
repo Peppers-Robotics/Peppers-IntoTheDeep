@@ -30,10 +30,6 @@ public class CameraDebug extends LinearOpMode {
         waitForStart();
         camera.start();
         camera.pipelineSwitch(0);
-//        MJpegStreamDecoder stream = new MJpegStreamDecoder("http://172.29.0.1:5800/stream");
-//
-//        FtcDashboard.getInstance().startCameraStream(stream, 20);
-//
         LLResult r = null;
         SparkFunOTOS.Pose2D p = null, o = null;
 
