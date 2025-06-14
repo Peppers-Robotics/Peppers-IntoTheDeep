@@ -6,14 +6,12 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.internal.hardware.android.GpioPin;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -64,26 +62,31 @@ public class Chassis {
     // Autonomous implementation
 
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
-    public static PIDController Strafe = new PIDController(0.01, 0.0, 0.001),
-                                Forward = new PIDController(-0.012, -0.02, -0.002),
-                                Heading = new PIDController(0.85, 0.5, 0.07);
+    public static PIDController Forward = new PIDController(0.01, 0.0, 0.001),
+                                Strafe = new PIDController(-0.012, -0.02, -0.002),
+                                Heading = new PIDController(0.85, 0.5, 0.07),
+                                ForwardVelo = new PIDController(0, 0, 0),
+                                StrafeVelo = new PIDController(0, 0, 0),
+                                HeadingVelo = new PIDController(0, 0, 0);
+
     public static PIDCoefficients FullExtendoHeading = new PIDCoefficients(0.3,0.0015,0.06);
     private static List<SparkFunOTOS.Pose2D> pointsToFollow;
 
     public static void setTargetPosition(SparkFunOTOS.Pose2D pose){
-        Strafe.setTargetPosition(0);
         Forward.setTargetPosition(0);
+        Strafe.setTargetPosition(0);
         pose.h = Localizer.normalizeRadians(pose.h);
         Heading.setTargetPosition(0);
         targetPosition = pose;
     }
     static{
-        Strafe.setFreq(30);
         Forward.setFreq(30);
+        Strafe.setFreq(30);
         Heading.setFreq(30);
+        ForwardVelo.setFreq(30);
 
-        Strafe.kS = 0.0;
-        Forward.kS = -0.04;
+        Forward.kS = 0.0;
+        Strafe.kS = -0.04;
         Heading.kS = 0.02;
 
     }
@@ -132,35 +135,9 @@ public class Chassis {
     public static void profiledFollow(SparkFunOTOS.Pose2D pose){
         RobotLog.dd("targetPosition", pose.x + ", " + pose.y + ", " + Math.toRadians(pose.h));
         pose.h = Localizer.normalizeRadians(pose.h);
-//        pointsToFollow.clear();
-//        pointsToFollow.add(pose);
         xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x, point == 0 ? xProfile.acceleration : 1e10, point == pointsToFollow.size() ? xProfile.deceleration : 1e10);
         yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y, point == 0 ? yProfile.acceleration : 1e10, point == pointsToFollow.size() ? yProfile.deceleration : 1e10);
         hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h, point == 0 ? hProfile.acceleration : 1e10, point == pointsToFollow.size() ? hProfile.deceleration : 1e10);
-        /*if(point == 0 && point == pointsToFollow.size()){
-            xProfile.changeInitialAndEndVelocity(0, 0);
-            yProfile.changeInitialAndEndVelocity(0, 0);
-            hProfile.changeInitialAndEndVelocity(0, 0);
-        }
-        if(point == 0) {
-//            Robot.telemetry.addLine("STARTPOINT");
-            xProfile.changeInitialAndEndVelocity(0, xProfile.maxVelocity / 2);
-            yProfile.changeInitialAndEndVelocity(0, yProfile.maxVelocity / 2);
-            hProfile.changeInitialAndEndVelocity(0, hProfile.maxVelocity / 2);
-        } else if(point == pointsToFollow.size()){
-//            Robot.telemetry.addLine("ENDPOINT");
-            xProfile.changeInitialAndEndVelocity(xProfile.maxVelocity / 2, 0);
-            yProfile.changeInitialAndEndVelocity(yProfile.maxVelocity / 2, 0);
-            hProfile.changeInitialAndEndVelocity(hProfile.maxVelocity / 2, 0);
-        } else {
-//            Robot.telemetry.addLine("INTERPOINT");
-            xProfile.changeInitialAndEndVelocity(xProfile.maxVelocity / 2, xProfile.maxVelocity / 2);
-            yProfile.changeInitialAndEndVelocity(yProfile.maxVelocity / 2, yProfile.maxVelocity / 2);
-            hProfile.changeInitialAndEndVelocity(hProfile.maxVelocity / 2, hProfile.maxVelocity / 2);
-        }*/
-//        xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x);
-//        yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y);
-//        hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h);
 
         totalDistanceToTravel = Math.sqrt((Localizer.getCurrentPosition().x - pose.x) * (Localizer.getCurrentPosition().x - pose.x) +
                                           (Localizer.getCurrentPosition().y - pose.y) * (Localizer.getCurrentPosition().y - pose.y));
@@ -226,10 +203,21 @@ public class Chassis {
             RobotLog.ee("Error during auton", e.getMessage());
         }
 
-        SparkFunOTOS.Pose2D normal = new SparkFunOTOS.Pose2D(
+        SparkFunOTOS.Pose2D normalPos = new SparkFunOTOS.Pose2D(
                 getTargetPosition().x - Localizer.getCurrentPosition().x,
                 getTargetPosition().y - Localizer.getCurrentPosition().y,
                 getTargetPosition().h - Localizer.getCurrentPosition().h);
+
+        SparkFunOTOS.Pose2D normalVelo = new SparkFunOTOS.Pose2D(
+                xProfile.getVelocity() - Localizer.getVelocity().x,
+                yProfile.getVelocity() - Localizer.getVelocity().y,
+                hProfile.getVelocity() - Localizer.getVelocity().h
+        );
+        SparkFunOTOS.Pose2D normal = new SparkFunOTOS.Pose2D(
+                normalVelo.x * (xProfile.motionEnded() ? 0 : 1) + normalPos.x * (xProfile.motionEnded() ? 1 : 0),
+                normalVelo.y * (yProfile.motionEnded() ? 0 : 1) + normalPos.y * (yProfile.motionEnded() ? 1 : 0),
+                normalVelo.h * (hProfile.motionEnded() ? 0 : 1) + normalPos.h * (hProfile.motionEnded() ? 1 : 0)
+        );
 
         double Herror = Localizer.normalizeRadians(normal.h);
         double h = Localizer.getCurrentPosition().h;
@@ -241,9 +229,13 @@ public class Chassis {
                 Herror
         );
 
-        double xP = Strafe.calculatePower(error.x);
-        double yP = Forward.calculatePower(error.y);
+        double xP = Forward.calculatePower(error.x);
+        double yP = Strafe.calculatePower(error.y);
         double hP = Heading.calculatePower(error.h);
+
+        if(!xProfile.motionEnded()) xP = ForwardVelo.calculatePower(error.x);
+        if(!yProfile.motionEnded()) yP = StrafeVelo.calculatePower(error.y);
+        if(!hProfile.motionEnded()) hP = HeadingVelo.calculatePower(error.h);
 
         Robot.telemetry.addData("xError", error.x);
         Robot.telemetry.addData("yError", error.y);

@@ -13,8 +13,6 @@ import org.firstinspires.ftc.teamcode.Intake.Extendo;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
-import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @TeleOp
 public class TestRotExt extends LinearOpMode {
@@ -26,8 +24,8 @@ public class TestRotExt extends LinearOpMode {
         Robot.enable();
         DropDown.setDown(0);
         Extendo.Extend(0);
-        Chassis.Strafe.pidCoefficients = new PIDCoefficients();
         Chassis.Forward.pidCoefficients = new PIDCoefficients();
+        Chassis.Strafe.pidCoefficients = new PIDCoefficients();
 
 
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "camera");
