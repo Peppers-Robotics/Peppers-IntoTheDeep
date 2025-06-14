@@ -59,7 +59,6 @@ public class Climb {
                 addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Chassis.Autonomous = true;
                         ActivateWheelie();
                         DisengagePTO();
 //                        Extendo.motor.setPower(-0.4);
