@@ -106,16 +106,17 @@ public class Sample extends LinearOpMode {
                         Elevator.PowerOnDownToTakeSample = false;
                         Extendo.PowerOnToTransfer = false;
 //                                Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
-                        Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
-                        if(Elevator.getCurrentPosition() >= 5)
-                            Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
-                        return true;
+//                        Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
+//                        if(Elevator.getCurrentPosition() >= 5)
+//                            Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
+                        ActiveIntake.powerOff();
+                        return Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), basketPosition) < 400;
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        ActiveIntake.powerOff();
+                        Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
                         if(Elevator.getCurrentPosition() >= 20)
                             Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
                         return Math.abs(Elevator.getCurrentPosition() - Elevator.getTargetPosition()) < 700;
@@ -129,7 +130,7 @@ public class Sample extends LinearOpMode {
                             Extension.Extend(0.2);
                         }
                         DropDown.setDown(0);
-                        return Arm.motionCompleted();
+                        return Arm.getCurrentArmAngle() > OutTakeLogic.ArmScoreSample - 15;
                     }
                 })
         ;
