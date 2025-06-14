@@ -29,10 +29,9 @@ public class OutTakeLogic {
     public static double ArmTakeSpecimen = 320, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 95, PivotScoreSpecimen = 0;
     public static double ArmIdle = -10, PivotIdle = 0, ElevatorIdle = -10, DropDownTransfer = 0, ArmTransfer = -10;
-    public static boolean ForcedAction = false;
     public static boolean save2 = false;
     public static double coeff = 5;
-    public static double TakeSpecimenExtension = 0.2, TransferExtension = 0.24, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.3;
+    public static double TakeSpecimenExtension = 0.2, TransferExtension = 0.24, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.2;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,
@@ -78,8 +77,8 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
-                                        Elevator.PowerOnDownToTakeSample = true;
-                                        Elevator.power = takeSpecimenPower;
+                                        Elevator.PowerOnDownToTakeSample = false;
+                                        Elevator.setTargetPosition(ElevatorIdle);
                                         return Arm.getPrecentOfArmMotionCompleted() > 90;
                                     }
                                 })
