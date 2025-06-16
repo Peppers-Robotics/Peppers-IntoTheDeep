@@ -56,6 +56,7 @@ public class Localizer {
     public static double getAngleDifference(double h1, double h2){
         h1 = Localizer.normalizeRadians(h1);
         h2 = Localizer.normalizeRadians(h2);
+        if(h1 == 0 && h2 == 180) return 0;
         return Math.min(Math.abs(h1 - h2), Math.PI * 2 - Math.abs(h1 - h2));
     }
     private static long imuUpdate = 0;
@@ -79,7 +80,7 @@ public class Localizer {
             }
         }
 
-        velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, getCurrentPosition().h - lastPose.h);
+        velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, getAngleDifference(getCurrentPosition().h, lastPose.h));
         lastPose = getCurrentPosition();
         velocity = Div(velocity, time.seconds());
 

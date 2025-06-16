@@ -7,7 +7,8 @@ public class AsymmetricMotionProfile {
     private ElapsedTime time = new ElapsedTime();
     private double accelerationTime, deccelarationTime, constantTime,
             currentPosition, initialPosition, targetPosition, mvUsed,
-            velocity, sig;
+            velocity;
+    public double sig;
     private double t0 = 0, t1 = 0, t2 = 0;
     public AsymmetricMotionProfile(double maxVelocity, double acceleration, double deceleration){
         this.maxVelocity = maxVelocity;
@@ -95,19 +96,19 @@ public class AsymmetricMotionProfile {
     private double a(double t){
         if(t <= t0) return acceleration;
         if(t <= t1) return 0;
-        if(t <= t2) return deceleration;
+        if(t <= t2) return -deceleration;
         return 0;
     }
     private double v(double t){
         if(t <= t0) return t * acceleration + initialVelocity;
         if(t <= t1) return maxVelocity;
-        if(t <= t2) return maxVelocity - deceleration * (t - t1);
+        if(t <= t2) return maxVelocity + deceleration * (t - t1);
         return 0;
     }
     private double p(double t){
         if(t <= t0) return acceleration / 2 * t * t;
         if(t <= t1) return acceleration / 2 * t0 * t0 + mvUsed * (t - t0);
-        if(t <= t2) return acceleration / 2 * t0 * t0 + mvUsed * (t - t0) - deceleration / 2 * (t - t1) * (t - t1);
+        if(t <= t2) return acceleration / 2 * t0 * t0 + mvUsed * (t - t0) + deceleration / 2 * (t - t1) * (t - t1);
         return 0;
     }
     public void update(){

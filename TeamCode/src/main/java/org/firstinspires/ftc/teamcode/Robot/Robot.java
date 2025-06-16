@@ -172,6 +172,7 @@ public class Robot {
         InitializeLocalizer(hm);
         InitializeStorage(hm);
         InitializeExtension();
+        Chassis.ONLY_FF_HEADING = false;
     }
     public static void InitializeExtension(){
         Extension.servo = new ServoPlus(ServoHub, 2, Servo.Direction.FORWARD);

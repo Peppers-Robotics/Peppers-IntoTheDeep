@@ -21,6 +21,7 @@ public class Chassis {
     public static CachedMotor FL, FR, BL, BR;
     public static double FLd = 1, FRd = -1, BLd = 1, BRd = -1;
     public static double SplineDoneNess = 0;
+    public static boolean ONLY_FF_HEADING = false;
     public static boolean PuttingSpecimens = false;
     public static boolean Autonomous = false;
     public static boolean DoingSpecimens = false;
@@ -62,12 +63,10 @@ public class Chassis {
     // Autonomous implementation
 
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
+    public static double hkA = 0, hkV = 0, hkS = 0;
     public static PIDController Forward = new PIDController(0.01, 0.0, 0.001),
                                 Strafe = new PIDController(-0.012, -0.02, -0.002),
-                                Heading = new PIDController(0.85, 0.5, 0.07),
-                                ForwardVelo = new PIDController(0, 0, 0),
-                                StrafeVelo = new PIDController(0, 0, 0),
-                                HeadingVelo = new PIDController(0, 0, 0);
+                                Heading = new PIDController(0.85, 0.5, 0.07);
 
     public static PIDCoefficients FullExtendoHeading = new PIDCoefficients(0.3,0.0015,0.06);
     private static List<SparkFunOTOS.Pose2D> pointsToFollow;
@@ -83,7 +82,6 @@ public class Chassis {
         Forward.setFreq(30);
         Strafe.setFreq(30);
         Heading.setFreq(30);
-        ForwardVelo.setFreq(30);
 
         Forward.kS = 0.0;
         Strafe.kS = -0.04;
@@ -104,7 +102,7 @@ public class Chassis {
     public static double xAccel = 4000, yAccel = 4000, xMV = 3000, yMV = 3000, xDecc = 2500, yDecc = 1000;
     public static AsymmetricMotionProfile xProfile = new AsymmetricMotionProfile(4000, 3000, 1000),
             yProfile = new AsymmetricMotionProfile(4000, 3000, 1000),
-            hProfile = new AsymmetricMotionProfile(Math.PI * 6, Math.PI * 4, Math.PI * 3);
+            hProfile = new AsymmetricMotionProfile(Math.PI * 2, Math.PI, Math.PI);
     public static void resetProfiles(){
         xProfile.maxVelocity = xMV;
         xProfile.acceleration = xAccel;
@@ -181,12 +179,9 @@ public class Chassis {
                 if (linearHeading) {
                     double soFar = Math.sqrt((xProfile.getPosition() - xProfile.getTargetPosition()) * (xProfile.getPosition() - xProfile.getTargetPosition()) +
                             (yProfile.getPosition() - yProfile.getTargetPosition()) * (yProfile.getPosition() - yProfile.getTargetPosition()));
-//                Robot.telemetry.addData("soFar", soFar);
                     h = headingInterpolation.getOutput((totalDistanceToTravel - soFar) / totalDistanceToTravel);
                 }
                 setTargetPosition(new SparkFunOTOS.Pose2D(xProfile.getPosition(), yProfile.getPosition(), h));
-//            Robot.telemetry.addData("x precent", xProfile.getPrecentOfMotion());
-//            Robot.telemetry.addData("y precent", yProfile.getPrecentOfMotion());
                 if (Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), new SparkFunOTOS.Pose2D(xProfile.getTargetPosition(), yProfile.getTargetPosition(), 0)) < 200 || point == 0) {
                     if (point >= pointsToFollow.size()) {
                         if (xProfile.motionEnded() && yProfile.motionEnded() && (linearHeading || hProfile.motionEnded())) {
@@ -203,21 +198,10 @@ public class Chassis {
             RobotLog.ee("Error during auton", e.getMessage());
         }
 
-        SparkFunOTOS.Pose2D normalPos = new SparkFunOTOS.Pose2D(
+        SparkFunOTOS.Pose2D normal = new SparkFunOTOS.Pose2D(
                 getTargetPosition().x - Localizer.getCurrentPosition().x,
                 getTargetPosition().y - Localizer.getCurrentPosition().y,
                 getTargetPosition().h - Localizer.getCurrentPosition().h);
-
-        SparkFunOTOS.Pose2D normalVelo = new SparkFunOTOS.Pose2D(
-                xProfile.getVelocity() - Localizer.getVelocity().x,
-                yProfile.getVelocity() - Localizer.getVelocity().y,
-                hProfile.getVelocity() - Localizer.getVelocity().h
-        );
-        SparkFunOTOS.Pose2D normal = new SparkFunOTOS.Pose2D(
-                normalVelo.x * (xProfile.motionEnded() ? 0 : 1) + normalPos.x * (xProfile.motionEnded() ? 1 : 0),
-                normalVelo.y * (yProfile.motionEnded() ? 0 : 1) + normalPos.y * (yProfile.motionEnded() ? 1 : 0),
-                normalVelo.h * (hProfile.motionEnded() ? 0 : 1) + normalPos.h * (hProfile.motionEnded() ? 1 : 0)
-        );
 
         double Herror = Localizer.normalizeRadians(normal.h);
         double h = Localizer.getCurrentPosition().h;
@@ -232,10 +216,9 @@ public class Chassis {
         double xP = Forward.calculatePower(error.x);
         double yP = Strafe.calculatePower(error.y);
         double hP = Heading.calculatePower(error.h);
-
-        if(!xProfile.motionEnded()) xP = ForwardVelo.calculatePower(error.x);
-        if(!yProfile.motionEnded()) yP = StrafeVelo.calculatePower(error.y);
-        if(!hProfile.motionEnded()) hP = HeadingVelo.calculatePower(error.h);
+        if(!hProfile.motionEnded() || ONLY_FF_HEADING){
+            hP = hkA * hProfile.getAcceleration() + hkV * hProfile.getVelocity() + hkA * hProfile.sig;
+        }
 
         Robot.telemetry.addData("xError", error.x);
         Robot.telemetry.addData("yError", error.y);
