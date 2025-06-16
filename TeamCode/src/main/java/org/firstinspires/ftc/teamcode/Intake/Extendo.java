@@ -52,6 +52,7 @@ public class Extendo {
     }
     public static boolean DISABLE = false, was = false;
     private static ElapsedTime time = new ElapsedTime();
+    public static double power = 1;
     public static boolean PowerOnToTransfer = false;
     public static int getTargetPosition(){
         return (int) targetPosition;
@@ -78,8 +79,9 @@ public class Extendo {
 //        }
 
         if(PowerOnToTransfer) {
-            motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
-            motor.setMotorEnable();
+//            motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
+            motor.setPower(-power);
+//            motor.setMotorDisable();
         } else {
             motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
             motor.setMotorEnable();

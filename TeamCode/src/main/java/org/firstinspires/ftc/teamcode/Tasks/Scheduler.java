@@ -162,7 +162,7 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
-                return Localizer.getVelocity().x < 10 && Localizer.getVelocity().y < 10;
+                return Localizer.getVelocity().x < 10 && Localizer.getVelocity().y < 10 && Localizer.getVelocity().h < Math.toRadians(5);
             }
         });
         return this;

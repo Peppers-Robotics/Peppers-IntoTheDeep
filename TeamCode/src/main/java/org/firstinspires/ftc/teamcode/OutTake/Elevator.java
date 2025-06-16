@@ -32,7 +32,7 @@ public class Elevator {
     private static double targetPos = 0;
     public static boolean PowerOnDownToTakeSample = false;
     public static double power = 1;
-    private static boolean resetTo0 = false;
+    public static boolean resetTo0 = false;
 
     synchronized public static void setTargetPosition(double pos){
         pos *= 1;
@@ -79,7 +79,7 @@ public class Elevator {
             RESET = true;
         }
         if (RESET) {
-            if ((motor.getCurrent(CurrentUnit.AMPS) + motor2.getCurrent(CurrentUnit.AMPS) >= 5 && Math.abs(encoder.getVelocity()) <= 1 && encoder.getCurrentPosition() < 30) || was) {
+            if ((motor.getCurrent(CurrentUnit.AMPS) + motor2.getCurrent(CurrentUnit.AMPS) >= 2 && Math.abs(encoder.getVelocity()) <= 1 && encoder.getCurrentPosition() < 30) || was) {
                 was = true;
                 encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

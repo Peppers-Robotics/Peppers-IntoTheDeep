@@ -64,9 +64,9 @@ public class Chassis {
     // Autonomous implementation
 
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
-    public static PIDController Strafe = new PIDController(0.01, 0.0, 0.001),
-                                Forward = new PIDController(-0.012, -0.02, -0.002),
-                                Heading = new PIDController(0.85, 0.5, 0.07);
+    public static PIDController Strafe = new PIDController(0.01, 0.0, 0.002),
+                                Forward = new PIDController(-0.015, 0, -0.002),
+                                Heading = new PIDController(0.6, 0, 0.08);
     public static PIDCoefficients FullExtendoHeading = new PIDCoefficients(0.3,0.0015,0.06);
     private static List<SparkFunOTOS.Pose2D> pointsToFollow;
 
@@ -82,9 +82,9 @@ public class Chassis {
         Forward.setFreq(30);
         Heading.setFreq(30);
 
-        Strafe.kS = 0.0;
-        Forward.kS = -0.04;
-        Heading.kS = 0.02;
+        Strafe.kS = -0.02;
+        Forward.kS = 0.03;
+        Heading.kS = -0.065;
 
     }
 
@@ -137,30 +137,6 @@ public class Chassis {
         xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x, point == 0 ? xProfile.acceleration : 1e10, point == pointsToFollow.size() ? xProfile.deceleration : 1e10);
         yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y, point == 0 ? yProfile.acceleration : 1e10, point == pointsToFollow.size() ? yProfile.deceleration : 1e10);
         hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h, point == 0 ? hProfile.acceleration : 1e10, point == pointsToFollow.size() ? hProfile.deceleration : 1e10);
-        /*if(point == 0 && point == pointsToFollow.size()){
-            xProfile.changeInitialAndEndVelocity(0, 0);
-            yProfile.changeInitialAndEndVelocity(0, 0);
-            hProfile.changeInitialAndEndVelocity(0, 0);
-        }
-        if(point == 0) {
-//            Robot.telemetry.addLine("STARTPOINT");
-            xProfile.changeInitialAndEndVelocity(0, xProfile.maxVelocity / 2);
-            yProfile.changeInitialAndEndVelocity(0, yProfile.maxVelocity / 2);
-            hProfile.changeInitialAndEndVelocity(0, hProfile.maxVelocity / 2);
-        } else if(point == pointsToFollow.size()){
-//            Robot.telemetry.addLine("ENDPOINT");
-            xProfile.changeInitialAndEndVelocity(xProfile.maxVelocity / 2, 0);
-            yProfile.changeInitialAndEndVelocity(yProfile.maxVelocity / 2, 0);
-            hProfile.changeInitialAndEndVelocity(hProfile.maxVelocity / 2, 0);
-        } else {
-//            Robot.telemetry.addLine("INTERPOINT");
-            xProfile.changeInitialAndEndVelocity(xProfile.maxVelocity / 2, xProfile.maxVelocity / 2);
-            yProfile.changeInitialAndEndVelocity(yProfile.maxVelocity / 2, yProfile.maxVelocity / 2);
-            hProfile.changeInitialAndEndVelocity(hProfile.maxVelocity / 2, hProfile.maxVelocity / 2);
-        }*/
-//        xProfile.startMotion(Localizer.getCurrentPosition().x, pose.x);
-//        yProfile.startMotion(Localizer.getCurrentPosition().y, pose.y);
-//        hProfile.startMotion(Localizer.getCurrentPosition().h, pose.h);
 
         totalDistanceToTravel = Math.sqrt((Localizer.getCurrentPosition().x - pose.x) * (Localizer.getCurrentPosition().x - pose.x) +
                                           (Localizer.getCurrentPosition().y - pose.y) * (Localizer.getCurrentPosition().y - pose.y));

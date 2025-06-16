@@ -28,7 +28,7 @@ public class OutTakeLogic {
     public static double ArmScoreSample = 235, PivotScoreSample = 0; // 220
     public static double ArmTakeSpecimen = 320, PivotTakeSpecimen = 0;
     public static double ArmScoreSpecimen = 95, PivotScoreSpecimen = 0;
-    public static double ArmIdle = -10, PivotIdle = 0, ElevatorIdle = -10, DropDownTransfer = 0, ArmTransfer = -10;
+    public static double ArmIdle = -10, PivotIdle = 0, ElevatorIdle = -10, DropDownTransfer = 0, ArmTransfer = -9;
     public static boolean save2 = false;
     public static double coeff = 5;
     public static double TakeSpecimenExtension = 0.2, TransferExtension = 0.24, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.2;
@@ -386,10 +386,10 @@ public class OutTakeLogic {
                     break;
                 case IDLE_SCORE_SPECIMEN:
 //                    Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * coeff);
-                    if(Controls.gamepad2.wasPressed.right_bumper){
-                        if(Extension.getPrecent() >= 0.2) Extension.Extend(0);
-                        else Extendo.Extend(1);
-                    }
+                    if(Controls.gamepad2.wasPressed.right_bumper)
+                        Extension.Extend(1);
+                    else
+                        Extension.Extend(0.2);
                     if (Controls.GrabSpecimen || Controls.gamepad1.wasPressed.square) {
                         currentTask = new Scheduler();
                         {

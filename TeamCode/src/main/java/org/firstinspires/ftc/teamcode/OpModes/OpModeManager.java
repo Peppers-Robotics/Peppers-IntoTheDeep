@@ -159,7 +159,7 @@ public class OpModeManager {
         Chassis.drive(
                 -getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
                 getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
-                -getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
+                getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
         );
         if(Controls.gamepad2.wasPressed.dpad_left) Claw.close();
 

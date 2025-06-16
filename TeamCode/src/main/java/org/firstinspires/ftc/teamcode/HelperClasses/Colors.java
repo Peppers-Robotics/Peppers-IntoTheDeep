@@ -16,11 +16,11 @@ public class Colors {
 
     }
     public enum ColorType {
-        BLUE(new Color(60, 120, 200)),
+        BLUE(new Color(60, 115, 190)),
 
-        RED(new Color(177, 133, 72)),
+        RED(new Color(189, 132, 65)),
 
-        YELLOW(new Color(288, 383, 94)),
+        YELLOW(new Color(288, 407, 103)),
 
         NONE(new Color(44, 76, 52));
 
@@ -42,6 +42,13 @@ public class Colors {
 
 
     public static ColorType getColorFromRGB(Color input){
+
+//        if(input.r > input.g && input.r > input.b) return ColorType.RED;
+       /* if(Math.max(input.r, Math.max(input.g, input.b)) == input.b) return ColorType.BLUE;
+        if(Math.max(input.r, Math.max(input.g, input.b)) == input.b) return ColorType.RED;
+        if(Math.max(input.r, Math.max(input.g, input.b)) == input.g && Math.abs(input.r - input.g) >= 30) return ColorType.RED;
+        return ColorType.NONE;*/
+
         ColorType detected = ColorType.NONE;
         double mini = 1e9;
         for(ColorType ct : ColorType.values()){
