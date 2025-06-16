@@ -479,7 +479,7 @@ public class Sample extends LinearOpMode {
 
     public static SparkFunOTOS.Pose2D
             basketPosition = new SparkFunOTOS.Pose2D(460, -160, Math.toRadians(55)),
-            sample1 = new SparkFunOTOS.Pose2D(450, -300, Math.toRadians(70)),
+            sample1 = new SparkFunOTOS.Pose2D(450, -300, Math.toRadians(72)),
             sample2 = new SparkFunOTOS.Pose2D(510, -230, Math.toRadians(85)),
             sample3 = new SparkFunOTOS.Pose2D(470, -260, Math.toRadians(110)),
             park = new SparkFunOTOS.Pose2D(-370, -1350, Math.toRadians(0)),
