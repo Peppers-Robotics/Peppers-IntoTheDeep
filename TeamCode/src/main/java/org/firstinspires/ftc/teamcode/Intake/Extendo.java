@@ -61,27 +61,9 @@ public class Extendo {
         if(DISABLE){
             return;
         }
-//        if (RESET) {
-//            if (motor.getCurrent(CurrentUnit.AMPS) > 9 || was) {
-//                was = true;
-//                motor.setPower(0);
-//                if (time.seconds() > 0.2) {
-//                    motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//                    RESET = false;
-//                }
-//
-//            } else {
-//                motor.setPower(-1);
-//                time.reset();
-//            }
-//            return;
-//        }
 
         if(PowerOnToTransfer) {
-//            motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
-            motor.setPower(-power);
-//            motor.setMotorDisable();
+            motor.setPower(-1);
         } else {
             motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
             motor.setMotorEnable();

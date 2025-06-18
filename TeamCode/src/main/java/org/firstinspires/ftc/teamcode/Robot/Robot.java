@@ -196,12 +196,12 @@ public class Robot {
     }
 
     public static void InitializeExtendo(){
-        Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.REVERSE);
+        Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
         Extendo.encoder = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Extendo.lm = new LimitSwitch(ControlHubDigital,1);
         MotorConfigurationType m = Extendo.motor.getMotorType();
-        m.setAchieveableMaxRPMFraction(1);
+        m.setAchieveableMaxRPMFraction(1.0);
         Extendo.motor.setMotorType(m);
     }
     public static void InitializeDropDown(){

@@ -79,9 +79,11 @@ public class Localizer {
             }
         }
 
-        velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, getCurrentPosition().h - lastPose.h);
+        velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, Robot.imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate);
         lastPose = getCurrentPosition();
-        velocity = Div(velocity, time.seconds());
+//        velocity = Div(velocity, time.seconds());
+        velocity.x /= time.seconds();
+        velocity.y /= time.seconds();
 
         Robot.telemetry.addData("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");
         RobotLog.dd("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");

@@ -16,13 +16,13 @@ public class Colors {
 
     }
     public enum ColorType {
-        BLUE(new Color(50, 110, 255)),
+        BLUE(new Color(70, 131, 206)),
 
-        RED(new Color(255, 116, 50)),
+        RED(new Color(221, 157, 80)),
 
-        YELLOW(new Color(200, 255, 50)),
+        YELLOW(new Color(235, 333, 108)),
 
-        NONE(new Color(160, 255, 180));
+        NONE(new Color(230, 360, 303));
 
         private final Color color;
 
@@ -48,6 +48,7 @@ public class Colors {
         if(Math.max(input.r, Math.max(input.g, input.b)) == input.b) return ColorType.RED;
         if(Math.max(input.r, Math.max(input.g, input.b)) == input.g && Math.abs(input.r - input.g) >= 30) return ColorType.RED;
         return ColorType.NONE;*/
+
 
         ColorType detected = ColorType.NONE;
         double mini = 1e9;

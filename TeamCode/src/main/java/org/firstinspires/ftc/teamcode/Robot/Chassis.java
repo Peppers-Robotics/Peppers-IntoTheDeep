@@ -64,9 +64,9 @@ public class Chassis {
     // Autonomous implementation
 
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
-    public static PIDController Strafe = new PIDController(0.01, 0.0, 0.002),
-                                Forward = new PIDController(-0.015, 0, -0.002),
-                                Heading = new PIDController(0.6, 0, 0.08);
+    public static PIDController Strafe = new PIDController(0.008, 0.0, 0.0009),
+                                Forward = new PIDController(-0.01, 0, -0.0008),
+                                Heading = new PIDController(0.67, 0, 0.08);
     public static PIDCoefficients FullExtendoHeading = new PIDCoefficients(0.3,0.0015,0.06);
     private static List<SparkFunOTOS.Pose2D> pointsToFollow;
 
@@ -82,9 +82,9 @@ public class Chassis {
         Forward.setFreq(30);
         Heading.setFreq(30);
 
-        Strafe.kS = -0.02;
-        Forward.kS = 0.03;
-        Heading.kS = -0.065;
+        Strafe.kS = -0.0;
+        Forward.kS = 0.00;
+        Heading.kS = -0.04;
 
     }
 
@@ -101,7 +101,7 @@ public class Chassis {
     public static double xAccel = 4000, yAccel = 4000, xMV = 3000, yMV = 3000, xDecc = 2500, yDecc = 1000;
     public static AsymmetricMotionProfile xProfile = new AsymmetricMotionProfile(4000, 3000, 1000),
             yProfile = new AsymmetricMotionProfile(4000, 3000, 1000),
-            hProfile = new AsymmetricMotionProfile(Math.PI * 6, Math.PI * 4, Math.PI * 3);
+            hProfile = new AsymmetricMotionProfile(Math.PI * 8, Math.PI * 4, Math.PI * 4);
     public static void resetProfiles(){
         xProfile.maxVelocity = xMV;
         xProfile.acceleration = xAccel;
@@ -186,7 +186,7 @@ public class Chassis {
                 setTargetPosition(new SparkFunOTOS.Pose2D(xProfile.getPosition(), yProfile.getPosition(), h));
 //            Robot.telemetry.addData("x precent", xProfile.getPrecentOfMotion());
 //            Robot.telemetry.addData("y precent", yProfile.getPrecentOfMotion());
-                if (Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), new SparkFunOTOS.Pose2D(xProfile.getTargetPosition(), yProfile.getTargetPosition(), 0)) < 200 || point == 0) {
+                if (Localizer.getDistanceFromTwoPoints(Localizer.getCurrentPosition(), new SparkFunOTOS.Pose2D(xProfile.getTargetPosition(), yProfile.getTargetPosition(), 0)) < 500 || point == 0) {
                     if (point >= pointsToFollow.size()) {
                         if (xProfile.motionEnded() && yProfile.motionEnded() && (linearHeading || hProfile.motionEnded())) {
                             asyncFollow = false;

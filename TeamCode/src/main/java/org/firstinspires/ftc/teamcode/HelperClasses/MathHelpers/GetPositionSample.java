@@ -59,7 +59,7 @@ public class GetPositionSample {
             double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
 
             if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo && // not close to a bar
-                    distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) + centerToExtendo // not too far away
+                    distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 100) + centerToExtendo // not too far away
                 /*&& getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y + Localizer.getCurrentPosition().y < halfYTerrain*/
                 //TODO: putini vecini aproape
 
