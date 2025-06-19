@@ -26,6 +26,8 @@ public class ElevatorPID extends LinearOpMode {
             Elevator.controller.setFreq(freq);
             Robot.telemetry.addData("elevator current motor", Elevator.motor.getCurrent(CurrentUnit.AMPS));
             Robot.telemetry.addData("elevator current motor2", Elevator.motor2.getCurrent(CurrentUnit.AMPS));
+            Robot.telemetry.addData("motor1 pow", Elevator.motor.getPower());
+            Robot.telemetry.addData("motor2 pow", Elevator.motor2.getPower());
             Elevator.update();
             Robot.clearCache();
         }

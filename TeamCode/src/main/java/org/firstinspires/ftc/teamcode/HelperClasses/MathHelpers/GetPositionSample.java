@@ -77,7 +77,7 @@ public class GetPositionSample {
         List<LLResultTypes.DetectorResult> targetSamples = detections.stream().filter(e -> e.getClassId() == targetID).collect(Collectors.toList());
         detections = detections.stream().filter(e -> e.getClassId() != targetID).collect(Collectors.toList());
 //        double score[] = new double[targetSamples.size()];
-        double min = 1e10;
+        double max = -1;
         int id = 0;
 //        for(LLResultTypes.DetectorResult detection : targetSamples){
         for(int i = 0; i < targetSamples.size(); i ++){
@@ -89,11 +89,12 @@ public class GetPositionSample {
 
             if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) - centerToExtendo){
                 double lateralT = getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y;
-                double score = Math.sqrt(detection.getTargetXPixels() * detection.getTargetXPixels() + detection.getTargetYPixels() * detection.getTargetYPixels());
+//                double score = Math.sqrt(detection.getTargetXPixels() * detection.getTargetXPixels() + detection.getTargetYPixels() * detection.getTargetYPixels());
+                double score = detection.getTargetArea();
 //                if(Localizer.getCurrentPosition().y + lateralT < middleY) score = 1e8;
-                if(score < min){
+                if(score > max){
                     id = i;
-                    min = score;
+                    max = score;
                 }
 //                return detection;
             }

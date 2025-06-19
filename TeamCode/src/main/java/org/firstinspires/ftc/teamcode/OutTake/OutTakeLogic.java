@@ -70,7 +70,7 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Elevator.PowerOnDownToTakeSample = true;
-                                        Elevator.power = 0.7;
+                                        Elevator.power = 0.5;
                                         return Elevator.getCurrentPosition() < 10;
                                     }
                                 })
@@ -120,7 +120,7 @@ public class OutTakeLogic {
 //                                        Arm.setArmAngle(ArmTransfer);
                                         DropDown.setDown(DropDownTransfer);
                                         Elevator.PowerOnDownToTakeSample = true;
-                                        Elevator.power = 0.5;
+                                        Elevator.power = 0.8;
                                         Extendo.PowerOnToTransfer = true;
                                         Extendo.Extend(25);
                                         return true;
@@ -233,7 +233,7 @@ public class OutTakeLogic {
                                         public boolean Run() {
                                             Elevator.setTargetPosition(ElevatorIdle);
                                             Elevator.PowerOnDownToTakeSample = true;
-                                            Elevator.power = 0.7;
+                                            Elevator.power = 1;
                                             Arm.setArmAngle(ArmIdle);
                                             return Elevator.getCurrentPosition() <= 10;
                                         }
@@ -569,7 +569,7 @@ public class OutTakeLogic {
                         public boolean Run() {
                             Elevator.setTargetPosition(ElevatorIdle);
                             Elevator.PowerOnDownToTakeSample = true;
-                            Elevator.power = 0.7;
+                            Elevator.power = 1;
                             return true;
                         }
                     })

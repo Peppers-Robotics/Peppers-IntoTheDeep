@@ -21,6 +21,7 @@ public class Extendo {
 
     static {
         pidController.setFreq(40);
+        pidController.setMaxActuatorOutput(1);
     }
     public static boolean ReachedTargetPosition(){
         return Math.abs(targetPosition - getCurrentPosition()) <= 5;
