@@ -40,7 +40,7 @@ public class BackAndForth extends LinearOpMode {
                 .waitForSync()
                 .waitSeconds(2)
         ;
-        Extendo.Extend(0);
+        Extendo.Extend(5);
         DropDown.setDown(0);
         waitForStart();
 

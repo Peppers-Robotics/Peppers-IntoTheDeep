@@ -66,7 +66,7 @@ public class Chassis {
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
     public static PIDController Strafe = new PIDController(0.008, 0.0, 0.0009),
                                 Forward = new PIDController(-0.01, 0, -0.0008),
-                                Heading = new PIDController(0.67, 0, 0.08);
+                                Heading = new PIDController(0.8, 0.01, 0.085);
     public static PIDCoefficients FullExtendoHeading = new PIDCoefficients(0.3,0.0015,0.06);
     private static List<SparkFunOTOS.Pose2D> pointsToFollow;
 

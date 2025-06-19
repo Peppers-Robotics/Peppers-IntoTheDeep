@@ -159,7 +159,7 @@ public class Sample extends LinearOpMode {
                             if(Extendo.getTargetPosition() < 200 && Extendo.getCurrentPosition() < 200)
                                 Extendo.Extend(200);
                             Extension.Retract();
-                            Arm.setArmAngle(OutTakeLogic.ArmIdle);
+                            Arm.setArmAngle(OutTakeLogic.ArmTransfer);
                             Elevator.setTargetPosition(0);
                             Elevator.power = 1;
                             isRetracting = true;
@@ -256,7 +256,7 @@ public class Sample extends LinearOpMode {
                             Extendo.Extend(
                                     (int) GetPositionSample.getExtendoRotPair(
                                             tx, ty
-                                    ).x - 25 // 30
+                                    ).x // 30
                             );
                             return Extendo.getCurrentPosition() > Extendo.getTargetPosition() - 30 && Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) <= Math.toRadians(3);
                         }
@@ -286,12 +286,10 @@ public class Sample extends LinearOpMode {
                                 DropDown.setDown(1);
                                 if(time == -1) time = System.currentTimeMillis();
                                 if(p == -1) p = Extendo.getTargetPosition();
+                                Extendo.DISABLE = true;
                             }
-                            if(p != -1 && (System.currentTimeMillis() - time) / 1000.f >= 0.05 && start) {
-//                                Extendo.Extend(Extendo.getTargetPosition() + 120);
-//                                Extendo.Extend(Extendo.getMaxPosition());
-                                Extendo.Extend(850);
-//                                Chassis.setHeading(Localizer.getCurrentPosition().h + Math.toRadians(10));
+                            if((System.currentTimeMillis() - time) / 1000.f >= 0.08 && start) {
+                                Extendo.motor.setPower(0.2);
                             }
                             if(((System.currentTimeMillis() - time) / 1000.f > timeOut + (ActiveIntake.motor.getCurrent(CurrentUnit.AMPS) > 3 ? 0.5 : 0) && time != -1)){
                                 return true;
@@ -304,6 +302,7 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
+                            Extendo.DISABLE = false;
 //                            Chassis.Heading.setPidCoefficients(headingCoeff);
                             if(Storage.hasTeamPice()) {
                                 ActiveIntake.Block();
@@ -490,7 +489,7 @@ public class Sample extends LinearOpMode {
             sample1 = new SparkFunOTOS.Pose2D(450, -300, Math.toRadians(68)),
             sample2 = new SparkFunOTOS.Pose2D(510, -230, Math.toRadians(85)),
             sample3 = new SparkFunOTOS.Pose2D(470, -260, Math.toRadians(110)),
-            park = new SparkFunOTOS.Pose2D(-370, -1350, Math.toRadians(0)),
+            park = new SparkFunOTOS.Pose2D(-400, -1350, Math.toRadians(0)),
             parkk = new SparkFunOTOS.Pose2D(-470, -1460, Math.toRadians(0))
                     ;
 
@@ -579,7 +578,6 @@ public class Sample extends LinearOpMode {
                 })
                 .waitSeconds(0.05)
                 .lineToAsync(sample1)
-
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -644,12 +642,8 @@ public class Sample extends LinearOpMode {
                         return Localizer.getCurrentPosition().h > Math.toRadians(80);
                     }
                 })
-                .addTask(new TakeSample(820))
-//                .lineToAsync(basketPosition)
+                .addTask(new TakeSample(850))
                 .lineToAsync(new SparkFunOTOS.Pose2D(basketPosition.x + 20, basketPosition.y + 30, basketPosition.h - Math.toRadians(10)))
-//                .lineToAsync(new SparkFunOTOS.Pose2D(basketPosition.x + 10, basketPosition.y + 20, basketPosition.h))
-//                .lineToAsync(new SparkFunOTOS.Pose2D(basketPosition.x + 10, basketPosition.y + 20, basketPosition.h - Math.toRadians(10)))
-//                .lineToAsync(basketPosition)
                 .addTask(new Transfer())
                 .waitForSync()
                 .addTask(new Task() {
