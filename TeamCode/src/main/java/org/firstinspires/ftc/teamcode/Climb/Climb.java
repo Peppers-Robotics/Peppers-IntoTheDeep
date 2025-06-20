@@ -24,8 +24,8 @@ public class Climb {
     public static double BAR1 = 210, BAR2 = 700;
     public static double pitch = 0;
     public static ElapsedTime time = new ElapsedTime();
-    public static double EngagePTO1 = 180, EngagePTO2 = 200, DisengagePTO1 = 300, DisengagePTO2 = 170,
-                         DisengageWheelie2 = 25,EngageWheelie2 = 135,EngageWheelie1  = 170,DisengageWheelie1 = 265 ,climbArmIntertia = 310;
+    public static double EngagePTO1 = 180, EngagePTO2 = 200, DisengagePTO1 = 270, DisengagePTO2 = 170,
+                         DisengageWheelie2 = 25, EngageWheelie2 = 135, EngageWheelie1  = 170, DisengageWheelie1 = 265, climbArmIntertia = 310;
 
 
 

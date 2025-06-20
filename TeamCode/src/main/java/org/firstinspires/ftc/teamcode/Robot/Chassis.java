@@ -168,6 +168,9 @@ public class Chassis {
     public static void setHeading(double h){
         setTargetPosition(new SparkFunOTOS.Pose2D(targetPosition.x, targetPosition.y, h));
     }
+    public static SparkFunOTOS.Pose2D getFinalTargetPosition(){
+        return new SparkFunOTOS.Pose2D(xProfile.getTargetPosition(), yProfile.getTargetPosition(), hProfile.getTargetPosition());
+    }
 
     public static void Update(){
         try {
