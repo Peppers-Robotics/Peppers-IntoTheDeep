@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 import org.firstinspires.ftc.teamcode.Tasks.Task;
 
-@Autonomous(name = "5 + 0")
+@Autonomous(name = "6 + 0")
 @Config
 public class Specimen extends LinearOpMode {
     public static class retractAsyncHelper extends Task{
@@ -62,13 +62,14 @@ public class Specimen extends LinearOpMode {
     public static double scoredLine = -700; // 580
     public static double veloTr = 800;
     public static SparkFunOTOS.Pose2D scoreSpecimen = new SparkFunOTOS.Pose2D(-750, -280, Math.toRadians(20)),
-        scoreSpecimen1 = new SparkFunOTOS.Pose2D(-750, -570, Math.toRadians(0)),
+        scoreSpecimen1 = new SparkFunOTOS.Pose2D(-750, -300, Math.toRadians(0)),
         sample1 = new SparkFunOTOS.Pose2D(-560, 570, Math.toRadians(-34)),
-        sample2 = new SparkFunOTOS.Pose2D(-560, 570, Math.toRadians(-55)),
-        sample3 = new SparkFunOTOS.Pose2D(-560, 600, Math.toRadians(-68)),
+        sample2 = new SparkFunOTOS.Pose2D(-560, 570, Math.toRadians(-50)),
+        sample3 = new SparkFunOTOS.Pose2D(-560, 600, Math.toRadians(-63)),
         humanReverse = new SparkFunOTOS.Pose2D(-560, 570, Math.toRadians(-150)),
         spitDetection = new SparkFunOTOS.Pose2D(-627, 130, Math.toRadians(-140)),
-        humanTake = new SparkFunOTOS.Pose2D(40, 440 , 0);
+        humanTake = new SparkFunOTOS.Pose2D(40, 440 , 0),
+        init = new SparkFunOTOS.Pose2D(0, -300, 0);
     public static int samplesScored = 0;
     public static int type = 2;
     private static int tries = 0;
@@ -291,7 +292,7 @@ public class Specimen extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            return Localizer.getCurrentPosition().x >= 6 + add && Math.abs(Localizer.getVelocity().x) <= veloTr;
+                            return Localizer.getCurrentPosition().x >= -1 && Math.abs(Localizer.getVelocity().x) <= veloTr;
                         }
                     })
                     .addTask(new Task() {
@@ -455,6 +456,8 @@ public class Specimen extends LinearOpMode {
         Sample.camera.pipelineSwitch(0);
         Extendo.encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Extendo.encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Localizer.setPosition(init);
+        Localizer.Update();
 
         auto
 //                .addTask(new ScoreSpecimen())
@@ -573,7 +576,7 @@ public class Specimen extends LinearOpMode {
                 })
 
                 .lineToAsync(humanTake)
-                .addTask(new SpecimenTake(true, 15))
+                .addTask(new SpecimenTake(true, 0))
                 .addTask(new ScoreSpecimen())
 
                 .lineToAsync(humanTake)
@@ -588,7 +591,7 @@ public class Specimen extends LinearOpMode {
                 .addTask(new ScoreSpecimen())
 
                 .lineToAsync(humanTake)
-                .addTask(new SpecimenTake(true, 15))
+                .addTask(new SpecimenTake(true, 0))
                 .addTask(new ScoreSpecimen())
                 .addTask(new Task() {
                     @Override
@@ -599,12 +602,12 @@ public class Specimen extends LinearOpMode {
                 })
 
                 .lineToAsync(humanTake)
-                .addTask(new SpecimenTake(true, 14))
+                .addTask(new SpecimenTake(true, 0))
                 .addTask(new ScoreSpecimen())
 
 
                 .lineToAsync(humanTake)
-                .addTask(new SpecimenTake(false, 14))
+                .addTask(new SpecimenTake(false, 0))
 //                .addTask(new ScoreSpecimen())
 
                 .waitForSync()

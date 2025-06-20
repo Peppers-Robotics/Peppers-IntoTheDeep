@@ -87,7 +87,7 @@ public class GetPositionSample {
             double distRobotToBar = 30;
             double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
 
-            if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) - centerToExtendo){
+            if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) - centerToExtendo && distSampleRobot <= 650){
                 double lateralT = getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y;
 //                double score = Math.sqrt(detection.getTargetXPixels() * detection.getTargetXPixels() + detection.getTargetYPixels() * detection.getTargetYPixels());
                 double score = detection.getTargetArea();

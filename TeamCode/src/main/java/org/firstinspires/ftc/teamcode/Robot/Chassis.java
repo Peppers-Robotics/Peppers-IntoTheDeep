@@ -64,8 +64,8 @@ public class Chassis {
     // Autonomous implementation
 
     private static SparkFunOTOS.Pose2D targetPosition = new SparkFunOTOS.Pose2D();
-    public static PIDController Strafe = new PIDController(0.008, 0.0, 0.0009),
-                                Forward = new PIDController(-0.01, 0, -0.0008),
+    public static PIDController Strafe = new PIDController(0.008, 0.0, 0.002),
+                                Forward = new PIDController(-0.01, 0, -0.001),
                                 Heading = new PIDController(0.8, 0.01, 0.085);
     public static PIDCoefficients FullExtendoHeading = new PIDCoefficients(0.3,0.0015,0.06);
     private static List<SparkFunOTOS.Pose2D> pointsToFollow;
@@ -84,7 +84,7 @@ public class Chassis {
 
         Strafe.kS = -0.0;
         Forward.kS = 0.00;
-        Heading.kS = -0.04;
+        Heading.kS = -0.035;
 
     }
 
@@ -130,7 +130,7 @@ public class Chassis {
     private static int point = 0;
 
     public static void profiledFollow(SparkFunOTOS.Pose2D pose){
-        RobotLog.dd("targetPosition", pose.x + ", " + pose.y + ", " + Math.toRadians(pose.h));
+//        RobotLog.dd("targetPosition", pose.x + ", " + pose.y + ", " + Math.toRadians(pose.h));
         pose.h = Localizer.normalizeRadians(pose.h);
 //        pointsToFollow.clear();
 //        pointsToFollow.add(pose);

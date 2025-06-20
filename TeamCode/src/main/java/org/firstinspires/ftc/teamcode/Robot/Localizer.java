@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.PinPoint;
 
 @Config
@@ -79,14 +80,14 @@ public class Localizer {
             }
         }
 
-        velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, Robot.imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate);
+        velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, pinPoint.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS));
         lastPose = getCurrentPosition();
 //        velocity = Div(velocity, time.seconds());
         velocity.x /= time.seconds();
         velocity.y /= time.seconds();
 
         Robot.telemetry.addData("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");
-        RobotLog.dd("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");
+//        RobotLog.dd("pose", "(" + getCurrentPosition().x + ", " + getCurrentPosition().y + ", " + Math.toDegrees(getCurrentPosition().h) + "deg)");
         time.reset();
     }
     public static void Reset(){
