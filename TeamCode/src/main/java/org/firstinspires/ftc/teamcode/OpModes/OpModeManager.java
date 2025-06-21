@@ -117,37 +117,6 @@ public class OpModeManager {
             return;
         }
 
-        if(gamepad1.dpad_left){
-            if(!resetPP){
-                Robot.imu.resetYaw();
-//                Localizer.setPosition(Specimen.humanTake);
-                Localizer.setPosition(new SparkFunOTOS.Pose2D(Specimen.humanTake.x, Specimen.humanTake.y, 0));
-            }
-            if(autoScore.done()){
-                autoScore = new Scheduler();
-                autoScore
-//                        .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(Specimen.humanTake.x - 100, Specimen.humanTake.y, 0), Specimen.humanTake))
-                        .lineToAsync(Specimen.humanTake)
-                        .addTask(new Specimen.SpecimenTake(true, 1))
-                        .addTask(new Specimen.ScoreSpecimen());
-            }
-            autoScore.update();
-            Localizer.Update();
-            Chassis.Update();
-            Elevator.update();
-            Extendo.update();
-            Arm.update();
-            resetPP = true;
-            return;
-        } else {
-            resetPP = false;
-            autoScore = new Scheduler();
-            autoScore
-                    .lineToAsync(Specimen.humanTake)
-                    .addTask(new Specimen.SpecimenTake(true, 1))
-                    .addTask(new Specimen.ScoreSpecimen());
-        }
-
         if(Elevator.getCurrentPosition() > 500){
             tSpeed = 0.6;
         }

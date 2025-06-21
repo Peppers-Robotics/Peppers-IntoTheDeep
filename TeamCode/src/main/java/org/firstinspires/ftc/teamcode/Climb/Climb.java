@@ -101,12 +101,8 @@ public class Climb {
                     public boolean Run() {
                         Elevator.Disable = false;
                         DeactivateWheelie();
-                        MotorConfigurationType mct = Elevator.motor.getMotorType();
-//                        mct.setAchieveableMaxRPMFraction(0.7);
-//                        Elevator.motor.setMotorType(mct);
-//                        Elevator.motor2.setMotorType(mct);
                         Elevator.setTargetPosition(-100);
-                        return Elevator.getCurrentPosition() <= 4;
+                        return Elevator.getCurrentPosition() <= 10;
                     }
                 })
                 .addTask(new Task() {
@@ -122,7 +118,7 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return Elevator.getCurrentPosition() >= 30 || time.seconds() >= 0.6;
+                        return Elevator.getCurrentPosition() >= 30 || time.seconds() >= 0.3;
                     }
                 })
                 .addTask(new Task() {
@@ -132,7 +128,7 @@ public class Climb {
                         DisengagePTO();
                         if(time == -1) time = System.currentTimeMillis();
                         Elevator.setTargetPosition(BAR2);
-                        Elevator.Disable = pitch <= 3 && (Elevator.getCurrentPosition() <= BAR2 - 30 && Elevator.getCurrentPosition() >= 250);
+                        Elevator.Disable = pitch <= 3;
                         return Elevator.getCurrentPosition() >= BAR2 - 35;
                     }
                 })

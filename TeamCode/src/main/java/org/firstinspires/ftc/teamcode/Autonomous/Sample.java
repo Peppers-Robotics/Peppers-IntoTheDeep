@@ -41,7 +41,6 @@ import java.util.Arrays;
 import kotlin.StandardKt;
 
 @Autonomous(name = "0 + 7")
-@Disabled
 @Config
 public class Sample extends LinearOpMode {
     public static boolean isRetracting = false;

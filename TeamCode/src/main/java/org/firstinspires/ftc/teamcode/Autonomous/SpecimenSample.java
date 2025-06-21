@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Autonomous(name = "6 + 0")
-//@Disabled
+@Disabled
 @Config
 public class SpecimenSample extends LinearOpMode {
     public static class retractAsyncHelper extends Task{
