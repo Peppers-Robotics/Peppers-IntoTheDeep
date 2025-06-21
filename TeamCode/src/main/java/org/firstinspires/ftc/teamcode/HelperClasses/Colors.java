@@ -7,22 +7,26 @@ import com.acmerobotics.dashboard.config.Config;
 public class Colors {
     public static double ColorMaxDifference = 120;
     public static class Color{
-        public double r, g, b;
-        public Color(double r, double g, double b){
+        public double r, g, b, d;
+        public Color(double r, double g, double b, double d){
             this.r = r;
             this.g = g;
             this.b = b;
+            this.d = d;
         }
 
     }
     public enum ColorType {
-        BLUE(new Color(70, 131, 206)),
+        BLUE(new Color(0.4, 0.7, 1.3, 2)),
+        BLUE1(new Color(0.2, 0.4, 0.4, 3.4)),
 
-        RED(new Color(221, 157, 80)),
+        RED(new Color(1.1, 0.8, 0.3, 2)),
+        RED1(new Color(0.5, 0.4, 0.2, 3)),
 
-        YELLOW(new Color(235, 333, 108)),
+        YELLOW(new Color(2.3, 3.2, 0.7, 1.5)),
+        YELLOW1(new Color(0.6, 0.8, 0.2, 3.1)),
 
-        NONE(new Color(230, 360, 303));
+        NONE(new Color(0.2, 0.3, 0.2, 4));
 
         private final Color color;
 
@@ -40,27 +44,14 @@ public class Colors {
         return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
     }
 
-
-    public static ColorType getColorFromRGB(Color input){
-
-//        if(input.r > input.g && input.r > input.b) return ColorType.RED;
-       /* if(Math.max(input.r, Math.max(input.g, input.b)) == input.b) return ColorType.BLUE;
-        if(Math.max(input.r, Math.max(input.g, input.b)) == input.b) return ColorType.RED;
-        if(Math.max(input.r, Math.max(input.g, input.b)) == input.g && Math.abs(input.r - input.g) >= 30) return ColorType.RED;
-        return ColorType.NONE;*/
-
-
-        ColorType detected = ColorType.NONE;
-        double mini = 1e9;
-        for(ColorType ct : ColorType.values()){
-            if(ct == ColorType.NONE) continue;
-            double dist = getColorDistance(input, ct.getColor());
-            if(mini > dist){
-                detected = ct;
-                mini = dist;
-            }
-        }
-        return detected;
+    public static ColorType getColorFromRGB(Color input) {
+        double redDist = Math.min(getColorDistance(input, ColorType.RED.getColor()), getColorDistance(input, ColorType.RED1.getColor()));
+        double blueDist = Math.min(getColorDistance(input, ColorType.BLUE.getColor()), getColorDistance(input, ColorType.BLUE1.getColor()));
+        double yellowDist = Math.min(getColorDistance(input, ColorType.YELLOW.getColor()), getColorDistance(input, ColorType.YELLOW1.getColor()));
+        if(redDist < blueDist && redDist < yellowDist) return ColorType.RED;
+        if(blueDist < redDist && blueDist < yellowDist) return ColorType.BLUE;
+        if(yellowDist < redDist && yellowDist < blueDist) return ColorType.YELLOW;
+        return ColorType.NONE;
     }
 
 }

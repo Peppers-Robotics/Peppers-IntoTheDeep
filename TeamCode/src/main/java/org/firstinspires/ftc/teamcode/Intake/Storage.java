@@ -49,7 +49,7 @@ public class Storage {
 
     public static SpecimenType getStorageStatus(){
 //        return SpecimenType.YELLOW;
-        if(sensor.getDistance(DistanceUnit.CM) >= 3) return SpecimenType.NONE;
+        if(sensor.getDistance(DistanceUnit.CM) >= 3.6) return SpecimenType.NONE;
 
         switch (sensor.getColorSeenBySensor()){
             case RED:

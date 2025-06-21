@@ -19,6 +19,7 @@ public class AutoGamepad {
         wasPressed.square = !lastState.square && currentState.square;
         wasPressed.circle = !lastState.circle && currentState.circle;
         wasPressed.triangle = !lastState.triangle && currentState.triangle;
+        wasPressed.cross = !lastState.cross && currentState.cross;
 
         wasPressed.dpad_up = !lastState.dpad_up && currentState.dpad_up;
         wasPressed.dpad_down = !lastState.dpad_down && currentState.dpad_down;

@@ -20,7 +20,6 @@ public class Elevator {
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
     public static PIDCoefficients normal = new PIDCoefficients(0.008, 0.0015, 0.0003);
-//    public static PIDCoefficients specimens = new PIDCoefficients(0.005, 0.0015, -0.0002);
     public static double kfUp = 0.1, kfDown = 0.04, elevatorMin = 400, elevatorMax = 1080;
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(10000, 12000, 10000);
 
@@ -56,20 +55,20 @@ public class Elevator {
     public static final double ratio = 1070/435.f;
     public static boolean RESET = true;
     public static ElapsedTime time = new ElapsedTime();
-    private static boolean was = false, dis = false;
+    private static boolean was = false;
 
     public static void update() {
         if (Disable) {
-                motor.setPower(0);
-                motor2.setPower(0);
-                if (Climb.PTOActivated()) {
-                    Chassis.FL.setPower(0);
-                    Chassis.FR.setPower(0);
-                    Chassis.BL.setPower(0);
-                    Chassis.BR.setPower(0);
-                }
+            motor.setPower(0);
+            motor2.setPower(0);
+            if (Climb.PTOActivated()) {
+                Chassis.FL.setPower(0);
+                Chassis.FR.setPower(0);
+                Chassis.BL.setPower(0);
+                Chassis.BR.setPower(0);
+            }
             return;
-        } else dis = false;
+        }
 //        Robot.telemetry.addData("Elevator Current Position", encoder.getCurrentPosition());
 //        Robot.telemetry.addData("Elevator power consumption", motor.getCurrent(CurrentUnit.AMPS) + motor2.getCurrent(CurrentUnit.AMPS));
 //        Robot.telemetry.addData("Elevator enabled", motor.isMotorEnabled());

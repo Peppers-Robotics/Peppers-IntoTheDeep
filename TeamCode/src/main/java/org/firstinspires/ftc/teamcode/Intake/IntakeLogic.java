@@ -20,8 +20,9 @@ public class IntakeLogic extends GenericController {
     public static States state = States.IDLE;
     public static ElapsedTime time = new ElapsedTime(), blocker = new ElapsedTime(), time2 = new ElapsedTime();
     public static boolean wasDriverActivated = false;
+    private static int startReversePos = 0;
+    private static boolean Reverse = false;
     public static boolean IgnoreUntilNext = false;
-    private static int pos = 0;
     public static int offset = 0;
     public static void update(){
         if(true) {
@@ -30,11 +31,12 @@ public class IntakeLogic extends GenericController {
             gamepad2.left_trigger = gamepad1.gamepad.left_bumper ? 1 : 0;
             gamepad2.right_trigger = gamepad1.gamepad.right_bumper ? 1 : 0;
         }
-        if(Controls.RetractExtendo && OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE && Storage.hasTeamPice()) {
-            state = States.RETRACT;
+        if(gamepad1.wasPressed.square){
             Controls.RetractExtendo = false;
+            state = States.RETRACT;
         }
-        else{
+        if(Controls.RetractExtendo && (OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE) && Storage.hasTeamPice()) {
+            state = States.RETRACT;
             Controls.RetractExtendo = false;
         }
         if(OutTakeLogic.Transfering) gamepad1.right_stick_y = 0;
@@ -49,6 +51,18 @@ public class IntakeLogic extends GenericController {
                     Extendo.DISABLE = true;
 //                Extendo.Extend((int) (Extendo.getTargetPosition() + 35 * (gamepad1.right_stick_y * gamepad1.right_stick_y)));
 //                Extendo.update();
+                    if(OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE_TAKE_SPECIMEN) {
+                        if (gamepad1.right_stick_y > 0 && !Reverse) {
+                            startReversePos = Extendo.getCurrentPosition();
+                            Reverse = true;
+                        } else if (gamepad1.right_stick_y <= 0) Reverse = false;
+
+                        if (Reverse && startReversePos - Extendo.getCurrentPosition() < 100) {
+                            ActiveIntake.Reverse(0.5);
+                        } else if (startReversePos - Extendo.getCurrentPosition() >= 100) {
+                            Reverse = false;
+                        }
+                    }
                     if (Extendo.getCurrentPosition() < 10 && gamepad1.right_stick_y > 0){
                         Extendo.motor.setPower(0);
                         break;
@@ -58,7 +72,6 @@ public class IntakeLogic extends GenericController {
                         break;
                     }
                     Extendo.motor.setPower(-Math.signum(gamepad1.right_stick_y) * (gamepad1.right_stick_y * gamepad1.right_stick_y));
-                    pos = Extendo.getCurrentPosition();
                 } else {
                     Extendo.motor.setPower(0);
                 }
@@ -117,7 +130,10 @@ public class IntakeLogic extends GenericController {
             } else {
                 ActiveIntake.powerOn(1);
                 ActiveIntake.Unblock();
-                DropDown.setDown(gamepad2.right_trigger);
+                if(Extendo.getCurrentPosition() > 20)
+                    DropDown.setDown(gamepad2.right_trigger);
+                else
+                    DropDown.setDown(0);
             }
             wasDriverActivated = true;
         } else if (gamepad2.left_trigger > 0.05) {

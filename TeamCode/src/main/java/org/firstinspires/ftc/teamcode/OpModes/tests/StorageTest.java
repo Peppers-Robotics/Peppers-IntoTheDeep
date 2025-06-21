@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.tests;
 
+import android.graphics.Color;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -26,25 +28,14 @@ public class StorageTest extends LinearOpMode {
         while (opModeIsActive()){
 
             Robot.clearCache();
-            Storage.sensor.getColorSeenBySensor();
+//            Storage.sensor.getColorSeenBySensor();
 
-            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
+            Robot.telemetry.addData("Color", Storage.sensor.getColorSeenBySensor());
+//            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
+            Robot.telemetry.addData("r", Storage.sensor.RGB.R);
+            Robot.telemetry.addData("g", Storage.sensor.RGB.G);
+            Robot.telemetry.addData("b", Storage.sensor.RGB.B);
 
-            Robot.telemetry.addData("yellow confidence",
-                    Colors.getColorDistance(Colors.ColorType.YELLOW.getColor(),
-                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-
-            Robot.telemetry.addData("red confidence",
-                    Colors.getColorDistance(Colors.ColorType.RED.getColor(),
-                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-
-            Robot.telemetry.addData("blue confidence",
-                    Colors.getColorDistance(Colors.ColorType.BLUE.getColor(),
-                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-
-            Robot.telemetry.addData("nothing confidence",
-                    Colors.getColorDistance(Colors.ColorType.NONE.getColor(),
-                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
             Robot.telemetry.addData("sensorDistance", Storage.sensor.getDistance(DistanceUnit.CM));
 
         }
