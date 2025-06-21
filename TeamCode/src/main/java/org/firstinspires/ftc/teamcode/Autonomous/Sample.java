@@ -745,7 +745,6 @@ public class Sample extends LinearOpMode {
 
 
         DropDown.setDown(0);
-        Elevator.resetTo0 = false;
         Elevator.RESET = false;
         while(opModeInInit()){
             Robot.clearCache(true);

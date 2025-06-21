@@ -4,8 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
@@ -25,9 +25,7 @@ public class Climb {
     public static double pitch = 0;
     public static ElapsedTime time = new ElapsedTime();
     public static double EngagePTO1 = 180, EngagePTO2 = 200, DisengagePTO1 = 270, DisengagePTO2 = 170,
-                         DisengageWheelie2 = 25, EngageWheelie2 = 135, EngageWheelie1  = 170, DisengageWheelie1 = 265, climbArmIntertia = 310;
-
-
+            EngageWheelie1 = 170, DisengageWheelie1 = 265, EngageWheelie2 = 135, DisengageWheelie2 = 25, climbArmIntertia = 310;
 
     public static void EngagePTO(){
         PTO1.setAngle(EngagePTO1);
@@ -76,12 +74,11 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Elevator.setTargetPosition(BAR1);
+                        Elevator.setTargetPosition(BAR1 + 80);
 //                        return Elevator.getCurrentPosition() <= BAR1 + 100;
                         return true;
                     }
                 })
-                .waitSeconds(0.2)
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -100,9 +97,12 @@ public class Climb {
                     @Override
                     public boolean Run() {
                         Elevator.Disable = false;
-                        DeactivateWheelie();
-                        Elevator.setTargetPosition(-100);
-                        return Elevator.getCurrentPosition() <= 10;
+                        MotorConfigurationType mct = Elevator.motor.getMotorType();
+//                        mct.setAchieveableMaxRPMFraction(0.7);
+//                        Elevator.motor.setMotorType(mct);
+//                        Elevator.motor2.setMotorType(mct);
+                        Elevator.setTargetPosition(-20);
+                        return Elevator.getCurrentPosition() < 5;
                     }
                 })
                 .addTask(new Task() {
@@ -110,6 +110,7 @@ public class Climb {
                     public boolean Run() {
 //                        DisengagePTO();
                         Elevator.Disable = true;
+                        Elevator.RESET = false;
                         DeactivateWheelie();
                         time.reset();
                         return true; // MAKE IT TRUE
@@ -118,33 +119,32 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return Elevator.getCurrentPosition() >= 30 || time.seconds() >= 0.3;
+                        Robot.telemetry.addLine("Cosmin e prost");
+                        return Elevator.getCurrentPosition() >= 50 || time.seconds() >= 0.6;
                     }
                 })
                 .addTask(new Task() {
-                    long time = -1;
                     @Override
                     public boolean Run() {
                         DisengagePTO();
-                        if(time == -1) time = System.currentTimeMillis();
                         Elevator.setTargetPosition(BAR2);
-                        Elevator.Disable = pitch <= 3;
-                        return Elevator.getCurrentPosition() >= BAR2 - 35;
+                        Elevator.Disable = pitch <= 3 && (Elevator.getCurrentPosition() <= BAR2 - 30 && Elevator.getCurrentPosition() >= 250);
+                        Robot.telemetry.addData("disabled?", Elevator.Disable);
+                        return Elevator.getCurrentPosition() >= BAR2 - 20;
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
+                        Robot.telemetry.addLine("Cosmin e prost");
                         Arm.setArmAngle(climbArmIntertia);
                         Elevator.Disable = false;
                         return true;
                     }
                 })
                 .addTask(new Task() {
-                    long time = -1;
                     @Override
                     public boolean Run() {
-                        if(time == -1) time = System.currentTimeMillis();
                         if(pitch < 7){
                             Elevator.setTargetPosition(BAR2 - 250);
                             return true;
@@ -193,9 +193,8 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.motor.setPower(0.1);
-                        if(Elevator.getCurrentPosition() <= 0){
-                            Elevator.setTargetPosition(-20);
+                        if(Elevator.getCurrentPosition() <= -15){
+                            Elevator.setTargetPosition(-40);
                             return true;
                         }
                         return false;
@@ -214,9 +213,5 @@ public class Climb {
         Robot.telemetry.addData("tasks", Integer.valueOf(climb.tasks.size() - run.tasks.size()).toString() + "/" + climb);
         Robot.telemetry.addData("pitch", pitch);
         Robot.telemetry.addData("elevator level", Elevator.getCurrentPosition());
-//        Robot.telemetry.update();
-        if(Elevator.getCurrentPosition() < 50){
-            RobotLog.dd("Level", Elevator.getCurrentPosition() + "");
-        }
     }
 }
