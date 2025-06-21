@@ -1,22 +1,17 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import android.widget.TabHost;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.GetPositionSample;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
@@ -34,11 +29,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 import org.firstinspires.ftc.teamcode.Tasks.Task;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
-
-import kotlin.StandardKt;
 
 @Autonomous(name = "0 + 7")
 @Config
@@ -188,7 +179,7 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Claw.closeAbit();
+                            Claw.openWide();
                             ActiveIntake.Unblock();
                             Extendo.Extend(0);
                             Chassis.setHeading(park.h);
@@ -290,7 +281,7 @@ public class Sample extends LinearOpMode {
                             }
 //                            if(ActiveIntake.motor.getCurrent(CurrentUnit.AMPS) > 2.5) ActiveIntake.powerOn(0.7);
 //                            Robot.telemetry.addData("POW", ActiveIntake.motor.getCurrent(CurrentUnit.AMPS));
-                            return Storage.hasTeamPice();
+                            else return Storage.hasTeamPice();
                         }
                     })
                     .addTask(new Task() {
@@ -331,7 +322,7 @@ public class Sample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Claw.closeAbit();
+                            Claw.openWide();
                             ActiveIntake.Unblock();
                             ActiveIntake.powerOn(1);
                             DropDown.setDown(1);
@@ -576,7 +567,7 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Claw.closeAbit();
+                        Claw.openWide();
                         return true;
                     }
                 })
@@ -619,7 +610,7 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Claw.closeAbit();
+                        Claw.openWide();
                         return true;
                     }
                 })
@@ -655,7 +646,7 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Claw.closeAbit();
+                        Claw.openWide();
                         return true;
                     }
                 })
@@ -694,7 +685,7 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Claw.closeAbit();
+                        Claw.openWide();
                         Robot.telemetry.addData("time", (System.currentTimeMillis() - startTime) / 1000.f);
                         Chassis.setProfiles(6000, 6000, 6000, 6000, 2000, 2000);
                         return true;

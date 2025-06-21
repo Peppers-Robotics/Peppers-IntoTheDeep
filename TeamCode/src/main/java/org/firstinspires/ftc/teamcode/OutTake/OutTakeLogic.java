@@ -1,13 +1,8 @@
 package org.firstinspires.ftc.teamcode.OutTake;
 import com.acmerobotics.dashboard.config.Config;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.Autonomous.Sample;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -58,7 +53,7 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
-                                        Claw.closeAbit();
+                                        Claw.openWide();
                                         Elevator.setTargetPosition(100);
                                         if (Elevator.getCurrentPosition() > 90) {
                                             Arm.setArmAngle(ArmTakeSpecimen - 5);
@@ -399,7 +394,7 @@ public class OutTakeLogic {
                                         @Override
                                         public boolean Run() {
 
-                                            Claw.closeAbit();
+                                            Claw.openWide();
                                             return true;
                                         }
                                     })

@@ -24,8 +24,10 @@ import java.util.Objects;
 
 public class Scheduler implements Cloneable {
 
+//    public LinkedList<Task> tasks;
     public LinkedList<Task> tasks;
     private boolean mutex = false;
+    private int thread = 0;
 
     public Scheduler(){
         tasks = new LinkedList<>();
