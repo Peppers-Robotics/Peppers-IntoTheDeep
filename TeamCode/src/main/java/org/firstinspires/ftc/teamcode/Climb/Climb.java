@@ -87,7 +87,7 @@ public class Climb {
                     public boolean Run() {
                         Elevator.Disable = true;
                         EngagePTO();
-                        Chassis.drive(-0.2, 0, 0);
+                        Chassis.drive(-0.4, 0, 0);
 //                        Elevator.setTargetPosition(BAR1 + 60);
                         Elevator.motor.setPower(-0.5);
                         Elevator.motor2.setPower(-0.5);
@@ -102,7 +102,7 @@ public class Climb {
                         Elevator.Disable = false;
                         DeactivateWheelie();
                         Elevator.setTargetPosition(-100);
-                        return Elevator.getCurrentPosition() <= 10;
+                        return Elevator.getCurrentPosition() <= 50;
                     }
                 })
                 .addTask(new Task() {

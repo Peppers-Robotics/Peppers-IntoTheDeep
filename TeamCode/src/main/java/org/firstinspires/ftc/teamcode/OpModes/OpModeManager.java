@@ -63,7 +63,7 @@ public class OpModeManager {
         Extendo.Extend(Extendo.getCurrentPosition());
         ActiveIntake.Unblock();
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Claw.open();
+//        Claw.open();
         Chassis.Heading.setPidCoefficients(new PIDCoefficients(0.5, 0, 0));
         Arm.setArmAngle(OutTakeLogic.ArmIdle);
         Rotation = 0;
