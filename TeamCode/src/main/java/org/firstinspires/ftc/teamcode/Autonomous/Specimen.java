@@ -381,7 +381,7 @@ public class Specimen extends LinearOpMode {
                             if(pow < 1){
                                 return Localizer.getCurrentPosition().h < Math.toRadians(-130);
                             }
-                            return Localizer.getCurrentPosition().h < Math.toRadians(-110);
+                            return Localizer.getCurrentPosition().h < Math.toRadians(-95);
 //                            return Localizer.getAngleDifference(Localizer.getCurrentPosition().h, Chassis.getTargetPosition().h) < Math.toRadians(10);
                         }
                     })
@@ -424,8 +424,8 @@ public class Specimen extends LinearOpMode {
         Extendo.Extend(0);
         Extension.Extend(0);
 
-        Chassis.setProfiles(5000, 5000, 8000, 8000, 800, 800);
-        Chassis.setHeadingProfiles(8*Math.PI, 8*Math.PI, 8*Math.PI);
+        Chassis.setProfiles(100000, 100000, 100000, 100000, 100000, 100000);
+        Chassis.setHeadingProfiles(100*Math.PI, 100*Math.PI, 100*Math.PI);
 
         samplesScored = 0;
 
@@ -456,10 +456,10 @@ public class Specimen extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend(300);
+//                        Extendo.Extend(300);
                         ActiveIntake.powerOn();
                         DropDown.setDown(1);
-                        return Localizer.getCurrentPosition().h >= Math.toRadians(-58);
+                        return Localizer.getCurrentPosition().h >= Math.toRadians(-60);
                     }
                 })
                 .addTask(new TakeSample(850))
@@ -470,7 +470,7 @@ public class Specimen extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        return Localizer.getCurrentPosition().h > Math.toRadians(-90);
+                        return Localizer.getCurrentPosition().h > Math.toRadians(-95);
                     }
                 })
                 .addTask(new TakeSample(850))

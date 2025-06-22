@@ -57,7 +57,7 @@ public class Sample extends LinearOpMode {
                                 if(Extendo.getCurrentPosition() < 40){
                                     Elevator.PowerOnDownToTakeSample = true;
                                 }
-                                return !Extendo.lm.getState();
+                                return Extendo.lm.getState();
                             }
                         })
                         .addTask(new Task() {

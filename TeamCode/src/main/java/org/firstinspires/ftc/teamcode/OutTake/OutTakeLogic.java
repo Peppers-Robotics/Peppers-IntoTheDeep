@@ -509,7 +509,7 @@ public class OutTakeLogic {
 
                                         @Override
                                         public boolean Run() {
-
+                                            Chassis.PuttingSpecimens = false;
                                             Claw.openWide();
                                             return true;
                                         }

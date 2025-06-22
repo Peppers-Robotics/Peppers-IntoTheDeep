@@ -51,18 +51,6 @@ public class IntakeLogic extends GenericController {
                     Extendo.DISABLE = true;
 //                Extendo.Extend((int) (Extendo.getTargetPosition() + 35 * (gamepad1.right_stick_y * gamepad1.right_stick_y)));
 //                Extendo.update();
-                    if(OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE_TAKE_SPECIMEN) {
-                        if (gamepad1.right_stick_y > 0 && !Reverse) {
-                            startReversePos = Extendo.getCurrentPosition();
-                            Reverse = true;
-                        } else if (gamepad1.right_stick_y <= 0) Reverse = false;
-
-                        if (Reverse && startReversePos - Extendo.getCurrentPosition() < 100) {
-                            ActiveIntake.Reverse(0.5);
-                        } else if (startReversePos - Extendo.getCurrentPosition() >= 100) {
-                            Reverse = false;
-                        }
-                    }
                     if (Extendo.getCurrentPosition() < 10 && gamepad1.right_stick_y > 0){
                         Extendo.motor.setPower(0);
                         break;
@@ -93,7 +81,7 @@ public class IntakeLogic extends GenericController {
 
                 Extendo.motor.setPower(-1);
 //                if(Math.abs(Extendo.motor.getVelocity()) > 2 && Extendo.motor.getCurrent(CurrentUnit.AMPS) <= 4) veloTimer.reset();
-                if(!Extendo.lm.getState()){
+                if(Extendo.lm.getState()){
                     Extendo.encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     Extendo.encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     ActiveIntake.powerOff();

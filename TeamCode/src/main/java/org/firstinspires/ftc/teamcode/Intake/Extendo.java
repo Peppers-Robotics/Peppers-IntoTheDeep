@@ -64,6 +64,7 @@ public class Extendo {
         }
 
         if(PowerOnToTransfer) {
+            motor.setMotorEnable();
             motor.setPower(-1);
         } else {
             motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
