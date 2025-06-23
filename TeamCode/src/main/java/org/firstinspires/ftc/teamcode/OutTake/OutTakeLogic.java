@@ -48,6 +48,7 @@ public class OutTakeLogic {
 //                    DropDown.setDown(0);
                     if (Controls.GrabSpecimen) {
                         Controls.Transfer = false;
+                        Controls.Throw = false;
                         currentTask = new Scheduler();
                         {
                         currentTask
@@ -321,17 +322,24 @@ public class OutTakeLogic {
                     break;
 
                 case IDLE_TAKE_SPECIMEN:
-                    if(Storage.hasTeamPice() && Controls.Throw){
-                        Controls.Throw = false;
+                    if(Storage.hasTeamPice() && Controls.Transfer){
+                        Controls.Transfer = false;
                         currentTask = new Scheduler();
                         currentTask
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
-                                        Arm.setArmAngle(ArmTransfer);
-                                        Elevator.setTargetPosition(100);
-                                        Claw.open();
-                                        return Arm.getCurrentArmAngle() < 20;
+                                        OutTakeLogic.Transfering = true;
+                                        return true;
+                                    }
+                                })
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
+                                        if(Elevator.getCurrentPosition() >= 40)
+                                            Arm.setArmAngle(ArmTransfer - 8);
+                                        Claw.openWide();
+                                        return Arm.getCurrentArmAngle() <= 5;
                                     }
                                 })
                                 .addTask(new Task() {
@@ -344,11 +352,8 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Arm.ShouldDoOffset = false;
-                                        Transfering = true;
                                         ActiveIntake.powerOn();
                                         Extension.Extend(TransferExtension);
-//                                        IntakeLogic.wasDriverActivated = true;
-//                                        Arm.setArmAngle(ArmTransControlsfer);
                                         return true;
                                     }
                                 })
@@ -372,7 +377,7 @@ public class OutTakeLogic {
                                         return Elevator.getCurrentPosition() < 30 && Extendo.getCurrentPosition() < 50;
                                     }
                                 })
-//                                .waitSeconds(0.05)
+                                .waitSeconds(0.05)
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
@@ -390,7 +395,6 @@ public class OutTakeLogic {
                                         Extendo.PowerOnToTransfer = false;
                                         ActiveIntake.powerOff();
                                         Extension.Retract();
-                                        Transfering = true;
                                         Arm.ShouldDoOffset = false;
                                         return true;
                                     }
@@ -398,17 +402,24 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
-                                        Transfering = false;
-                                        Elevator.setTargetPosition(200);
-                                        return Elevator.getCurrentPosition() > 150;
+                                        Elevator.setTargetPosition(150);
+                                        return Elevator.getCurrentPosition() > 100;
                                     }
                                 })
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
                                         Arm.setArmAngle(ArmTakeSpecimen - 50);
-                                        Elevator.setTargetPosition(-600);
+//                                        Arm.armProfile.setInstant(ArmTakeSpecimen - 50);
                                         return Arm.getCurrentArmAngle() > 100;
+                                    }
+                                })
+                                .waitSeconds(0.1)
+                                .addTask(new Task() {
+                                    @Override
+                                    public boolean Run() {
+                                        Elevator.setTargetPosition(-600);
+                                        return true;
                                     }
                                 })
                                 .addTask(new Task() {
@@ -420,6 +431,7 @@ public class OutTakeLogic {
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
+                                        Controls.Grab = false;
                                         Claw.openWide();
                                         return true;
                                     }
@@ -429,7 +441,8 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Claw.openWide();
-                                        Arm.setArmAngle(ArmTakeSpecimen);
+                                        Arm.setArmAngle(ArmTakeSpecimen - 13);
+                                        Transfering = false;
                                         return true;
                                     }
                                 })

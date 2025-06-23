@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.GenericController;
 import org.firstinspires.ftc.teamcode.OpModes.OpModeManager;
+import org.firstinspires.ftc.teamcode.OutTake.Arm;
+import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogic;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
@@ -31,7 +33,7 @@ public class IntakeLogic extends GenericController {
             gamepad2.left_trigger = gamepad1.gamepad.left_bumper ? 1 : 0;
             gamepad2.right_trigger = gamepad1.gamepad.right_bumper ? 1 : 0;
         }
-        if(gamepad1.wasPressed.square){
+        if(gamepad1.wasPressed.square && OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE){
             Controls.RetractExtendo = false;
             state = States.RETRACT;
         }
@@ -63,6 +65,13 @@ public class IntakeLogic extends GenericController {
                 } else {
                     Extendo.motor.setPower(0);
                 }
+                if(Storage.isStorageEmpty() || Storage.getStorageStatus() == Storage.SpecimenType.YELLOW) Controls.Throw = false;
+                if(Storage.hasTeamPice() && Controls.Throw && OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE_TAKE_SPECIMEN){
+                    state = States.RETRACT;
+                    Elevator.setTargetPosition(150);
+                    Arm.setArmAngle(90);
+//                    Arm.setArmAngle(OutTakeLogic.ArmTransfer - 3);
+                }
                 if(Storage.hasTeamPice() && !IgnoreUntilNext){
                     Controls.RetractExtendo = true;
                 }
@@ -75,7 +84,10 @@ public class IntakeLogic extends GenericController {
             case RETRACT:
                 Extendo.DISABLE = true;
                 DropDown.setDown(0);
-
+                if(Controls.Throw && Elevator.getCurrentPosition() >= 100){
+                    Controls.Throw = false;
+                    Arm.setArmAngle(OutTakeLogic.ArmTransfer);
+                }
                 ActiveIntake.Reverse(0.6);
                 ActiveIntake.Block();
 
@@ -85,9 +97,9 @@ public class IntakeLogic extends GenericController {
                     Extendo.encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     Extendo.encoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     ActiveIntake.powerOff();
-                    Extendo.Extend(30);
+                    Extendo.Extend(0);
                     Extendo.motor.setPower(0);
-                    if(Storage.hasTeamPice() || Storage.getStorageStatus() == Storage.SpecimenType.YELLOW)
+                    if(Storage.hasTeamPice())
                         Controls.Transfer = true;
                     state = States.IDLE;
                 }
@@ -118,7 +130,7 @@ public class IntakeLogic extends GenericController {
             } else {
                 ActiveIntake.powerOn(1);
                 ActiveIntake.Unblock();
-                if(Extendo.getCurrentPosition() > 20)
+                if(Extendo.getCurrentPosition() > 50)
                     DropDown.setDown(gamepad2.right_trigger);
                 else
                     DropDown.setDown(0);

@@ -98,7 +98,7 @@ public class Chassis {
         drive(x, y, rot);
     }
 
-    public static double xAccel = 4000, yAccel = 4000, xMV = 3000, yMV = 3000, xDecc = 2500, yDecc = 1000;
+    public static double xAccel = 4000, yAccel = 4000, xMV = 3000, yMV = 3000, xDecc = 1000, yDecc = 1000;
     public static AsymmetricMotionProfile xProfile = new AsymmetricMotionProfile(4000, 3000, 1000),
             yProfile = new AsymmetricMotionProfile(4000, 3000, 1000),
             hProfile = new AsymmetricMotionProfile(Math.PI * 8, Math.PI * 4, Math.PI * 4);
@@ -171,8 +171,17 @@ public class Chassis {
     public static SparkFunOTOS.Pose2D getFinalTargetPosition(){
         return new SparkFunOTOS.Pose2D(xProfile.getTargetPosition(), yProfile.getTargetPosition(), hProfile.getTargetPosition());
     }
+    private static boolean stop = false;
+    public static void stopFollow(){ stop = true; }
+    public static void startFollow(){ stop = false; }
 
     public static void Update(){
+        if(stop){
+            asyncFollow = false;
+//            drive(0, 0, 0);
+            setTargetPosition(Localizer.getCurrentPosition());
+            return;
+        }
         try {
             Robot.telemetry.addLine(point + " / " + pointsToFollow.size() + " of motion done");
             if (asyncFollow) {

@@ -73,7 +73,7 @@ public class Controls {
         }
 
 
-        if(gamepad1.wasPressed.cross)    Throw        = true;
+        if(gamepad2.wasPressed.cross)    Throw        = true;
         if(gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
         if(gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
         if(gamepad2.wasPressed.dpad_right || gamepad2.wasPressed.dpad_left)  raiseElevator = true;
