@@ -119,7 +119,6 @@ public class Climb {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Robot.telemetry.addLine("Cosmin e prost");
                         return Elevator.getCurrentPosition() >= 50 || time.seconds() >= 0.6;
                     }
                 })
@@ -129,14 +128,12 @@ public class Climb {
                         DisengagePTO();
                         Elevator.setTargetPosition(BAR2);
                         Elevator.Disable = pitch <= 3 && (Elevator.getCurrentPosition() <= BAR2 - 30 && Elevator.getCurrentPosition() >= 250);
-                        Robot.telemetry.addData("disabled?", Elevator.Disable);
                         return Elevator.getCurrentPosition() >= BAR2 - 20;
                     }
                 })
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Robot.telemetry.addLine("Cosmin e prost");
                         Arm.setArmAngle(climbArmIntertia);
                         Elevator.Disable = false;
                         return true;
