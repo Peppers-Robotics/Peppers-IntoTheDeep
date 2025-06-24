@@ -44,7 +44,6 @@ public class IntakeLogic extends GenericController {
         else Extendo.DISABLE = true;
         switch (state){
             case IDLE:
-                if(OutTakeLogic.Transfering) break;
                 // :)
                 if(Math.abs(gamepad1.right_stick_y) > 0.01) {
                     Extendo.PowerOnToTransfer = false;

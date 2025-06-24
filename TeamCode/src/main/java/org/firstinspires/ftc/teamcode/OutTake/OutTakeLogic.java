@@ -4,6 +4,7 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -357,19 +358,23 @@ public class OutTakeLogic {
                                     public boolean Run() {
                                         Claw.open();
                                         ActiveIntake.Block();
+                                        Extendo.DISABLE = false;
+
 //                                        Arm.setArmAngle(ArmTransfer);
                                         DropDown.setDown(DropDownTransfer);
                                         Elevator.PowerOnDownToTakeSample = true;
                                         Elevator.power = 0.8;
-                                        Extendo.PowerOnToTransfer = true;
-                                        Extendo.Extend(25);
-                                        return true;
+                                        Extendo.motor.setPower(-1);
+                                        Robot.telemetry.addData("disabled in loop", Extendo.DISABLE);
+                                        return Elevator.getCurrentPosition() < 30 && !Extendo.lm.getState();
                                     }
                                 })
                                 .addTask(new Task() {
                                     @Override
                                     public boolean Run() {
-                                        return Elevator.getCurrentPosition() < 30 && Extendo.getCurrentPosition() < 50;
+                                        Extendo.motor.setPower(0);
+                                        Extendo.Extend(0);
+                                        return true;
                                     }
                                 })
 //                                .waitSeconds(0.05)
@@ -390,8 +395,6 @@ public class OutTakeLogic {
                                         Extendo.PowerOnToTransfer = false;
                                         ActiveIntake.powerOff();
                                         Extension.Retract();
-                                        Transfering = true;
-                                        Arm.ShouldDoOffset = false;
                                         return true;
                                     }
                                 })
@@ -679,8 +682,13 @@ public class OutTakeLogic {
             Controls.RetractExtendo = false;
 
         }
-        Robot.telemetry.addData("state", CurrentState.toString());
         currentTask.update();
+
+        Robot.telemetry.addData("state", CurrentState.toString());
+        Robot.telemetry.addData("throw", Controls.Throw);
+        Robot.telemetry.addData("current pos extendo", Extendo.getCurrentPosition());
+        Robot.telemetry.addData("disabled", Extendo.DISABLE);
+        Robot.telemetry.addData("current in extendo", Extendo.motor.getCurrent(CurrentUnit.AMPS));
     }
 
 }
