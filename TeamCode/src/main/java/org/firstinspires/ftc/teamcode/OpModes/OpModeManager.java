@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -25,6 +26,7 @@ import org.firstinspires.ftc.teamcode.Robot.Chassis;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 
+@Config
 public class OpModeManager {
     public HardwareMap hardwareMap;
     public Gamepad gamepad1, gamepad2;
@@ -32,6 +34,7 @@ public class OpModeManager {
     public static double tSpeed = 1, rot = 0.7;
     public static double min = 0.4;
     public boolean isClimbing = false;
+    public static boolean reverse = true;
     public static Thread thread;
     public OpModeManager(HardwareMap hm, Gamepad g1, Gamepad g2, Telemetry t, Storage.Team team){
         hardwareMap = hm;
@@ -64,8 +67,8 @@ public class OpModeManager {
         ActiveIntake.Unblock();
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Claw.open();
-        Chassis.Heading.setPidCoefficients(new PIDCoefficients(0.5, 0, 0));
-        Arm.setArmAngle(OutTakeLogic.ArmIdle);
+//        Chassis.Heading.setPidCoefficients(new PIDCoefficients(0.5, 0, 0));
+//        Arm.setArmAngle(OutTakeLogic.ArmIdle);
         Rotation = 0;
         isClimbing = false;
     }
@@ -89,6 +92,7 @@ public class OpModeManager {
     }
     private static Scheduler autoScore;
     long freq = 0;
+    private static boolean stop = false;
     public void update(){
         Robot.clearCache(true);
 
@@ -119,14 +123,11 @@ public class OpModeManager {
         double pow = (min - 1) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition() + 1;
 
         Chassis.drive(
-                -getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
-                getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
+                (reverse ? -1 : 1) * getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
+                (reverse ? 1 : -1) * getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
                 getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
         );
         if(Controls.gamepad2.wasPressed.dpad_left) Claw.close();
-
-
-        OutTakeLogic.update();
         IntakeLogic.update();
         Extendo.update();
         Elevator.update();

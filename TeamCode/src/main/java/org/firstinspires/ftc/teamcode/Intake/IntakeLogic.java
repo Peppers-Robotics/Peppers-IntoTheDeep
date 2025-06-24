@@ -69,7 +69,7 @@ public class IntakeLogic extends GenericController {
                 if(Storage.hasTeamPice() && Controls.Throw && OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE_TAKE_SPECIMEN){
                     state = States.RETRACT;
                     Elevator.setTargetPosition(150);
-                    Arm.setArmAngle(90);
+                    Arm.setArmAngle(OutTakeLogic.ArmTransfer);
 //                    Arm.setArmAngle(OutTakeLogic.ArmTransfer - 3);
                 }
                 if(Storage.hasTeamPice() && !IgnoreUntilNext){
@@ -84,7 +84,7 @@ public class IntakeLogic extends GenericController {
             case RETRACT:
                 Extendo.DISABLE = true;
                 DropDown.setDown(0);
-                if(Controls.Throw && Elevator.getCurrentPosition() >= 100){
+                if(Controls.Throw && Elevator.getCurrentPosition() >= 130 && Arm.getCurrentArmAngle() < 60){
                     Controls.Throw = false;
                     Arm.setArmAngle(OutTakeLogic.ArmTransfer);
                 }
@@ -137,9 +137,10 @@ public class IntakeLogic extends GenericController {
             }
             wasDriverActivated = true;
         } else if (gamepad2.left_trigger > 0.05) {
-            if (Storage.hasTeamPice() || Storage.sensor.getColorSeenBySensor() == Colors.ColorType.YELLOW) {
+            if (Storage.hasTeamPice()) {
                 ActiveIntake.Block();
                 DropDown.setDown(0);
+                ActiveIntake.Reverse(0.6);
                 wasDriverActivated = true;
             } else {
                 ActiveIntake.Reverse(0.6);
