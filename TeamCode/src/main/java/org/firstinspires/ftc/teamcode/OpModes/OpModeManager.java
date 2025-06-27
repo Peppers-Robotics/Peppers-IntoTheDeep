@@ -128,6 +128,7 @@ public class OpModeManager {
                 getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
         );
         if(Controls.gamepad2.wasPressed.dpad_left) Claw.close();
+        OutTakeLogic.update();
         IntakeLogic.update();
         Extendo.update();
         Elevator.update();

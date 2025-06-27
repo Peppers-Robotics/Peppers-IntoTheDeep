@@ -32,6 +32,7 @@ public class Arm {
     public static void setArmAngle(double angle){
         angle *= -1;
         if(armProfile.getPosition() == angle) return;
+        if(armProfile.getTargetPosition() == angle) return;
         armProfile.startMotion(armPrevPos, angle);
         armPrevPos = angle;
     }

@@ -30,8 +30,8 @@ public class Chassis {
     public static void drive(double x, double y, double r){
         if(PuttingSpecimens) {
             r *= 0.7;
-            x *= 0.8;
-            y *= 0.8;
+//            x *= 0.8;
+//            y *= 0.8;
         }
         Robot.telemetry.addData("FL PC", FL.getCurrent(CurrentUnit.AMPS));
         Robot.telemetry.addData("FR PC", FR.getCurrent(CurrentUnit.AMPS));

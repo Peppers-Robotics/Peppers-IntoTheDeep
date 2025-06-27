@@ -59,9 +59,9 @@ public class Controls {
             if(gamepad1.wasPressed.dpad_down)   ScoreLevel1  = true;
             if(gamepad1.wasPressed.dpad_up)     ScoreLevel2  = true;
             if(gamepad1.wasPressed.square){      Grab         = true; RetractExtendo = true;}
-            if(gamepad1.wasPressed.circle)      {Retract      = true; Chassis.DoingSpecimens = false;
+            if(gamepad1.wasPressed.circle)      {Retract      = true;
             }
-            if(gamepad1.wasPressed.triangle)    {GrabSpecimen = true; Chassis.DoingSpecimens = true;}
+            if(gamepad1.wasPressed.triangle)    {GrabSpecimen = true;}
             if(gamepad1.wasPressed.cross)       Throw        = true;
             if(gamepad1.wasPressed.right_stick_button && gamepad1.wasPressed.left_stick_button){
                 Climbing = true;

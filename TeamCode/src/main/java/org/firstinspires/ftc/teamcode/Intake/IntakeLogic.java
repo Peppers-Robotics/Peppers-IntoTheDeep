@@ -33,7 +33,7 @@ public class IntakeLogic extends GenericController {
             gamepad2.left_trigger = gamepad1.gamepad.left_bumper ? 1 : 0;
             gamepad2.right_trigger = gamepad1.gamepad.right_bumper ? 1 : 0;
         }
-        if(gamepad1.wasPressed.square && OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE){
+        if((gamepad1.wasPressed.square || gamepad2.wasPressed.square) && OutTakeLogic.CurrentState == OutTakeLogic.States.IDLE){
             Controls.RetractExtendo = false;
             state = States.RETRACT;
         }

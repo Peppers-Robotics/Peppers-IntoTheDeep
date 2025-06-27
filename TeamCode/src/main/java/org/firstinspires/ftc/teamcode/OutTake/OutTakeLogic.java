@@ -256,7 +256,6 @@ public class OutTakeLogic {
 //                    break;
                 case IDLE_WITH_SAMPLE:
                     Transfering = false;
-//                    Elevator.setTargetPosition(Elevator.getTargetPosition() - Controls.gamepad2.right_stick_y * coeff);
                     if (Controls.ScoreLevel1) {
 
                         save2 = false;
@@ -466,17 +465,17 @@ public class OutTakeLogic {
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
-                                            Claw.close();
+                                            return Elevator.getCurrentPosition() < 20;
+                                        }
+                                    })
+                                    .addTask(new Task() {
+                                        @Override
+                                        public boolean Run() {
+                                            Claw.closeAbit();
                                             return true;
                                         }
                                     })
                                     .waitSeconds(0.08)
-                                    .addTask(new Task() {
-                                        @Override
-                                        public boolean Run() {
-                                            return Elevator.getCurrentPosition() < 20;
-                                        }
-                                    })
                                     .addTask(new Task() {
                                         @Override
                                         public boolean Run() {
@@ -497,7 +496,7 @@ public class OutTakeLogic {
                                             Arm.setArmAngle(ArmScoreSpecimen);
                                             if (Arm.getCurrentArmAngle() < 250)
                                                 Arm.setPivotAngle(PivotScoreSpecimen);
-                                            if(Arm.getCurrentArmAngle() < 120) Extension.Extend(0.2);
+                                            if(Arm.getCurrentArmAngle() < 120) Extension.Extend(0.4);
                                             return Arm.motionCompleted() && Elevator.ReachedTargetPosition();
                                         }
                                     })

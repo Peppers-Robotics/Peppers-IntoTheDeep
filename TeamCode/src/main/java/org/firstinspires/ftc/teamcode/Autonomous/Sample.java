@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import android.hardware.camera2.params.BlackLevelPattern;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -485,7 +487,7 @@ public class Sample extends LinearOpMode {
     public static SparkFunOTOS.Pose2D
             basketPosition = new SparkFunOTOS.Pose2D(520, -160, Math.toRadians(55)),
             basketPositionOne = new SparkFunOTOS.Pose2D(540, -130, Math.toRadians(68)),
-            basketPositionTwo = new SparkFunOTOS.Pose2D(563, -220, Math.toRadians(82)),
+            basketPositionTwo = new SparkFunOTOS.Pose2D(563, -210, Math.toRadians(82)),
             sample1 = new SparkFunOTOS.Pose2D(450, -290, Math.toRadians(68)),
             sample2 = new SparkFunOTOS.Pose2D(556, -286, Math.toRadians(84)),
             sample3 = new SparkFunOTOS.Pose2D(470, -260, Math.toRadians(110)),
@@ -766,6 +768,7 @@ public class Sample extends LinearOpMode {
             Elevator.update();
             telemetry.update();
         }
+        Storage.team = Storage.Team.BLUE;
         startTime = System.currentTimeMillis();
         autoTimer = 0;
         long auto = System.currentTimeMillis();
