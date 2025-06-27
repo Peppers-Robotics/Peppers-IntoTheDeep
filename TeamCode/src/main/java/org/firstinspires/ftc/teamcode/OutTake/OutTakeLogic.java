@@ -145,17 +145,12 @@ public class OutTakeLogic {
                                         Elevator.PowerOnDownToTakeSample = false;
                                         Elevator.Disable = false;
                                         Extendo.PowerOnToTransfer = false;
-                                        ActiveIntake.powerOff();
-//                                        Elevator.setTargetPosition(ElevatorScoreSample);
-//                                        if (Elevator.getCurrentPosition() > ElevatorUp - 80) {
-//                                            Arm.setArmAngle(ArmUpSample);
-//                                            Arm.setPivotAngle(PivotUpSample);
-//                                        }
-//                                        return Arm.getCurrentArmAngle() >= 100;
+                                        ActiveIntake.powerOff();//
                                         Extension.Retract();
 //                                        DropDown.setDown(0.6);
                                         Transfering = true;
                                         Arm.ShouldDoOffset = false;
+                                        ActiveIntake.Unblock();
 //                                        IntakeLogic.wasDriverActivated = false;
                                         return true;
                                     }
@@ -329,6 +324,7 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         OutTakeLogic.Transfering = true;
+                                        Elevator.setTargetPosition(0);
                                         return true;
                                     }
                                 })
@@ -496,7 +492,10 @@ public class OutTakeLogic {
                                             Arm.setArmAngle(ArmScoreSpecimen);
                                             if (Arm.getCurrentArmAngle() < 250)
                                                 Arm.setPivotAngle(PivotScoreSpecimen);
-                                            if(Arm.getCurrentArmAngle() < 120) Extension.Extend(0.4);
+                                            if(Arm.getCurrentArmAngle() < 120) {
+                                                Extension.Extend(0.4);
+                                                Claw.close();
+                                            }
                                             return Arm.motionCompleted() && Elevator.ReachedTargetPosition();
                                         }
                                     })

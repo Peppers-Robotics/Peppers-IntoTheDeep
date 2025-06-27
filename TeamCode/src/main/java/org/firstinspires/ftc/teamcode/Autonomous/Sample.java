@@ -723,7 +723,7 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend(750 + 100 * (first ? 0 : 1));
+                        Extendo.Extend(770 + 100 * (first ? 0 : 1));
                         DropDown.setDown(1);
                         ActiveIntake.powerOn();
                         if(Arm.getCurrentArmAngle() <= 120)
