@@ -73,9 +73,9 @@ public class Specimen extends LinearOpMode {
     public static double scoredLine = -670;
     public static SparkFunOTOS.Pose2D scoreSpecimen = new SparkFunOTOS.Pose2D(-1000, -120, Math.toRadians(10)),
             scoreSpecimen1 = new SparkFunOTOS.Pose2D(-1000, -200, Math.toRadians(0)),
-            sample1 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-35)),
-            sample2 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-51.5)),
-            sample3 = new SparkFunOTOS.Pose2D(-500, 950, Math.toRadians(-58)),
+            sample1 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-30)), // -33
+            sample2 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-51)),
+            sample3 = new SparkFunOTOS.Pose2D(-500, 950, Math.toRadians(-57)),
             humanReverse = new SparkFunOTOS.Pose2D(-530, 860, Math.toRadians(-130)),
             spitDetection = new SparkFunOTOS.Pose2D(-627, 430, Math.toRadians(-140)),
             humanTake = new SparkFunOTOS.Pose2D(60, 780 ,Math.toRadians(0));
@@ -152,14 +152,14 @@ public class Specimen extends LinearOpMode {
                         @Override
                         public boolean Run() {
                             Chassis.startFollow();
-                            if(tries >= 2){
+                            if(tries >= 1){
                                 tries ++;
                                 r.skip();
                                 return true;
                             }
                             if(s == null){
                                 s = new Scheduler();
-                                s.addTask(new Sample.TakeSample(type, 0.5))
+                                s.addTask(new Sample.TakeSamplePacanea(type, 1))
                                         .addTask(new Task() {
                                             @Override
                                             public boolean Run() {
@@ -171,7 +171,7 @@ public class Specimen extends LinearOpMode {
                             s.update();
                             if(s.done() && Storage.getStorageStatus() != GetPositionSample.getType(type)){
                                 s = new Scheduler();
-                                s.addTask(new Sample.TakeSample(type, 0.5))
+                                s.addTask(new Sample.TakeSamplePacanea(type, 1))
                                         .addTask(new Task() {
                                             @Override
                                             public boolean Run() {
@@ -202,6 +202,7 @@ public class Specimen extends LinearOpMode {
                         public boolean Run() {
                             if(Storage.isStorageEmpty()){
                                 skip = true;
+                                sample1.h = Math.toRadians(-28);
                             }
                             return true;
                         }
@@ -218,7 +219,7 @@ public class Specimen extends LinearOpMode {
                         @Override
                         public boolean Run() {
                             Extendo.Extend(600);
-                            ActiveIntake.Reverse(0.7);
+                            ActiveIntake.Reverse(1);
                             return true;
                         }
                     })
@@ -273,7 +274,7 @@ public class Specimen extends LinearOpMode {
                         public boolean Run() {
                             Elevator.PowerOnDownToTakeSample = false;
                             Extension.Extend(0);
-                            Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSpecimen - 20);
+                            Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSpecimen - 30);
 //                            return Arm.getCurrentArmAngle() < 300;
                             return Elevator.getCurrentPosition() >= 50;
                         }
@@ -517,14 +518,26 @@ public class Specimen extends LinearOpMode {
 //                .addTask(new ScoreSpecimen())
                 .addTask(new ScoreSpecimen1())
                 .lineToAsync(sample1)
-                .lineToAsync(new SparkFunOTOS.Pose2D(sample1.x, sample1.y, tries >= 3 ? Math.toRadians(-10) : sample1.h))
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
                         Extendo.Extend(0);
-                        return Localizer.getCurrentPosition().h <= Math.toRadians(-35);
+                        return true;
                     }
                 })
+                .waitForSync()
+//                .lineToAsync(new SparkFunOTOS.Pose2D(sample1.x, sample1.y, skip ? Math.toRadians(-5) : sample1.h))
+                /*.addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Extendo.Extend(0);
+                        if(skip){
+                            return Localizer.getCurrentPosition().h <= Math.toRadians(-10);
+                        } else {
+                            return Localizer.getCurrentPosition().h <= Math.toRadians(-30) && Localizer.getCurrentPosition().y > 800;
+                        }
+                    }
+                })*/
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
@@ -545,6 +558,7 @@ public class Specimen extends LinearOpMode {
                     @Override
                     public boolean Run() {
 //                        Extendo.Extend(300);
+                        sample1.h = Math.toRadians(-33);
                         ActiveIntake.powerOn();
                         DropDown.setDown(1);
                         return Localizer.getCurrentPosition().h >= Math.toRadians(-85);
@@ -559,6 +573,13 @@ public class Specimen extends LinearOpMode {
                     @Override
                     public boolean Run() {
                         return Localizer.getCurrentPosition().h > Math.toRadians(-110);
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        ActiveIntake.powerOn(1);
+                        return true;
                     }
                 })
                 .addTask(new TakeSample(850))

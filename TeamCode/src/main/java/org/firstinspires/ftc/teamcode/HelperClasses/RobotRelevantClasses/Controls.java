@@ -15,7 +15,7 @@ public class Controls {
     public static boolean RetractExtendo, ScoreLevel1, ScoreLevel2, GrabSpecimen, Climbing,
             Grab,
             Retract,
-                            DunkToScore, Transfer, Throw, SlowDown, ImogenDriver, NotGettingRetractedExtendoEmergency, ResetExtendoD2;
+                            DunkToScore, Transfer, Throw, SlowDown, ImogenDriver, NotGettingRetractedExtendoEmergency, ResetExtendoD2, EmergencyRaiseElevator;
 
     public static void Initialize(Gamepad gamepadD1, Gamepad gamepadD2){
         gamepad1 = new AutoGamepad(gamepadD1);
@@ -73,13 +73,14 @@ public class Controls {
         }
 
 
-        if(gamepad2.wasPressed.cross || gamepad1.wasPressed.cross)    Throw        = true;
+        if(gamepad1.wasPressed.cross)    Throw        = true;
         if(gamepad2.wasPressed.dpad_down)   ScoreLevel1  = true;
         if(gamepad2.wasPressed.dpad_up)     ScoreLevel2  = true;
         if(gamepad2.wasPressed.dpad_right || gamepad2.wasPressed.dpad_left) ResetExtendoD2 = true;
         if(gamepad1.wasPressed.triangle)    GrabSpecimen = true;
         if(gamepad1.wasPressed.square)      Grab         = true;
         if(gamepad2.wasPressed.circle || gamepad1.wasPressed.circle)      Retract      = true;
+        if(gamepad2.wasPressed.cross) EmergencyRaiseElevator = true;
         if(gamepad2.wasPressed.dpad_right)  {DunkToScore  = true;NotGettingRetractedExtendoEmergency = true;}
         if((gamepad2.gamepad.left_stick_button || gamepad2.gamepad.right_stick_button) &&
                 (gamepad1.gamepad.left_stick_button || gamepad1.gamepad.right_stick_button) && !ClimbingHelp) {

@@ -84,7 +84,7 @@ public class Chassis {
 
         Strafe.kS = -0.0;
         Forward.kS = 0.00;
-        Heading.kS = -0.035;
+        Heading.kS = -0.045; //-0.035
 
     }
 

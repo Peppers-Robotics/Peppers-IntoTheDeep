@@ -623,6 +623,23 @@ public class OutTakeLogic {
             }
 
         }
+        if(Controls.EmergencyRaiseElevator){
+            currentTask.removeAllTasks();
+            currentTask = new Scheduler();
+            Transfering = false;
+            currentTask.addTask(new Task() {
+                @Override
+                public boolean Run() {
+                    Elevator.setTargetPosition(ElevatorScoreSample2);
+                    return true;
+                }
+            });
+            Controls.EmergencyRaiseElevator = false;
+            Controls.Grab = false;
+            Controls.RetractExtendo = false;
+            Controls.Transfer = false;
+            Controls.Retract = false;
+        }
         if(Controls.Retract){
 
             Robot.telemetry.addLine("RETRACT !$#%@$^%&^%*&%^$%#$");
