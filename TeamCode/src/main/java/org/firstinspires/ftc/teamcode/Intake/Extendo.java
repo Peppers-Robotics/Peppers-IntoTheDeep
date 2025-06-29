@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 public class Extendo {
     public static CachedMotor motor, encoder;
     public static PIDController pidController = new PIDController(0.01, 0, -0.0004);
-    public static int MaxExtendoExtension = 840;
+    public static int MaxExtendoExtension = 880;
     private static double targetPosition = 0;
     public static int offset = 0;
     public static LimitSwitch lm;

@@ -55,7 +55,7 @@ public class GetPositionSample {
         for(LLResultTypes.DetectorResult detection : targetSamples){
             double distSampleRobot = getExtendoRotPair(detection.getTargetXDegreesNoCrosshair(), detection.getTargetYDegreesNoCrosshair()).x;
 //            double distRobotToBar = Math.abs(XBarSub - Localizer.getCurrentPosition().x);
-            double distRobotToBar = 30;
+            double distRobotToBar = 100;
             double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
 
             if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo && // not close to a bar
@@ -84,11 +84,10 @@ public class GetPositionSample {
             LLResultTypes.DetectorResult detection = targetSamples.get(i);
             double distSampleRobot = getExtendoRotPair(detection.getTargetXDegreesNoCrosshair(), detection.getTargetYDegreesNoCrosshair()).x;
 //            double distRobotToBar = Math.abs(XBarSub - Localizer.getCurrentPosition().x);
-            double distRobotToBar = 30;
+            double distRobotToBar = 200;
             double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
 
-            if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) - centerToExtendo && distSampleRobot <= 650){
-                double lateralT = getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y;
+            if(distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 50) - centerToExtendo){
 //                double score = Math.sqrt(detection.getTargetXPixels() * detection.getTargetXPixels() + detection.getTargetYPixels() * detection.getTargetYPixels());
                 double score = detection.getTargetArea();
 //                if(Localizer.getCurrentPosition().y + lateralT < middleY) score = 1e8;
@@ -99,6 +98,7 @@ public class GetPositionSample {
 //                return detection;
             }
         }
+        if(targetSamples.isEmpty()) return null;
         return targetSamples.get(id);
     }
 

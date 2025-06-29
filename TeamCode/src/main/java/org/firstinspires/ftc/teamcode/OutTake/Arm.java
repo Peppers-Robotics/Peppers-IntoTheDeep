@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.DifferentialHelp
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.PIDController;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.ServoPlus;
 import org.firstinspires.ftc.teamcode.Intake.Extendo;
+import org.firstinspires.ftc.teamcode.OpModes.OpModeManager;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 import java.time.OffsetTime;
@@ -22,7 +23,8 @@ public class Arm {
     private static final DifferentialHelper diffy;
 
     static {
-        armProfile = new AsymmetricMotionProfile(8000, 4500, 2000);
+//        armProfile = new AsymmetricMotionProfile(8500, 4500, 2000);
+        armProfile = new AsymmetricMotionProfile(10000, 5500, 2500);
         pivotProfile = new AsymmetricMotionProfile(3000, 4500, 2000);
         diffy = new DifferentialHelper(1);
     }
@@ -31,7 +33,7 @@ public class Arm {
     public static void setArmAngle(double angle){
         angle *= -1;
         if(armProfile.getPosition() == angle) return;
-        armProfile.changeInitialAndEndVelocity(0, 0);
+        if(armProfile.getTargetPosition() == angle) return;
         armProfile.startMotion(armPrevPos, angle);
         armPrevPos = angle;
     }
@@ -44,7 +46,7 @@ public class Arm {
         armProfile.update();
         pivotProfile.update();
         diffy.setAngleToSecondJoint(armProfile.getPosition());
-        diffy.setAngleToFirstJoint(pivotProfile.getPosition());
+//        diffy.setAngleToFirstJoint(pivotProfile.getPosition());
 
         servo1.setAngle(diffy.getRawAngles()[1] + s1Offset - (ShouldDoOffset?offsetAngle : 0));
         servo2.setAngle(diffy.getRawAngles()[0] + s2Offset);

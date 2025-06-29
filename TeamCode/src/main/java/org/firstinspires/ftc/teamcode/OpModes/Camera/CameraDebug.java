@@ -36,6 +36,7 @@ public class CameraDebug extends LinearOpMode {
         while (opModeIsActive()){
             Robot.clearCache();
             Localizer.Update();
+            Robot.telemetry.addData("is camera off", camera.isConnected());
             r = camera.getLatestResult();
             if(r != null && r.isValid() && GetPositionSample.hasId(r, id)){
                 double tx = GetPositionSample.getOptimalResult(r, id).getTargetXDegrees(), ty = GetPositionSample.getOptimalResult(r, id).getTargetYDegrees();
