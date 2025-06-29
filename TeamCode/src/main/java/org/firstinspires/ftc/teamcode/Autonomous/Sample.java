@@ -184,7 +184,7 @@ public class Sample extends LinearOpMode {
         private double tx, ty;
         private SparkFunOTOS.Pose2D took;
         private double ks = 0;
-        private static double offset = 5, extendo = 0;
+        public static double offset = 5, extendo = 0;
         public TakeSamplePacanea(int id, double timeOut){
             take = new Scheduler();
             take
@@ -229,10 +229,14 @@ public class Sample extends LinearOpMode {
                                 Extendo.motor.setPower(0);
                                 Extendo.DISABLE = true;
                             }
-                            if((System.currentTimeMillis() - time) / 1000.f >= 0.15 && start && (System.currentTimeMillis() - time) / 1000.f < 0.2) {
-                                Extendo.motor.setPower(-1);
-                            } else if((System.currentTimeMillis() - time) / 1000.f >= 0.2 && start){
-                                Extendo.motor.setPower(0.6);
+                            if((System.currentTimeMillis() - time) / 1000.f >= 0.1 && start && (System.currentTimeMillis() - time) / 1000.f < 0.2) {
+                                Extendo.motor.setPower(-0.7);
+                            } else if((System.currentTimeMillis() - time) / 1000.f >= 0.2 && start && (System.currentTimeMillis() - time) / 1000.f < 0.3){
+                                Extendo.motor.setPower(0.7);
+                            } else if((System.currentTimeMillis() - time) / 1000.f >= 0.3 && start && (System.currentTimeMillis() - time) / 1000.f < 0.4){
+                                Extendo.motor.setPower(-0.7);
+                            } else {
+                                Extendo.motor.setPower(0.7);
                             }
                             if(((System.currentTimeMillis() - time) / 1000.f > timeOut + (ActiveIntake.motor.getCurrent(CurrentUnit.AMPS) > 3 ? 0.5 : 0) && time != -1)){
                                 return true;
@@ -326,7 +330,7 @@ public class Sample extends LinearOpMode {
                             }
                             if(!camera.isConnected()) RobotLog.d("camera disconnected");
                             if(!camera.isRunning()) RobotLog.d("camera stopped");
-                            if((System.currentTimeMillis() - time) / 1000.f >= 0.8){
+                            if((System.currentTimeMillis() - time) / 1000.f >= 0.4){
                                 take.clear();
                                 stopDetection = true;
                                 return true;
@@ -469,15 +473,16 @@ public class Sample extends LinearOpMode {
                             if((System.currentTimeMillis() - time) / 1000.f >= 0.2){
                                 Extendo.Extend(pos + 100);
                             }
-                            return Storage.hasTeamPice() || (double) (System.currentTimeMillis() - time) / 1000.f >= 0.5;
+                            return Storage.hasTeamPice() || (double) (System.currentTimeMillis() - time) / 1000.f >= 0.8;
                         }
                     })
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-//                            Extension.Extend(OutTakeLogic.TransferExtension);
-                            ActiveIntake.Unblock();
-//                            ActiveIntake.Block();
+                            if(!Storage.hasTeamPice())
+                                ActiveIntake.Unblock();
+                            else
+                                ActiveIntake.Block();
                             ActiveIntake.powerOn();
                             Extendo.Extend(0);
                             DropDown.setDown(0);
@@ -607,7 +612,7 @@ public class Sample extends LinearOpMode {
             basketPosition = new SparkFunOTOS.Pose2D(520, -160, Math.toRadians(55)),
             basketPositionOne = new SparkFunOTOS.Pose2D(540, -130, Math.toRadians(62)),
             basketPositionTwo = new SparkFunOTOS.Pose2D(563, -180, Math.toRadians(82)),
-            sample1 = new SparkFunOTOS.Pose2D(450, -290, Math.toRadians(65)), // 68
+            sample1 = new SparkFunOTOS.Pose2D(450, -290, Math.toRadians(68)), // 68
             sample2 = new SparkFunOTOS.Pose2D(556, -286, Math.toRadians(80)),
             sample3 = new SparkFunOTOS.Pose2D(470, -260, Math.toRadians(110)),
             park = new SparkFunOTOS.Pose2D(-400, -1400, Math.toRadians(0))

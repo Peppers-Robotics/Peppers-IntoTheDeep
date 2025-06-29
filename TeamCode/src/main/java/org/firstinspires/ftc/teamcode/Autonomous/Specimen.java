@@ -70,12 +70,12 @@ public class Specimen extends LinearOpMode {
             return s.done();
         }
     }
-    public static double scoredLine = -670;
-    public static SparkFunOTOS.Pose2D scoreSpecimen = new SparkFunOTOS.Pose2D(-1000, -120, Math.toRadians(10)),
+    public static double scoredLine = -620;
+    public static SparkFunOTOS.Pose2D scoreSpecimen = new SparkFunOTOS.Pose2D(-1000, -210, Math.toRadians(10)),
             scoreSpecimen1 = new SparkFunOTOS.Pose2D(-1000, -200, Math.toRadians(0)),
             sample1 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-30)), // -33
-            sample2 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-51)),
-            sample3 = new SparkFunOTOS.Pose2D(-500, 950, Math.toRadians(-57)),
+            sample2 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-45)),
+            sample3 = new SparkFunOTOS.Pose2D(-500, 950, Math.toRadians(-53)),
             humanReverse = new SparkFunOTOS.Pose2D(-530, 860, Math.toRadians(-130)),
             spitDetection = new SparkFunOTOS.Pose2D(-627, 430, Math.toRadians(-140)),
             humanTake = new SparkFunOTOS.Pose2D(60, 780 ,Math.toRadians(0));
@@ -152,14 +152,14 @@ public class Specimen extends LinearOpMode {
                         @Override
                         public boolean Run() {
                             Chassis.startFollow();
-                            if(tries >= 1){
+                            if(tries >= 2){
                                 tries ++;
                                 r.skip();
                                 return true;
                             }
                             if(s == null){
                                 s = new Scheduler();
-                                s.addTask(new Sample.TakeSamplePacanea(type, 1))
+                                s.addTask(new Sample.TakeSample(type, 1))
                                         .addTask(new Task() {
                                             @Override
                                             public boolean Run() {
@@ -167,11 +167,13 @@ public class Specimen extends LinearOpMode {
                                                 return true;
                                             }
                                         });
+//                                Sample.TakeSamplePacanea.offset = 15;
+                                Sample.park.h = Math.toRadians(-8);
                             }
                             s.update();
                             if(s.done() && Storage.getStorageStatus() != GetPositionSample.getType(type)){
                                 s = new Scheduler();
-                                s.addTask(new Sample.TakeSamplePacanea(type, 1))
+                                s.addTask(new Sample.TakeSample(type, 1))
                                         .addTask(new Task() {
                                             @Override
                                             public boolean Run() {
@@ -193,6 +195,10 @@ public class Specimen extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
+                            if(Storage.getStorageStatus() != GetPositionSample.getType(type)){
+                                ActiveIntake.Unblock();
+                                ActiveIntake.Reverse(0.7);
+                            }
                             Extendo.Extend(0);
                             return Extendo.getCurrentPosition() < 40;
                         }
@@ -202,7 +208,7 @@ public class Specimen extends LinearOpMode {
                         public boolean Run() {
                             if(Storage.isStorageEmpty()){
                                 skip = true;
-                                sample1.h = Math.toRadians(-28);
+                                sample1.h = Math.toRadians(-24);
                             }
                             return true;
                         }
@@ -500,6 +506,7 @@ public class Specimen extends LinearOpMode {
         Elevator.setTargetPosition(0);
         Arm.setArmAngle(70);
         Claw.close();
+        tries = 0;
 
         Extendo.Extend(0);
         Extension.Extend(0);
@@ -561,7 +568,7 @@ public class Specimen extends LinearOpMode {
                         sample1.h = Math.toRadians(-33);
                         ActiveIntake.powerOn();
                         DropDown.setDown(1);
-                        return Localizer.getCurrentPosition().h >= Math.toRadians(-85);
+                        return Localizer.getCurrentPosition().h >= Math.toRadians(-65);
                     }
                 })
                 .addTask(new TakeSample(685))
