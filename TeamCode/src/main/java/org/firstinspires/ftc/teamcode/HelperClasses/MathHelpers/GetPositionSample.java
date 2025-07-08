@@ -46,30 +46,29 @@ public class GetPositionSample {
     public static double middleX = 630, middleY = -1600;
 
     @Deprecated
-    public static LLResultTypes.DetectorResult getOptimalResultSmort(LLResult camera, int targetID){
-        List<LLResultTypes.DetectorResult> detections = camera.getDetectorResults();
+    public static LLResultTypes.ColorResult getOptimalResultSmort(LLResult camera){
+        List<LLResultTypes.ColorResult> detections = camera.getColorResults();
+        LLResultTypes.ColorResult ret = null;
+        double max = -1;
 
         // split the list into two separate lists
-        List<LLResultTypes.DetectorResult> targetSamples = detections.stream().filter(e -> e.getClassId() == targetID).collect(Collectors.toList());
-        detections = detections.stream().filter(e -> e.getClassId() != targetID).collect(Collectors.toList());
-        for(LLResultTypes.DetectorResult detection : targetSamples){
+        for(LLResultTypes.ColorResult detection : detections){
             double distSampleRobot = getExtendoRotPair(detection.getTargetXDegreesNoCrosshair(), detection.getTargetYDegreesNoCrosshair()).x;
-//            double distRobotToBar = Math.abs(XBarSub - Localizer.getCurrentPosition().x);
             double distRobotToBar = 100;
             double distRobotToSubBar = distRobotToBar / Math.cos(Localizer.getCurrentPosition().h);
+            if(getSamplePositionRelativeToCamera(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y < Math.abs(halfYTerrain - Localizer.getCurrentPosition().y) &&
+                distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 20)){
+                if(detection.getTargetArea() > max){
+                    max = detection.getTargetArea();
+                    ret = detection;
+                }
 
-            if(distSampleRobot >= distRobotToSubBar + 10 - centerToExtendo && // not close to a bar
-                    distSampleRobot <= AutoTakeSample.ExtendoToDistance(Extendo.getMaxPosition() - 100) + centerToExtendo // not too far away
-                /*&& getPositionRelativeToRobot(detection.getTargetXDegrees(), detection.getTargetYDegrees()).y + Localizer.getCurrentPosition().y < halfYTerrain*/
-                //TODO: putini vecini aproape
-
-            ){
-                return detection;
             }
+
         }
-        return targetSamples.get(0);
+        return ret;
     }
-    public static double XBarSub = 0, halfYTerrain = 0;
+    public static double XBarSub = 0, halfYTerrain = -1500;
     public static LLResultTypes.DetectorResult getOptimalResult(LLResult result, int targetID){
         List<LLResultTypes.DetectorResult> detections = result.getDetectorResults();
 

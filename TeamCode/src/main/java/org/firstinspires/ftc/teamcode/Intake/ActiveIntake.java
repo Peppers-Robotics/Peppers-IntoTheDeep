@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 public class ActiveIntake {
     public static CachedMotor motor;
     public static ServoPlus blocker;
-    public static double block = 195, unblock = 290;
+    public static double block = 195, unblock = 297;
 
     public static void Block(){
         blocker.setAngle(block);

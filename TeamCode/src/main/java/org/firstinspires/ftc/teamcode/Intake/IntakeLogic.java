@@ -125,16 +125,16 @@ public class IntakeLogic extends GenericController {
             DropDown.setDown(0);
             wasDriverActivated = false;
         }
-        if (Math.abs(gamepad2.left_trigger) > 0.05) {
+        if (Math.abs(gamepad2.left_trigger) > 0.05 && !OutTakeLogic.Transfering) {
             ActiveIntake.Reverse(0.7);
             DropDown.setDown(0);
             wasDriverActivated = true;
             ActiveIntake.Unblock();
-        } else if (gamepad2.right_trigger > 0.05) {
+        } else if (gamepad2.right_trigger > 0.05 && !OutTakeLogic.Transfering) {
             if (Storage.hasTeamPice()) {
                 ActiveIntake.Block();
                 DropDown.setDown(0);
-                if(blocker.seconds() >= 0.1) {
+                if(blocker.seconds() >= 0.2) {
                    ActiveIntake.Reverse(0.7);
                    Reverse = true;
                 }
@@ -144,6 +144,9 @@ public class IntakeLogic extends GenericController {
                 DropDown.setDown(gamepad2.right_trigger);
             }
             wasDriverActivated = true;
+        }
+        if(Storage.isStorageEmpty() && !wasDriverActivated){
+            ActiveIntake.Unblock();
         }
         /*if(Storage.hasTeamPice() && Reverse){
             if(reverseTimer.seconds() <= 1) ActiveIntake.Reverse(0.7);

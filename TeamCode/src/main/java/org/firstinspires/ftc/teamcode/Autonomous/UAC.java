@@ -34,15 +34,15 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 import java.util.Arrays;
 
-@Autonomous(name = "0 + 7")
+@Autonomous(name = "0 + 7 ( UAC )")
 @Config
-public class Sample extends LinearOpMode {
+public class UAC extends LinearOpMode {
     public static boolean isRetracting = false;
     public static double parkElevator = 250;
     public static Limelight3A camera;
     public static PIDCoefficients headingCoeff;
     private static LLResult result = null;
-    public static class Transfer extends Task{
+    public static class Transfer extends Task {
         private Scheduler transfer, run;
         private boolean retry = false;
         public Transfer(){
@@ -475,8 +475,7 @@ public class Sample extends LinearOpMode {
                                 result = null;
                                 return true;
                             } else {
-                                if(Storage.isStorageEmpty()) ActiveIntake.Reverse(0.4);
-                                else ActiveIntake.Reverse(0.7);
+                                ActiveIntake.Reverse(0.7);
                                 ActiveIntake.Unblock();
                             }
                             result = null;
@@ -654,19 +653,72 @@ public class Sample extends LinearOpMode {
             return go.done();
         }
     }
+    public static SparkFunOTOS.Pose2D human = new SparkFunOTOS.Pose2D(-1300, -80, Math.toRadians(0)),
+                                        basketPosHuman = new SparkFunOTOS.Pose2D(440, -55, Math.toRadians(20));
+
+    public static class GoTakeFromHuman extends Task{
+        Scheduler go;
+        public GoTakeFromHuman(){
+            go = new Scheduler();
+            go
+                    .lineToAsync(human)
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            Extendo.Extend(0);
+                            return Localizer.getCurrentPosition().x < 200; // TODO: tune
+                        }
+                    })
+                    .addTask(new Retract())
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            ActiveIntake.powerOn();
+                            return Localizer.getCurrentPosition().x < -400;
+                        }
+                    })
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            DropDown.setDown(1);
+                            Extendo.Extend(700);
+                            return Localizer.getCurrentPosition().h <= Math.toRadians(5);
+                        }
+                    })
+                    .addTask(new TakeSample(900))
+                    .lineToAsync(basketPosHuman)
+                    .waitForTrajDone(80)
+                    .addTask(new Transfer())
+                    .waitForSync()
+                    .addTask(new Task() {
+                        @Override
+                        public boolean Run() {
+                            Claw.openWide();
+                            return true;
+                        }
+                    })
+                    .waitSeconds(0.05)
+
+                    ;
+        }
+        @Override
+        public boolean Run() {
+            go.update();
+            return go.done();
+        }
+    }
 
     public static SparkFunOTOS.Pose2D
             basketPosition = new SparkFunOTOS.Pose2D(520, -160, Math.toRadians(55)),
             basketPositionOne = new SparkFunOTOS.Pose2D(540, -90, Math.toRadians(62)),
             basketPositionTwo = new SparkFunOTOS.Pose2D(563, -180, Math.toRadians(82)),
-            sample1 = new SparkFunOTOS.Pose2D(450, -290, Math.toRadians(70)), // 68
+            sample1 = new SparkFunOTOS.Pose2D(450, -290, Math.toRadians(68)), // 68
             sample2 = new SparkFunOTOS.Pose2D(556, -286, Math.toRadians(80)),
             sample3 = new SparkFunOTOS.Pose2D(470, -260, Math.toRadians(110)),
             park = new SparkFunOTOS.Pose2D(-400, -1400, Math.toRadians(0))
                     ;
 
     private static long startTime = 0;
-    public static double savedKs = Chassis.Heading.kS;
     private static double autoTimer = 0, angleToHead = 0, p = -1;
     private static boolean autoTake = false, first = false;
     @Override
@@ -708,8 +760,6 @@ public class Sample extends LinearOpMode {
                         ActiveIntake.Unblock();
                         autoTake = true;
                         first = true;
-//                        Chassis.Heading.kS = -0.055;
-
                         angleToHead = basketPositionOne.h;
                         Elevator.setTargetPosition(OutTakeLogic.ElevatorScoreSample2);
                         Arm.setArmAngle(OutTakeLogic.ArmScoreSample);
@@ -766,7 +816,6 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Chassis.Heading.kS = savedKs;
                         autoTake = true;
                         angleToHead = basketPositionTwo.h;
                         return true;
@@ -864,6 +913,8 @@ public class Sample extends LinearOpMode {
                         return true;
                     }
                 })
+                .addTask(new GoTakeFromHuman())
+                .addTask(new GoTakeFromHuman())
                 .addTask(new GoToTakeSampleFromSubmersible())
                 .addTask(new GoToTakeSampleFromSubmersible())
                 .addTask(new GoToTakeSampleFromSubmersible())
@@ -889,7 +940,7 @@ public class Sample extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend(800 + 80 * (first ? 0 : 1));
+                        Extendo.Extend(800 + 60 * (first ? 0 : 1));
                         DropDown.setDown(1);
                         ActiveIntake.powerOn();
                         if(Arm.getCurrentArmAngle() <= 120)
