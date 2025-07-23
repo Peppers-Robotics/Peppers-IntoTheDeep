@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.OutTake.Elevator;
 import org.firstinspires.ftc.teamcode.OutTake.Extension;
 import org.firstinspires.ftc.teamcode.OutTake.OutTakeLogic;
 import org.firstinspires.ftc.teamcode.Robot.Chassis;
+import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 
@@ -96,6 +97,13 @@ public class OpModeManager {
     public void update(){
         Robot.clearCache(true);
 
+        if(gamepad1.dpad_left){
+
+            Chassis.Update();
+            Localizer.Update();
+            return;
+        }
+
         if(Controls.Climbing && !isClimbing){
             Chassis.drive(0, 0, 0);
             Climb.run = Climb.climb.clone();
@@ -121,12 +129,11 @@ public class OpModeManager {
             tSpeed = 1;
         }
         double pow = (min - 1) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition() + 1;
-
-        Chassis.drive(
-                (reverse ? -1 : 1) * getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
-                (reverse ? 1 : -1) * getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
-                getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
-        );
+            Chassis.drive(
+                    (reverse ? -1 : 1) * getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
+                    (reverse ? 1 : -1) * getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
+                    getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
+            );
         if(Controls.gamepad2.wasPressed.dpad_left) Claw.close();
         OutTakeLogic.update();
         IntakeLogic.update();
@@ -135,6 +142,7 @@ public class OpModeManager {
         Arm.update();
         Controls.CleanCommands();
         Controls.Update();
+        Localizer.Update();
 
         if(gamepad1.options) {
             Storage.getStorageStatus();

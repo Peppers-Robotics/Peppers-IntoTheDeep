@@ -445,6 +445,7 @@ public class OutTakeLogic {
 
                     }
                     if (Controls.Grab) {
+                        Controls.Grab = false;
                         currentTask = new Scheduler();
                         {
                             currentTask
@@ -487,21 +488,23 @@ public class OutTakeLogic {
                                             Chassis.DoingSpecimens = true;
                                             Controls.GrabSpecimen = false;
 
+
                                             Elevator.Disable = false;
                                             Elevator.setTargetPosition(ElevatorScoreSpecimen);
                                             Arm.setArmAngle(ArmScoreSpecimen);
                                             if (Arm.getCurrentArmAngle() < 250)
                                                 Arm.setPivotAngle(PivotScoreSpecimen);
                                             if(Arm.getCurrentArmAngle() < 120) {
-                                                Extension.Extend(0.4);
+                                                Extension.Extend(0);
                                                 Claw.close();
+                                                Chassis.setTargetPosition(Chassis.specimenScoringPos);
                                             }
                                             return Arm.motionCompleted() && Elevator.ReachedTargetPosition();
                                         }
                                     })
                             ;
                         }
-                        Controls.Grab = false;
+
                         CurrentState = States.IDLE_SCORE_SPECIMEN;
                         Controls.GrabSpecimen = false;
                     }
@@ -516,6 +519,14 @@ public class OutTakeLogic {
                         currentTask = new Scheduler();
                         {
                             currentTask
+                                    .addTask(new Task() {
+                                        @Override
+                                        public boolean Run() {
+                                            Extension.Extend(1);
+                                            return true;
+                                        }
+                                    })
+                                    .waitSeconds(0.1)
                                     .addTask(new Task() {
 
                                         @Override
@@ -708,6 +719,9 @@ public class OutTakeLogic {
 
         }
         Robot.telemetry.addData("state", CurrentState.toString());
+        Robot.telemetry.addData("Pos x", Localizer.getCurrentPosition().x);
+        Robot.telemetry.addData("Pos y", Localizer.getCurrentPosition().y);
+        Robot.telemetry.addData("Pos h", Localizer.getCurrentPosition().h);
         currentTask.update();
     }
 

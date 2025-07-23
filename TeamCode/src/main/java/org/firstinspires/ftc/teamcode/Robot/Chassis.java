@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.internal.hardware.android.GpioPin;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
@@ -26,36 +27,38 @@ public class Chassis {
     public static boolean PuttingSpecimens = false;
     public static boolean Autonomous = false;
     public static boolean DoingSpecimens = false;
+    public static final SparkFunOTOS.Pose2D specimenScoringPos = new SparkFunOTOS.Pose2D(-500, -200, Math.toRadians(0));
+
+    public static boolean IsDoingAutomatedSpeciemens = false;
 
     public static void drive(double x, double y, double r){
-        if(PuttingSpecimens) {
-            r *= 0.7;
+            if (PuttingSpecimens) {
+                r *= 0.7;
 //            x *= 0.8;
 //            y *= 0.8;
-        }
-        Robot.telemetry.addData("FL PC", FL.getCurrent(CurrentUnit.AMPS));
-        Robot.telemetry.addData("FR PC", FR.getCurrent(CurrentUnit.AMPS));
-        Robot.telemetry.addData("BL PC", BL.getCurrent(CurrentUnit.AMPS));
-        Robot.telemetry.addData("BR PC", BR.getCurrent(CurrentUnit.AMPS));
-        double d = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
-        double fl, bl, fr, br;
+            }
+            Robot.telemetry.addData("FL PC", FL.getCurrent(CurrentUnit.AMPS));
+            Robot.telemetry.addData("FR PC", FR.getCurrent(CurrentUnit.AMPS));
+            Robot.telemetry.addData("BL PC", BL.getCurrent(CurrentUnit.AMPS));
+            Robot.telemetry.addData("BR PC", BR.getCurrent(CurrentUnit.AMPS));
+            double d = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
+            double fl, bl, fr, br;
 
-        fl = (y + x + r) / d;
-        bl = (y - x + r) / d;
-        fr = (y - x - r) / d;
-        br = (y + x - r) / d;
+            fl = (y + x + r) / d;
+            bl = (y - x + r) / d;
+            fr = (y - x - r) / d;
+            br = (y + x - r) / d;
 
-        FL.setPower(fl * FLd);
-        FR.setPower(fr * FRd);
-        BL.setPower(bl * BLd);
-        BR.setPower(br * BRd);
-
+            FL.setPower(fl * FLd);
+            FR.setPower(fr * FRd);
+            BL.setPower(bl * BLd);
+            BR.setPower(br * BRd);
     }
+
     public static double holdHeading(){
         double err = getTargetPosition().h - Localizer.getCurrentPosition().h;
         return Heading.calculatePower(err, Localizer.getVelocity().h);
     }
-
 
     public static void drivePolar(double mod, double alpha){
 
@@ -240,8 +243,13 @@ public class Chassis {
         if(Robot.VOLTAGE > 12.8){
             p *= 12.8 / Robot.VOLTAGE;
         }
+
+
         drive(yP * p, -xP * p, hP * p);
     }
+
+
+
     public static double getPrecentageOfMotionDone(){
 
         final double maxContributedProcentage = 100.0 / pointsToFollow.size();
