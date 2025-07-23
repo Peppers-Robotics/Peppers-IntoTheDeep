@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Config
 public class OutTakeLogic {
-    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 230, ElevatorScoreSample2 = 780; // 700
+    public static double ElevatorScoreSample = 780, ElevatorScoreSample1 = 230, ElevatorScoreSample2 = 790; // 700
     public static double ElevatorScoreSpecimen = 310;
     public static double ArmUpSample = 180, PivotUpSample = 0, ElevatorUp = 200;
     public static double ArmScoreSample = 235, PivotScoreSample = 0; // 220
@@ -27,7 +27,7 @@ public class OutTakeLogic {
     public static double ArmIdle = -10, PivotIdle = 0, ElevatorIdle = -10, DropDownTransfer = 0, ArmTransfer = -9;
     public static boolean save2 = false;
     public static double coeff = 5;
-    public static double TakeSpecimenExtension = 0.2, TransferExtension = 0.24, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.2;
+    public static double TakeSpecimenExtension = 0.2, TransferExtension = 0.3, ScoreSampleExtension = 0.5, takeSpecimenPower = 0.2;
     private static SparkFunOTOS.Pose2D scoredSample, scoredSpecimen;
     public enum States{
         IDLE,
@@ -113,7 +113,6 @@ public class OutTakeLogic {
                                     @Override
                                     public boolean Run() {
                                         Claw.open();
-                                        ActiveIntake.Block();
 //                                        Arm.setArmAngle(ArmTransfer);
                                         DropDown.setDown(DropDownTransfer);
                                         Elevator.PowerOnDownToTakeSample = true;

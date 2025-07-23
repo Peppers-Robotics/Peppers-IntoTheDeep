@@ -73,8 +73,8 @@ public class Specimen extends LinearOpMode {
     public static double scoredLine = -620;
     public static SparkFunOTOS.Pose2D scoreSpecimen = new SparkFunOTOS.Pose2D(-1000, -210, Math.toRadians(10)),
             scoreSpecimen1 = new SparkFunOTOS.Pose2D(-1000, -200, Math.toRadians(0)),
-            sample1 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-30)), // -33
-            sample2 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-45)),
+            sample1 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-31)), // -33
+            sample2 = new SparkFunOTOS.Pose2D(-500, 860, Math.toRadians(-50)),
             sample3 = new SparkFunOTOS.Pose2D(-500, 950, Math.toRadians(-53)),
             humanReverse = new SparkFunOTOS.Pose2D(-530, 860, Math.toRadians(-130)),
             spitDetection = new SparkFunOTOS.Pose2D(-627, 430, Math.toRadians(-140)),
@@ -133,7 +133,7 @@ public class Specimen extends LinearOpMode {
                         public boolean Run() {
                             Claw.openWide();
                             Chassis.stopFollow();
-                            Chassis.drive(0, 0.7, 0);
+                            Chassis.drive(0, 0.3, 0);
                             return true;
                         }
                     })
@@ -208,7 +208,8 @@ public class Specimen extends LinearOpMode {
                         public boolean Run() {
                             if(Storage.isStorageEmpty()){
                                 skip = true;
-                                sample1.h = Math.toRadians(-24);
+                                sample1.h = Math.toRadians(-22);
+                                Extendo.Extend(0);
                             }
                             return true;
                         }
@@ -532,7 +533,7 @@ public class Specimen extends LinearOpMode {
                         return true;
                     }
                 })
-                .waitForSync()
+//                .waitForSync()
 //                .lineToAsync(new SparkFunOTOS.Pose2D(sample1.x, sample1.y, skip ? Math.toRadians(-5) : sample1.h))
                 /*.addTask(new Task() {
                     @Override
@@ -548,10 +549,19 @@ public class Specimen extends LinearOpMode {
                 .addTask(new Task() {
                     @Override
                     public boolean Run() {
-                        Extendo.Extend(300);
+                        if(!skip){
+                            Extendo.Extend(300);
+                        }
                         ActiveIntake.powerOn();
                         DropDown.setDown(1);
-                        return Localizer.getCurrentPosition().h >= Math.toRadians(-55);
+                        return (Localizer.getCurrentPosition().h >= Math.toRadians(-55) && !skip) || (skip && Localizer.getCurrentPosition().h <= Math.toRadians(-23));
+                    }
+                })
+                .addTask(new Task() {
+                    @Override
+                    public boolean Run() {
+                        Extendo.Extend(300);
+                        return true;
                     }
                 })
 //                .waitForTrajDone(98)
@@ -609,22 +619,22 @@ public class Specimen extends LinearOpMode {
                 })
                 .lineToAsync(humanTake)
                 .addTask(new SpecimenTake(true))
-                .addTask(new ScoreSpecimen(-20))
+                .addTask(new ScoreSpecimen(-120))
 
 //                .lineToAsync(humanTake)
                 .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(humanTake.x - 100, humanTake.y + 100, Math.toRadians(45)), humanTake))
                 .addTask(new SpecimenTake(true))
-                .addTask(new ScoreSpecimen(-50))
+                .addTask(new ScoreSpecimen(-100))
 
 //                .lineToAsync(humanTake)
                 .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(humanTake.x - 100, humanTake.y + 100, Math.toRadians(45)), humanTake))
                 .addTask(new SpecimenTake(true))
-                .addTask(new ScoreSpecimen(-70))
+                .addTask(new ScoreSpecimen(-80))
 
 //                .lineToAsync(humanTake)
                 .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(humanTake.x - 100, humanTake.y + 100, Math.toRadians(45)), humanTake))
                 .addTask(new SpecimenTake(true))
-                .addTask(new ScoreSpecimen(-90))
+                .addTask(new ScoreSpecimen(-60))
 
 //                .lineToAsync(humanTake)
                 .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(humanTake.x - 100, humanTake.y + 100, Math.toRadians(45)), humanTake))
@@ -636,7 +646,7 @@ public class Specimen extends LinearOpMode {
                         return true;
                     }
                 })
-                .addTask(new ScoreSpecimen(-120))
+                .addTask(new ScoreSpecimen(-40))
 
 //                .lineToLinearHeadingAsync(humanTake)
                 .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(humanTake.x - 100, humanTake.y + 100, Math.toRadians(45)), humanTake))
