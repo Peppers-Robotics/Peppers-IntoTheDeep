@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.Devices.LimitSwitch;
 @Config
 @TeleOp
 public class DIgitalSensorTTest extends LinearOpMode {
-    public DigitalChannelController ControlHubDigital;
+    public DigitalChannelController ControlHubDigital,ExpansionHubDigital;
     public LimitSwitch lm;
     public static int port = 0;
     
@@ -23,11 +23,12 @@ public class DIgitalSensorTTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         ControlHubDigital = hardwareMap.get(DigitalChannelController.class,"Control Hub");
+        ExpansionHubDigital = hardwareMap.get(DigitalChannelController.class,"Expansion Hub 2");
         waitForStart();
 
         while(opModeIsActive())
         {
-            lm = new LimitSwitch(ControlHubDigital,port);
+            lm = new LimitSwitch(ExpansionHubDigital,port);
             lm.setMode(DigitalChannel.Mode.INPUT);
 
             telemetry.addData("result",lm.getState());

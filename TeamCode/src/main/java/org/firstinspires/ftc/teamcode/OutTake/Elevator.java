@@ -19,8 +19,8 @@ public class Elevator {
     public static CachedMotor motor, motor2, encoder;
     public static PIDController controller = new PIDController(0.013, 0, -0.0003);
     public static PIDCoefficients climb = new PIDCoefficients(0.04, 0, 0);
-    public static PIDCoefficients normal = new PIDCoefficients(0.008, 0.0015, 0.0003);
-    public static double kfUp = 0.1, kfDown = 0.04, elevatorMin = 400, elevatorMax = 1080;
+    public static PIDCoefficients normal = new PIDCoefficients(0.006, 0.0008, 0.00017);
+    public static double kfUp = 0.1, kfDown = -0.3, elevatorMin = 0, elevatorMax = 1080;
     public static AsymmetricMotionProfile motionProfile = new AsymmetricMotionProfile(10000, 12000, 10000);
 
     static {
@@ -89,8 +89,8 @@ public class Elevator {
 //                }
 
             } else {
-                motor.setPower(-1);
-                motor2.setPower(-1);
+                motor.setPower(-0.7);
+                motor2.setPower(-0.7);
                 time.reset();
             }
             return;

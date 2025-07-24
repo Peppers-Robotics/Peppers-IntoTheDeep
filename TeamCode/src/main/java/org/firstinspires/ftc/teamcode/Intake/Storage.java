@@ -19,7 +19,7 @@ public class Storage {
         BLUE
     }
     public static Team team = Team.RED;
-    public static FastColorRangeSensor sensor;
+    public static FastColorRangeSensor sensor1,sensor2;
 
     public static boolean isStorageEmpty(){
         return getStorageStatus() == SpecimenType.NONE;
@@ -49,9 +49,11 @@ public class Storage {
 
     public static SpecimenType getStorageStatus(){
 //        return SpecimenType.YELLOW;
-        if(sensor.getDistance(DistanceUnit.CM) >= 3.6) return SpecimenType.NONE;
+        //sensor2 cel mai aproape de iesire
+        //sensor1 cel din capat
+        if(sensor1.getDistance(DistanceUnit.CM) >= 3.6) return SpecimenType.NONE;
 
-        switch (sensor.getColorSeenBySensor()){
+        switch (sensor1.getColorSeenBySensor()){
             case RED:
                 return SpecimenType.RED;
             case BLUE:

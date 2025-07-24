@@ -146,7 +146,7 @@ public class OpModeManager {
 
         if(gamepad1.options) {
             Storage.getStorageStatus();
-            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
+            Robot.telemetry.addData("r, g, b", Storage.sensor1.RGB.R + ", " + Storage.sensor1.RGB.G + ", " + Storage.sensor1.RGB.B);
         }
 
     }

@@ -53,7 +53,7 @@ public class Robot {
     public static IMU imu;
     public static DcMotorController ControlHubMotors, ExpansionHubMotors;
     public static ServoController ControlHubServos, ExpansionHubServos, ServoHub;
-    public static DigitalChannelController ControlHubDigital;
+    public static DigitalChannelController ControlHubDigital,ExpansionHubDigital;
     public static double VOLTAGE = 12;
     public static boolean isDisabled(){
         return !hubs.get(0).isEngaged();
@@ -89,6 +89,7 @@ public class Robot {
         ExpansionHubServos = hm.get(ServoController.class, "Expansion Hub 2");
 
         ControlHubDigital = hm.get(DigitalChannelController.class,"Control Hub");
+        ExpansionHubDigital = hm.get(DigitalChannelController.class,"Expansion Hub 2");
 
         IMUBNO085.controller = hm.get(DigitalChannelController.class, "Expansion Hub 2");
         try {
@@ -174,13 +175,13 @@ public class Robot {
         InitializeExtension();
     }
     public static void InitializeExtension(){
-        Extension.servo = new ServoPlus(ServoHub, 2, Servo.Direction.FORWARD);
+        Extension.servo = new ServoPlus(ServoHub, 1, Servo.Direction.FORWARD);
     }
     public static void InitializeChassis(){
-        Chassis.FL = new CachedMotor(ExpansionHubMotors, 2, DcMotorSimple.Direction.FORWARD);
-        Chassis.FR = new CachedMotor(ControlHubMotors, 0, DcMotorSimple.Direction.FORWARD);
-        Chassis.BL = new CachedMotor(ExpansionHubMotors, 3, DcMotorSimple.Direction.FORWARD);
-        Chassis.BR = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
+        Chassis.FL = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
+        Chassis.FR = new CachedMotor(ExpansionHubMotors, 0, DcMotorSimple.Direction.FORWARD);
+        Chassis.BL = new CachedMotor(ControlHubMotors, 0, DcMotorSimple.Direction.FORWARD);
+        Chassis.BR = new CachedMotor(ExpansionHubMotors, 2, DcMotorSimple.Direction.FORWARD);
 
         Chassis.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Chassis.FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -191,25 +192,26 @@ public class Robot {
         Localizer.Initialize(hm);
     }
     public static void InitializeStorage(HardwareMap hm){
-        Storage.sensor = hm.get(FastColorRangeSensor.class, "Storage");
+        Storage.sensor1 = hm.get(FastColorRangeSensor.class, "Storage");
+        //Storage.sensor2 = hm.get(FastColorRangeSensor.class, "Storage2");
 //        Storage.sensor = null;
     }
 
     public static void InitializeExtendo(){
-        Extendo.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
-        Extendo.encoder = new CachedMotor(ControlHubMotors, 1, DcMotorSimple.Direction.FORWARD);
+        Extendo.motor = new CachedMotor(ExpansionHubMotors, 3, DcMotorSimple.Direction.FORWARD);
+        Extendo.encoder = new CachedMotor(ExpansionHubMotors, 1, DcMotorSimple.Direction.FORWARD);
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Extendo.lm = new LimitSwitch(ControlHubDigital,1);
+        Extendo.lm = new LimitSwitch(ExpansionHubDigital,1);
         MotorConfigurationType m = Extendo.motor.getMotorType();
         m.setAchieveableMaxRPMFraction(1.0);
         Extendo.motor.setMotorType(m);
     }
     public static void InitializeDropDown(){
-        DropDown.servo = new ServoPlus(ExpansionHubServos, 3, Servo.Direction.FORWARD);
+        DropDown.servo = new ServoPlus(ControlHubServos, 1, Servo.Direction.FORWARD);
     }
    public static void InitializeActiveIntake(){
-        ActiveIntake.motor = new CachedMotor(ExpansionHubMotors, 0, DcMotorSimple.Direction.FORWARD);
-        ActiveIntake.blocker = new ServoPlus(ExpansionHubServos, 2, Servo.Direction.FORWARD); // TODO: portul bun
+        ActiveIntake.motor = new CachedMotor(ControlHubMotors, 3, DcMotorSimple.Direction.FORWARD);
+        ActiveIntake.blocker = new ServoPlus(ControlHubServos, 2, Servo.Direction.REVERSE); // TODO: portul bun
     }
     public static void InitializeElevator(){
         Elevator.motor = new CachedMotor(ExpansionHubMotors, 1, DcMotorSimple.Direction.FORWARD);
@@ -219,11 +221,11 @@ public class Robot {
         Elevator.motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public static void InitializeArm(){
-        Arm.servo2 = new ServoPlus(ServoHub, 0, Servo.Direction.FORWARD);
-        Arm.servo1 = new ServoPlus(ServoHub, 1, Servo.Direction.FORWARD);
+        Arm.servo2 = new ServoPlus(ControlHubServos, 0, Servo.Direction.REVERSE);
+        Arm.servo1 = new ServoPlus(ServoHub, 2, Servo.Direction.REVERSE);
     }
     public static void InitializeClaw(){
-        Claw.clawServo = new ServoPlus(ExpansionHubServos, 0, Servo.Direction.FORWARD);
+        Claw.clawServo = new ServoPlus(ServoHub, 0, Servo.Direction.FORWARD);
     }
     public static void InitializeClimb(){
         Climb.W1 = new ServoPlus(ServoHub, 3, Servo.Direction.FORWARD);

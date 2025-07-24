@@ -30,13 +30,13 @@ public class StorageTest extends LinearOpMode {
             Robot.clearCache();
 //            Storage.sensor.getColorSeenBySensor();
 
-            Robot.telemetry.addData("Color", Storage.sensor.getColorSeenBySensor());
+            Robot.telemetry.addData("Color", Storage.sensor1.getColorSeenBySensor());
 //            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
-            Robot.telemetry.addData("r", Storage.sensor.RGB.R);
-            Robot.telemetry.addData("g", Storage.sensor.RGB.G);
-            Robot.telemetry.addData("b", Storage.sensor.RGB.B);
+            Robot.telemetry.addData("r", Storage.sensor1.RGB.R);
+            Robot.telemetry.addData("g", Storage.sensor1.RGB.G);
+            Robot.telemetry.addData("b", Storage.sensor1.RGB.B);
 
-            Robot.telemetry.addData("sensorDistance", Storage.sensor.getDistance(DistanceUnit.CM));
+            Robot.telemetry.addData("sensorDistance", Storage.sensor1.getDistance(DistanceUnit.CM));
 
         }
     }
