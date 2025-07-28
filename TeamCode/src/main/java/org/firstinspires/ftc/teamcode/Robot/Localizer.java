@@ -81,11 +81,7 @@ public class Localizer {
             }
         }
 
-<<<<<<< HEAD
-        velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, getAngleDifference(getCurrentPosition().h, lastPose.h));
-=======
         velocity = new SparkFunOTOS.Pose2D(getCurrentPosition().x - lastPose.x, getCurrentPosition().y - lastPose.y, pinPoint.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS));
->>>>>>> main
         lastPose = getCurrentPosition();
 //        velocity = Div(velocity, time.seconds());
         velocity.x /= time.seconds();

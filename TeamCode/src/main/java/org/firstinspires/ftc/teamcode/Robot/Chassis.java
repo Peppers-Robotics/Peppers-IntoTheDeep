@@ -6,11 +6,6 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-<<<<<<< HEAD
-=======
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.internal.hardware.android.GpioPin;
->>>>>>> main
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.AsymmetricMotionProfile;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
@@ -234,9 +229,6 @@ public class Chassis {
         double xP = Forward.calculatePower(error.x);
         double yP = Strafe.calculatePower(error.y);
         double hP = Heading.calculatePower(error.h);
-        if(!hProfile.motionEnded() || ONLY_FF_HEADING){
-            hP = hkA * hProfile.getAcceleration() + hkV * hProfile.getVelocity() + hkA * hProfile.sig;
-        }
 
         Robot.telemetry.addData("xError", error.x);
         Robot.telemetry.addData("yError", error.y);

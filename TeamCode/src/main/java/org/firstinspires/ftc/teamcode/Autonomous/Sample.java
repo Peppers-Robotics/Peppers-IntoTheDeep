@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import android.hardware.camera2.params.BlackLevelPattern;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -683,6 +684,7 @@ public class Sample extends LinearOpMode {
         camera = hardwareMap.get(Limelight3A.class, "camera");
         camera.start();
         camera.pipelineSwitch(0);
+        FtcDashboard.getInstance().startCameraStream(camera, 5);
         Extension.Retract();
         Chassis.setTargetPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
         Chassis.setProfiles(5000, 5000, 10000, 10000, 4000, 4000);
