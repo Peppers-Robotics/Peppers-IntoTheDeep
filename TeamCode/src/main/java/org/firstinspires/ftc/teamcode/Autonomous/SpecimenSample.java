@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.HelperClasses.Devices.CachedMotor;
 import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.GetPositionSample;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -26,6 +25,7 @@ import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 import org.firstinspires.ftc.teamcode.Tasks.Task;
 
 @Autonomous(name = "6 + 0")
+@Disabled
 @Config
 public class SpecimenSample extends LinearOpMode {
     public static class retractAsyncHelper extends Task{
@@ -36,7 +36,7 @@ public class SpecimenSample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Claw.closeAbit();
+                            Claw.openWide();
                             Arm.setArmAngle(Arm.getCurrentArmAngle() + 15);
                             samplesScored ++;
                             return true;
@@ -243,7 +243,7 @@ public class SpecimenSample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Claw.closeAbit();
+                            Claw.openWide();
                             samplesScored ++;
                             return true;
                         }
@@ -274,7 +274,7 @@ public class SpecimenSample extends LinearOpMode {
                     .addTask(new Task() {
                         @Override
                         public boolean Run() {
-                            Claw.closeAbit();
+                            Claw.openWide();
                             if(scoredSecond){
                                 Arm.setArmAngle(OutTakeLogic.ArmTakeSpecimen - 3);
                             } else {
@@ -502,7 +502,7 @@ public class SpecimenSample extends LinearOpMode {
                     @Override
                     public boolean Run() {
                         // if not work uncomment
-                        Claw.closeAbit();
+                        Claw.openWide();
                         scoredSecond = true;
                         Arm.setArmAngle(OutTakeLogic.ArmTakeSpecimen - 30);
                         return Localizer.getCurrentPosition().h > Math.toRadians(-90);
@@ -517,7 +517,7 @@ public class SpecimenSample extends LinearOpMode {
                     @Override
                     public boolean Run() {
                         Elevator.PowerOnDownToTakeSample = true;
-                        Claw.closeAbit();
+                        Claw.openWide();
                         Extendo.Extend(0);
 //                        Arm.setArmAngle(OutTakeLogic.ArmTakeSpecimen);
                         return Localizer.getAngleDifference(Localizer.getCurrentPosition().h, 0) < Math.toRadians(10);

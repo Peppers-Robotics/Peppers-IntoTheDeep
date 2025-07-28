@@ -43,13 +43,6 @@ public class AutoTakeSample extends LinearOpMode {
     public static int DistanceToExtendo(double d){
         return (int) (d / (2 * Math.PI * spool / RA)) * CPR;
     }
-
-    /*
-
-    1t .... 2*PI*spool / RA mm
-    xt? .... d
-    x = d /
-     */
     public static double ExtendoToDistance(int e){
         return (2 * Math.PI * spool / RA) * ((double) e / CPR);
     }

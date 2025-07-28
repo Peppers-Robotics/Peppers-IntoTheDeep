@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.tests;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.Devices.LimitSwitch;
 @Config
 @TeleOp
 public class DIgitalSensorTTest extends LinearOpMode {
-    public DigitalChannelController ControlHubDigital;
+    public DigitalChannelController ControlHubDigital,ExpansionHubDigital;
     public LimitSwitch lm;
     public static int port = 0;
     
@@ -22,11 +23,12 @@ public class DIgitalSensorTTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         ControlHubDigital = hardwareMap.get(DigitalChannelController.class,"Control Hub");
+        ExpansionHubDigital = hardwareMap.get(DigitalChannelController.class,"Expansion Hub 2");
         waitForStart();
 
         while(opModeIsActive())
         {
-            lm = new LimitSwitch(ControlHubDigital,port);
+            lm = new LimitSwitch(ExpansionHubDigital,port);
             lm.setMode(DigitalChannel.Mode.INPUT);
 
             telemetry.addData("result",lm.getState());

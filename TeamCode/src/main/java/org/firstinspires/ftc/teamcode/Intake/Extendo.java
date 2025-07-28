@@ -14,13 +14,14 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 public class Extendo {
     public static CachedMotor motor, encoder;
     public static PIDController pidController = new PIDController(0.01, 0, -0.0004);
-    public static int MaxExtendoExtension = 840;
+    public static int MaxExtendoExtension = 880;
     private static double targetPosition = 0;
     public static int offset = 0;
     public static LimitSwitch lm;
 
     static {
         pidController.setFreq(40);
+        pidController.setMaxActuatorOutput(1);
     }
     public static boolean ReachedTargetPosition(){
         return Math.abs(targetPosition - getCurrentPosition()) <= 5;
@@ -52,6 +53,7 @@ public class Extendo {
     }
     public static boolean DISABLE = false, was = false;
     private static ElapsedTime time = new ElapsedTime();
+    public static double power = 1;
     public static boolean PowerOnToTransfer = false;
     public static int getTargetPosition(){
         return (int) targetPosition;
@@ -60,26 +62,10 @@ public class Extendo {
         if(DISABLE){
             return;
         }
-//        if (RESET) {
-//            if (motor.getCurrent(CurrentUnit.AMPS) > 9 || was) {
-//                was = true;
-//                motor.setPower(0);
-//                if (time.seconds() > 0.2) {
-//                    motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//                    RESET = false;
-//                }
-//
-//            } else {
-//                motor.setPower(-1);
-//                time.reset();
-//            }
-//            return;
-//        }
 
         if(PowerOnToTransfer) {
-            motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
             motor.setMotorEnable();
+            motor.setPower(-1);
         } else {
             motor.setPower(pidController.calculatePower(getCurrentPosition(), getCurrentVelocity()));
             motor.setMotorEnable();

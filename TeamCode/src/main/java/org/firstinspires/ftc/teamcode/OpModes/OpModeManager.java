@@ -1,19 +1,16 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.Autonomous.Specimen;
 import org.firstinspires.ftc.teamcode.Climb.Climb;
 import org.firstinspires.ftc.teamcode.HelperClasses.Colors;
-import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
 import org.firstinspires.ftc.teamcode.HelperClasses.RobotRelevantClasses.Controls;
 import org.firstinspires.ftc.teamcode.Intake.ActiveIntake;
 import org.firstinspires.ftc.teamcode.Intake.DropDown;
@@ -30,8 +27,7 @@ import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Tasks.Scheduler;
 
-import java.util.Arrays;
-
+@Config
 public class OpModeManager {
     public HardwareMap hardwareMap;
     public Gamepad gamepad1, gamepad2;
@@ -39,6 +35,7 @@ public class OpModeManager {
     public static double tSpeed = 1, rot = 0.7;
     public static double min = 0.4;
     public boolean isClimbing = false;
+    public static boolean reverse = true;
     public static Thread thread;
     public OpModeManager(HardwareMap hm, Gamepad g1, Gamepad g2, Telemetry t, Storage.Team team){
         hardwareMap = hm;
@@ -71,8 +68,8 @@ public class OpModeManager {
         ActiveIntake.Unblock();
         Extendo.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Claw.open();
-        Chassis.Heading.setPidCoefficients(new PIDCoefficients(0.5, 0, 0));
-        Arm.setArmAngle(OutTakeLogic.ArmIdle);
+//        Chassis.Heading.setPidCoefficients(new PIDCoefficients(0.5, 0, 0));
+//        Arm.setArmAngle(OutTakeLogic.ArmIdle);
         Rotation = 0;
         isClimbing = false;
     }
@@ -96,8 +93,16 @@ public class OpModeManager {
     }
     private static Scheduler autoScore;
     long freq = 0;
+    private static boolean stop = false;
     public void update(){
-        Robot.clearCache(gamepad1.options);
+        Robot.clearCache(true);
+
+        if(gamepad1.dpad_left){
+
+            Chassis.Update();
+            Localizer.Update();
+            return;
+        }
 
         if(Controls.Climbing && !isClimbing){
             Chassis.drive(0, 0, 0);
@@ -117,37 +122,6 @@ public class OpModeManager {
             return;
         }
 
-        if(gamepad1.dpad_left){
-            if(!resetPP){
-                Robot.imu.resetYaw();
-//                Localizer.setPosition(Specimen.humanTake);
-                Localizer.setPosition(new SparkFunOTOS.Pose2D(Specimen.humanTake.x, Specimen.humanTake.y, 0));
-            }
-            if(autoScore.done()){
-                autoScore = new Scheduler();
-                autoScore
-//                        .splineToAsync(Arrays.asList(new SparkFunOTOS.Pose2D(Specimen.humanTake.x - 100, Specimen.humanTake.y, 0), Specimen.humanTake))
-                        .lineToAsync(Specimen.humanTake)
-                        .addTask(new Specimen.SpecimenTake(true, 1))
-                        .addTask(new Specimen.ScoreSpecimen());
-            }
-            autoScore.update();
-            Localizer.Update();
-            Chassis.Update();
-            Elevator.update();
-            Extendo.update();
-            Arm.update();
-            resetPP = true;
-            return;
-        } else {
-            resetPP = false;
-            autoScore = new Scheduler();
-            autoScore
-                    .lineToAsync(Specimen.humanTake)
-                    .addTask(new Specimen.SpecimenTake(true, 1))
-                    .addTask(new Specimen.ScoreSpecimen());
-        }
-
         if(Elevator.getCurrentPosition() > 500){
             tSpeed = 0.6;
         }
@@ -155,15 +129,12 @@ public class OpModeManager {
             tSpeed = 1;
         }
         double pow = (min - 1) / (Extendo.getMaxPosition()) * Extendo.getCurrentPosition() + 1;
-
-        Chassis.drive(
-                -getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
-                getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
-                -getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
-        );
+            Chassis.drive(
+                    (reverse ? -1 : 1) * getPowerSigned(gamepad1.left_stick_x, 3) * tSpeed,
+                    (reverse ? 1 : -1) * getPowerSigned(gamepad1.left_stick_y, 3) * tSpeed,
+                    getPowerSigned(gamepad1.right_trigger - gamepad1.left_trigger, 3) * tSpeed * pow * rot
+            );
         if(Controls.gamepad2.wasPressed.dpad_left) Claw.close();
-
-
         OutTakeLogic.update();
         IntakeLogic.update();
         Extendo.update();
@@ -171,26 +142,11 @@ public class OpModeManager {
         Arm.update();
         Controls.CleanCommands();
         Controls.Update();
+        Localizer.Update();
 
         if(gamepad1.options) {
             Storage.getStorageStatus();
-            Robot.telemetry.addData("r, g, b", Storage.sensor.RGB.R + ", " + Storage.sensor.RGB.G + ", " + Storage.sensor.RGB.B);
-
-            Robot.telemetry.addData("yellow confidence",
-                    Colors.getColorDistance(Colors.ColorType.YELLOW.getColor(),
-                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-
-            Robot.telemetry.addData("red confidence",
-                    Colors.getColorDistance(Colors.ColorType.RED.getColor(),
-                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-
-            Robot.telemetry.addData("blue confidence",
-                    Colors.getColorDistance(Colors.ColorType.BLUE.getColor(),
-                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
-
-            Robot.telemetry.addData("nothing confidence",
-                    Colors.getColorDistance(Colors.ColorType.NONE.getColor(),
-                            new Colors.Color(Storage.sensor.RGB.R, Storage.sensor.RGB.G, Storage.sensor.RGB.B)));
+            Robot.telemetry.addData("r, g, b", Storage.sensor1.RGB.R + ", " + Storage.sensor1.RGB.G + ", " + Storage.sensor1.RGB.B);
         }
 
     }

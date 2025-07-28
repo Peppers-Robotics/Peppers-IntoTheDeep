@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Intake;
 
+import android.hardware.camera2.params.BlackLevelPattern;
+import android.widget.GridLayout;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.HelperClasses.Devices.FastColorRangeSensor;
 
@@ -16,30 +19,41 @@ public class Storage {
         BLUE
     }
     public static Team team = Team.RED;
-    public static FastColorRangeSensor sensor;
+    public static FastColorRangeSensor sensor1,sensor2;
 
     public static boolean isStorageEmpty(){
         return getStorageStatus() == SpecimenType.NONE;
     }
 
     public static boolean hasWrongPice(){
+        SpecimenType t = getStorageStatus();
         switch (team){
             case RED:
-                return getStorageStatus() == SpecimenType.BLUE || isStorageEmpty();
+                return t == SpecimenType.BLUE || t == SpecimenType.NONE;
             case BLUE:
-                return isStorageEmpty() || getStorageStatus() == SpecimenType.RED;
+                return t == SpecimenType.RED || t == SpecimenType.NONE;
         }
         return false;
     }
     public static boolean hasTeamPice(){
-        return !hasWrongPice();
+        SpecimenType t = getStorageStatus();
+        if(t == SpecimenType.YELLOW) return true;
+        switch (team){
+            case RED:
+                return t == SpecimenType.RED;
+            case BLUE:
+                return t == SpecimenType.BLUE;
+        }
+        return false;
     }
 
     public static SpecimenType getStorageStatus(){
 //        return SpecimenType.YELLOW;
-        if(sensor.getDistance(DistanceUnit.CM) >= 4.3) return SpecimenType.NONE;
+        //sensor2 cel mai aproape de iesire
+        //sensor1 cel din capat
+        if(sensor1.getDistance(DistanceUnit.CM) >= 3.6) return SpecimenType.NONE;
 
-        switch (sensor.getColorSeenBySensor()){
+        switch (sensor1.getColorSeenBySensor()){
             case RED:
                 return SpecimenType.RED;
             case BLUE:

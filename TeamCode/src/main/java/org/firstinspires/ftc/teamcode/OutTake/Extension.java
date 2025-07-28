@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.HelperClasses.MathHelpers.LinearFunction;
 @Config
 public class Extension {
     public static ServoPlus servo;
-    public static double extendoPos = 95, retractPos = 295;
+    public static double extendoPos = 115, retractPos = 315;
     public static LinearFunction f = new LinearFunction(retractPos, extendoPos);
     private static double frac = 0;
     public static void Retract(){

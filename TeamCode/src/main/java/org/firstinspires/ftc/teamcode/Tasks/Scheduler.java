@@ -24,11 +24,15 @@ import java.util.Objects;
 
 public class Scheduler implements Cloneable {
 
+//    public LinkedList<Task> tasks;
     public LinkedList<Task> tasks;
+    private int tasksDone = 0;
     private boolean mutex = false;
+    private int thread = 0;
 
     public Scheduler(){
         tasks = new LinkedList<>();
+        tasksDone = 0;
     }
 
     public Scheduler addTask(Task t){
@@ -62,8 +66,9 @@ public class Scheduler implements Cloneable {
     }
     @NonNull
     public String toString(){
-        return Integer.toString(tasks.size());
+        return Integer.toString(tasksDone);
     }
+    public int getTasksDone(){ return tasksDone; }
     public boolean DEBUG = false;
     public boolean Next = false;
 
@@ -76,13 +81,16 @@ public class Scheduler implements Cloneable {
         if(DEBUG){
             if(Next){
                 tasks.removeLast();
+                tasksDone ++;
                 Next = false;
             }
             mutex = false;
             return;
         }
-        if(result)
+        if(result) {
             tasks.removeLast();
+            tasksDone ++;
+        }
         mutex = false;
     }
 
@@ -162,7 +170,7 @@ public class Scheduler implements Cloneable {
         addTask(new Task() {
             @Override
             public boolean Run() {
-                return Localizer.getVelocity().x < 10 && Localizer.getVelocity().y < 10;
+                return Localizer.getVelocity().x < 10 && Localizer.getVelocity().y < 10 && Localizer.getVelocity().h < Math.toRadians(5);
             }
         });
         return this;
