@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.HelperClasses.CameraDetection;
 
+import android.provider.ContactsContract;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.sun.tools.javac.code.Attribute;
@@ -26,12 +28,13 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
     public static int erodeSteps = 1, dilateSteps = 2, morphologySteps = 2;
 
     // daca nu cuprinde toate sampleurile din cauza luminii mai scade putin din rosu
-    public static Scalar lowerYellow = new Scalar(85, 30, 0), higherYellow = new Scalar(255, 255, 10);
+//    public static Scalar lowerYellow = new Scalar(85, 30, 0), higherYellow = new Scalar(255, 255, 10);
+    public static Scalar lowerYellow = new Scalar(10, 255, 85), higherYellow = new Scalar(30, 245, 255);
     public static final double cameraFOV_X = 49.5, cameraFOV_Y = 60; // tune
 
     // daca nu recunoaste pachuri de sample uri posibil ca sunt prea mici, mareste treshold ul
     // sau fa-l mai mic daca ia in calcul noise ul din background
-    public static double SizeTreshold = 500;
+    public static double SizeTreshold = 50;
     private Mat mask = new Mat(), tmp = new Mat(),
             labels = new Mat(), stats = new Mat(), centroids = new Mat();
     private double tx = 0, ty = 0;
@@ -54,18 +57,19 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         poseWhenSnapshoted = Localizer.getCurrentPosition();
         double largestContour = -1;
-//        Imgproc.cvtColor(input, BGRmap, Imgproc.COLOR_RGB2BGR);
+//        Imgproc.cvtColor(input, mask, Imgproc.COLOR_RGB2BGR);
+        Imgproc.cvtColor(input, mask, Imgproc.COLOR_BGR2HSV);
 
         //make treshold
-        Core.inRange(input, lowerYellow, higherYellow, tmp);
+        Core.inRange(mask, lowerYellow, higherYellow, tmp);
 
         //apply filters
         Imgproc.morphologyEx(tmp, mask, Imgproc.MORPH_OPEN, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, morphologicalKernel), new Point(-1, -1), morphologySteps);
-        tmp.release();
+//        tmp.release();
         Imgproc.erode(mask, tmp, Imgproc.getStructuringElement(Imgproc.MORPH_ERODE, erodeKernel), new Point(-1, -1), erodeSteps);
-        mask.release();
+//        mask.release();
         Imgproc.dilate(tmp, mask, Imgproc.getStructuringElement(Imgproc.MORPH_DILATE, dilateKernel), new Point(-1, -1), dilateSteps);
-        tmp.release();
+//        tmp.release();
 
 
         Imgproc.connectedComponentsWithStats(mask, labels, stats, centroids, 8);
@@ -74,6 +78,8 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
         if(showMask){
             input = mask.clone();
         }
+        tx = -100;
+        ty = -100;
 
         for(int i = 0; i < centroids.rows(); i++){
             if(stats.get(i, Imgproc.CC_STAT_AREA)[0] < SizeTreshold) continue;
@@ -86,15 +92,19 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
                     h = stats.get(i, Imgproc.CC_STAT_HEIGHT)[0];
 
             //id
-            Imgproc.putText(input, Integer.toString(i), new Point(x, y - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 255, 255), 1);
+//            Imgproc.putText(input, Integer.toString(i), new Point(x, y - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 255, 255), 1);
+            Scalar rectColor = new Scalar(255, 0, 0);
+            if(stats.get(i, Imgproc.CC_STAT_AREA)[0] <= largestContour){
+                rectColor = new Scalar(0, 255, 0);
+            }
             //bounding box
             Imgproc.drawContours(input, Arrays.asList(
-                    new MatOfPoint(new Point(x, y)),
-                    new MatOfPoint(new Point(x + w, y)),
-                    new MatOfPoint(new Point(x + w, y + h)),
-                    new MatOfPoint(new Point(x, y + h))
+                    new MatOfPoint(new Point(x, y),
+                    new Point(x + w, y),
+                    new Point(x + w, y + h),
+                    new Point(x, y + h))
 
-            ), -1, new Scalar(0, 255, 0), 2);
+            ), -1, rectColor, 2);
 
 
             // todo: add here field localization and other algorithms
@@ -102,25 +112,27 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
             // get useful data
             if(stats.get(i, Imgproc.CC_STAT_AREA)[0] <= largestContour) continue;
             largestContour = stats.get(i, Imgproc.CC_STAT_AREA)[0];
-            Point target = getLowerTargetPoint(stats, i);
+//            Point target = getLowerTargetPoint(stats, i);
+            Point target = new Point(centroids.get(i, 0)[0], centroids.get(i, 1)[0]);
             tx = Math.atan2((target.x - input.cols()) / 2.d, focalX);
             ty = Math.atan2((target.y - input.rows()) / 2.d, focalY);
 
 
         }
+        largestContour = -1;
         mask.release();
         tmp.release();
 
         return input;
     }
 
-    public double getTx(){
+    public synchronized double getTx(){
         return tx;
     }
-    public double getTy(){
+    public synchronized double getTy(){
         return ty;
     }
-    public SparkFunOTOS.Pose2D getPoseAtDetectionTime(){
+    public synchronized SparkFunOTOS.Pose2D getPoseAtDetectionTime(){
         return poseWhenSnapshoted;
     }
 }
