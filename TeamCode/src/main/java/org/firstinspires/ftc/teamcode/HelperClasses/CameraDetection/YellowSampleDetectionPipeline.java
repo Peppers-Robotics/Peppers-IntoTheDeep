@@ -29,7 +29,7 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
 
     // daca nu cuprinde toate sampleurile din cauza luminii mai scade putin din rosu
 //    public static Scalar lowerYellow = new Scalar(85, 30, 0), higherYellow = new Scalar(255, 255, 10);
-    public static Scalar lowerYellow = new Scalar(10, 255, 85), higherYellow = new Scalar(30, 245, 255);
+    public static Scalar lowerYellow = new Scalar(10, 150, 50), higherYellow = new Scalar(30, 255, 255);
     public static final double cameraFOV_X = 49.5, cameraFOV_Y = 60; // tune
 
     // daca nu recunoaste pachuri de sample uri posibil ca sunt prea mici, mareste treshold ul
@@ -58,7 +58,7 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
         poseWhenSnapshoted = Localizer.getCurrentPosition();
         double largestContour = -1;
 //        Imgproc.cvtColor(input, mask, Imgproc.COLOR_RGB2BGR);
-        Imgproc.cvtColor(input, mask, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(input, mask, Imgproc.COLOR_RGB2HSV);
 
         //make treshold
         Core.inRange(mask, lowerYellow, higherYellow, tmp);
@@ -72,7 +72,7 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
 //        tmp.release();
 
 
-        Imgproc.connectedComponentsWithStats(mask, labels, stats, centroids, 8);
+        int noSamples = Imgproc.connectedComponentsWithStats(mask, labels, stats, centroids, 8);
         double focalY = .5d * input.rows() / Math.tan(Math.toRadians(cameraFOV_Y / 2.d));
         double focalX = .5d * input.cols() / Math.tan(Math.toRadians(cameraFOV_X / 2.d));
         if(showMask){
@@ -81,7 +81,7 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
         tx = -100;
         ty = -100;
 
-        for(int i = 0; i < centroids.rows(); i++){
+        for(int i = 1; i < noSamples; i++){
             if(stats.get(i, Imgproc.CC_STAT_AREA)[0] < SizeTreshold) continue;
 
             // draw image for debugging
@@ -98,13 +98,14 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
                 rectColor = new Scalar(0, 255, 0);
             }
             //bounding box
-            Imgproc.drawContours(input, Arrays.asList(
-                    new MatOfPoint(new Point(x, y),
-                    new Point(x + w, y),
-                    new Point(x + w, y + h),
-                    new Point(x, y + h))
-
-            ), -1, rectColor, 2);
+//            Imgproc.drawContours(input, Arrays.asList(
+//                    new MatOfPoint(new Point(x, y),
+//                    new Point(x + w, y),
+//                    new Point(x + w, y + h),
+//                    new Point(x, y + h))
+//
+//            ), -1, rectColor, 2);
+            Imgproc.rectangle(input, new Point(x, y), new Point(x + w, y + h), rectColor);
 
 
             // todo: add here field localization and other algorithms
