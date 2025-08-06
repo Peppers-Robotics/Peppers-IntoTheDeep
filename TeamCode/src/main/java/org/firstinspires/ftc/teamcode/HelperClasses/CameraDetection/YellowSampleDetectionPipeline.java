@@ -28,16 +28,17 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
     public static int erodeSteps = 1, dilateSteps = 2, morphologySteps = 2;
 
     // daca nu cuprinde toate sampleurile din cauza luminii mai scade putin din rosu
-//    public static Scalar lowerYellow = new Scalar(85, 30, 0), higherYellow = new Scalar(255, 255, 10);
     public static Scalar lowerYellow = new Scalar(10, 150, 50), higherYellow = new Scalar(30, 255, 255);
-    public static final double cameraFOV_X = 49.5, cameraFOV_Y = 60; // tune
+
+//    public static final double cameraFOV_X = 70.42, cameraFOV_Y = 43.3; // tune
+    public static final double cameraFOV = 78;
 
     // daca nu recunoaste pachuri de sample uri posibil ca sunt prea mici, mareste treshold ul
     // sau fa-l mai mic daca ia in calcul noise ul din background
     public static double SizeTreshold = 50;
     private Mat mask = new Mat(), tmp = new Mat(),
             labels = new Mat(), stats = new Mat(), centroids = new Mat();
-    private double tx = 0, ty = 0;
+//    private double tx = 0, ty = 0;
 
     private static Point getMiddleTargetPoint(Mat stat, int i){
         double xM = (stat.get(i, Imgproc.CC_STAT_LEFT)[0] + stat.get(i, Imgproc.CC_STAT_WIDTH)[0]) / 2.d;
@@ -53,11 +54,17 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
         return new Point(xM, y);
     }
 
+    private double[] tx, ty;
+
     @Override
     public Mat processFrame(Mat input) {
         poseWhenSnapshoted = Localizer.getCurrentPosition();
+
         double largestContour = -1;
-//        Imgproc.cvtColor(input, mask, Imgproc.COLOR_RGB2BGR);
+        double cameraFOV_Y = 2 * input.rows() * (1 - Math.cos(cameraFOV)) / (input.rows() * input.rows() + input.cols() * input.cols());
+        double cameraFOV_X = 2 * input.cols() * (1 - Math.cos(cameraFOV)) / (input.rows() * input.rows() + input.cols() * input.cols());
+
+
         Imgproc.cvtColor(input, mask, Imgproc.COLOR_RGB2HSV);
 
         //make treshold
@@ -73,16 +80,47 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
 
 
         int noSamples = Imgproc.connectedComponentsWithStats(mask, labels, stats, centroids, 8);
-        double focalY = .5d * input.rows() / Math.tan(Math.toRadians(cameraFOV_Y / 2.d));
-        double focalX = .5d * input.cols() / Math.tan(Math.toRadians(cameraFOV_X / 2.d));
+//        double focalY = .5d * input.rows() / Math.tan(Math.toRadians(cameraFOV_Y / 2.d));
+//        double focalX = .5d * input.cols() / Math.tan(Math.toRadians(cameraFOV_X / 2.d));
+
+        double vpw = 2.d * Math.tan(cameraFOV_X / 2.d);
+        double vph = 2.d * Math.tan(cameraFOV_Y / 2.d);
         if(showMask){
             input = mask.clone();
         }
-        tx = -100;
-        ty = -100;
-
+//        tx = -100;
+//        ty = -100;
+        tx = new double[noSamples];
+        ty = new double[noSamples];
         for(int i = 1; i < noSamples; i++){
             if(stats.get(i, Imgproc.CC_STAT_AREA)[0] < SizeTreshold) continue;
+
+            // draw image for debugging
+
+            double x = stats.get(i, Imgproc.CC_STAT_LEFT)[0],
+                    y = stats.get(i, Imgproc.CC_STAT_TOP)[0],
+                    w = stats.get(i, Imgproc.CC_STAT_WIDTH)[0],
+                    h = stats.get(i, Imgproc.CC_STAT_HEIGHT)[0];
+
+
+            // todo: add here field localization and other algorithms
+
+            if(stats.get(i, Imgproc.CC_STAT_AREA)[0] <= largestContour) continue;
+
+            largestContour = stats.get(i, Imgproc.CC_STAT_AREA)[0];
+
+            Point target = new Point(centroids.get(i, 0)[0], centroids.get(i, 1)[0]);
+            double nx = (target.x - input.cols() / 2.d - 0.5d) * 2.d / input.cols(),
+                    ny = (input.rows() / 2.d - 0.5d - target.y) * 2.d / input.rows();
+
+            target = new Point(vpw / 2.d * nx, vph / 2.d * ny);
+
+            tx[i] = Math.atan2(target.x, 1);
+            ty[i] = Math.atan2(target.y, 1);
+
+        }
+        for(int i = 1; i < noSamples; i++) {
+            if (stats.get(i, Imgproc.CC_STAT_AREA)[0] < SizeTreshold) continue;
 
             // draw image for debugging
 
@@ -94,31 +132,12 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
             //id
 //            Imgproc.putText(input, Integer.toString(i), new Point(x, y - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 255, 255), 1);
             Scalar rectColor = new Scalar(255, 0, 0);
-            if(stats.get(i, Imgproc.CC_STAT_AREA)[0] <= largestContour){
+            if (stats.get(i, Imgproc.CC_STAT_AREA)[0] < largestContour) {
                 rectColor = new Scalar(0, 255, 0);
             }
             //bounding box
-//            Imgproc.drawContours(input, Arrays.asList(
-//                    new MatOfPoint(new Point(x, y),
-//                    new Point(x + w, y),
-//                    new Point(x + w, y + h),
-//                    new Point(x, y + h))
-//
-//            ), -1, rectColor, 2);
-            Imgproc.rectangle(input, new Point(x, y), new Point(x + w, y + h), rectColor);
 
-
-            // todo: add here field localization and other algorithms
-
-            // get useful data
-            if(stats.get(i, Imgproc.CC_STAT_AREA)[0] <= largestContour) continue;
-            largestContour = stats.get(i, Imgproc.CC_STAT_AREA)[0];
-//            Point target = getLowerTargetPoint(stats, i);
-            Point target = new Point(centroids.get(i, 0)[0], centroids.get(i, 1)[0]);
-            tx = Math.atan2((target.x - input.cols()) / 2.d, focalX);
-            ty = Math.atan2((target.y - input.rows()) / 2.d, focalY);
-
-
+            Imgproc.rectangle(input, new Point(x, y), new Point(x + w, y + h), rectColor, 2);
         }
         largestContour = -1;
         mask.release();
@@ -127,11 +146,14 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
         return input;
     }
 
-    public synchronized double getTx(){
-        return tx;
+    public synchronized double getTx(int id){
+        return Math.toRadians(tx[id]);
     }
-    public synchronized double getTy(){
-        return ty;
+    public synchronized double getTy(int id){
+        return Math.toRadians(ty[id]);
+    }
+    public synchronized int getNODetections(){
+        return centroids.rows();
     }
     public synchronized SparkFunOTOS.Pose2D getPoseAtDetectionTime(){
         return poseWhenSnapshoted;
