@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.HelperClasses.CameraDetection;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.sun.tools.javac.code.Attribute;
 
+import org.firstinspires.ftc.teamcode.Robot.Localizer;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -16,6 +18,7 @@ import java.util.Arrays;
 
 @Config
 public class YellowSampleDetectionPipeline extends OpenCvPipeline {
+    private SparkFunOTOS.Pose2D poseWhenSnapshoted;
     public static boolean showMask = false;
     public static Size morphologicalKernel = new Size(3, 3),
                     erodeKernel = new Size(3, 3),
@@ -44,6 +47,7 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+        poseWhenSnapshoted = Localizer.getCurrentPosition();
         double largestContour = -1;
 //        Imgproc.cvtColor(input, BGRmap, Imgproc.COLOR_RGB2BGR);
 
@@ -110,5 +114,8 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
     }
     public double getTy(){
         return ty;
+    }
+    public SparkFunOTOS.Pose2D getPoseAtDetectionTime(){
+        return poseWhenSnapshoted;
     }
 }
