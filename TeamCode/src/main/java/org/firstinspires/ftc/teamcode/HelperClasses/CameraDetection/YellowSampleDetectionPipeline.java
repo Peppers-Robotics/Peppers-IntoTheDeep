@@ -24,8 +24,13 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
                     erodeKernel = new Size(3, 3),
                     dilateKernel = new Size(3, 3);
     public static int erodeSteps = 1, dilateSteps = 2, morphologySteps = 2;
+
+    // daca nu cuprinde toate sampleurile din cauza luminii mai scade putin din rosu
     public static Scalar lowerYellow = new Scalar(85, 30, 0), higherYellow = new Scalar(255, 255, 10);
     public static final double cameraFOV_X = 49.5, cameraFOV_Y = 60; // tune
+
+    // daca nu recunoaste pachuri de sample uri posibil ca sunt prea mici, mareste treshold ul
+    // sau fa-l mai mic daca ia in calcul noise ul din background
     public static double SizeTreshold = 500;
     private Mat mask = new Mat(), tmp = new Mat(),
             labels = new Mat(), stats = new Mat(), centroids = new Mat();
@@ -95,8 +100,8 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
             // todo: add here field localization and other algorithms
 
             // get useful data
-            if(stats.get(i, 0)[Imgproc.CC_STAT_AREA] <= largestContour) continue;
-            largestContour = stats.get(i, 0)[Imgproc.CC_STAT_AREA];
+            if(stats.get(i, Imgproc.CC_STAT_AREA)[0] <= largestContour) continue;
+            largestContour = stats.get(i, Imgproc.CC_STAT_AREA)[0];
             Point target = getLowerTargetPoint(stats, i);
             tx = Math.atan2((target.x - input.cols()) / 2.d, focalX);
             ty = Math.atan2((target.y - input.rows()) / 2.d, focalY);
