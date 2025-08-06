@@ -28,16 +28,16 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
             labels = new Mat(), stats = new Mat(), centroids = new Mat();
     private double tx = 0, ty = 0;
 
-    private static Point getMiddleTargetPoint(double[] stat){
-        double xM = (stat[Imgproc.CC_STAT_LEFT] + stat[Imgproc.CC_STAT_WIDTH]) / 2.d;
-        double yM = (stat[Imgproc.CC_STAT_TOP] + stat[Imgproc.CC_STAT_HEIGHT]) / 2.d;
+    private static Point getMiddleTargetPoint(Mat stat, int i){
+        double xM = (stat.get(i, Imgproc.CC_STAT_LEFT)[0] + stat.get(i, Imgproc.CC_STAT_WIDTH)[0]) / 2.d;
+        double yM = (stat.get(i, Imgproc.CC_STAT_TOP)[0] + stat.get(i, Imgproc.CC_STAT_HEIGHT)[0]) / 2.d;
 
         return new Point(xM, yM);
     }
 
-    private static Point getLowerTargetPoint(double[] stat){
-        double xM = (stat[Imgproc.CC_STAT_LEFT] + stat[Imgproc.CC_STAT_WIDTH]) / 2.d;
-        double y = (stat[Imgproc.CC_STAT_TOP] + stat[Imgproc.CC_STAT_HEIGHT]);
+    private static Point getLowerTargetPoint(Mat stat, int i){
+        double xM = (stat.get(i, Imgproc.CC_STAT_LEFT)[0] + stat.get(i, Imgproc.CC_STAT_WIDTH)[0]) / 2.d;
+        double y = (stat.get(i, Imgproc.CC_STAT_TOP)[0] + stat.get(i, Imgproc.CC_STAT_HEIGHT)[0]);
 
         return new Point(xM, y);
     }
@@ -67,14 +67,14 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
         }
 
         for(int i = 0; i < centroids.rows(); i++){
-            if(stats.get(i, 0)[Imgproc.CC_STAT_AREA] < SizeTreshold) continue;
+            if(stats.get(i, Imgproc.CC_STAT_AREA)[0] < SizeTreshold) continue;
 
             // draw image for debugging
 
-            double x = stats.get(i, 0)[Imgproc.CC_STAT_LEFT],
-                    y = stats.get(i, 0)[Imgproc.CC_STAT_TOP],
-                    w = stats.get(i, 0)[Imgproc.CC_STAT_WIDTH],
-                    h = stats.get(i, 0)[Imgproc.CC_STAT_HEIGHT];
+            double x = stats.get(i, Imgproc.CC_STAT_LEFT)[0],
+                    y = stats.get(i, Imgproc.CC_STAT_TOP)[0],
+                    w = stats.get(i, Imgproc.CC_STAT_WIDTH)[0],
+                    h = stats.get(i, Imgproc.CC_STAT_HEIGHT)[0];
 
             //id
             Imgproc.putText(input, Integer.toString(i), new Point(x, y - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 255, 255), 1);
@@ -93,7 +93,7 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
             // get useful data
             if(stats.get(i, 0)[Imgproc.CC_STAT_AREA] <= largestContour) continue;
             largestContour = stats.get(i, 0)[Imgproc.CC_STAT_AREA];
-            Point target = getLowerTargetPoint(stats.get(i, 0));
+            Point target = getLowerTargetPoint(stats, i);
             tx = Math.atan2((target.x - input.cols()) / 2.d, focalX);
             ty = Math.atan2((target.y - input.rows()) / 2.d, focalY);
 
