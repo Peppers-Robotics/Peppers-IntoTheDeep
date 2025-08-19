@@ -7,8 +7,11 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.sun.tools.javac.code.Attribute;
 
 import org.firstinspires.ftc.teamcode.Robot.Localizer;
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -16,7 +19,9 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Config
 public class YellowSampleDetectionPipeline extends OpenCvPipeline {
@@ -35,7 +40,7 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
     // sau fa-l mai mic daca ia in calcul noise ul din background
     public static double SizeTreshold = 50;
     private Mat mask = new Mat(), tmp = new Mat(),
-            labels = new Mat(), stats = new Mat(), centroids = new Mat();
+            labels = new Mat(), stats = new Mat(), centroids = new Mat(), undistorted = new Mat();
 
     private static Point getMiddleTargetPoint(Mat stat, int i){
         double xM = (stat.get(i, Imgproc.CC_STAT_LEFT)[0] + stat.get(i, Imgproc.CC_STAT_WIDTH)[0]) / 2.d;
@@ -50,18 +55,33 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
 
         return new Point(xM, y);
     }
-
-    private double[] tx, ty;
+    private List<Double> tx, ty;
     private int biggestDetectionID = 0;
+    private static final Mat distCoeff = new MatOfDouble(0.1208, -0.261599, 0, 0, 0.10308, 0, 0, 0), cameraMat = Mat.eye(3, 3, CvType.CV_64F);
+    static{
+        cameraMat.put(0, 0, 622.001f);
+        cameraMat.put(1, 1, 622.001f);
+        cameraMat.put(0, 2, 319.803f);
+        cameraMat.put(1, 2, 241.251f);
+    }
 
     @Override
     public Mat processFrame(Mat input) {
+        if(tx == null){
+            tx = new ArrayList<>(2);
+            ty = new ArrayList<>(2);
+        }
+        Calib3d.undistort(input, undistorted, cameraMat, distCoeff);
+        input = undistorted.clone();
+        undistorted.release();
         poseWhenSnapshoted = Localizer.getCurrentPosition();
 
         double largestContour = -1;
 
-        double cameraFOV_Y = 2 * input.rows() * (1 - Math.cos(cameraFOV)) / (input.rows() * input.rows() + input.cols() * input.cols());
-        double cameraFOV_X = 2 * input.cols() * (1 - Math.cos(cameraFOV)) / (input.rows() * input.rows() + input.cols() * input.cols());
+
+        // Daca tot nu merge schimva fov urile sa fie cele bune (cauta pe net)
+        double cameraFOV_Y = Math.sqrt(2 * input.rows() * (1 - Math.cos(cameraFOV)) / (input.rows() * input.rows() + input.cols() * input.cols()));
+        double cameraFOV_X = Math.sqrt(2 * input.cols() * (1 - Math.cos(cameraFOV)) / (input.rows() * input.rows() + input.cols() * input.cols()));
 
 
         Imgproc.cvtColor(input, mask, Imgproc.COLOR_RGB2HSV);
@@ -86,9 +106,13 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
         }
 
         // initialize empty list for tx and ty
-        tx = new double[noSamples];
-        ty = new double[noSamples];
+//        tx = new double[noSamples];
+//        ty = new double[noSamples];
+        List<Double> ttx = new ArrayList<>();
+        List<Double> tty = new ArrayList<>();
 
+        ttx.add(0.d);
+        tty.add(0.d);
         for(int i = 1; i < noSamples; i++){
             if(stats.get(i, Imgproc.CC_STAT_AREA)[0] < SizeTreshold) continue;
             if(stats.get(i, Imgproc.CC_STAT_AREA)[0] > largestContour) {
@@ -107,8 +131,10 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
             target = new Point(vpw / 2.d * nx, vph / 2.d * ny);
 
             // get the angle
-            tx[i] = Math.atan2(target.x, 1);
-            ty[i] = Math.atan2(target.y, 1);
+//            ttx.set(i, Math.atan2(target.x, 1));
+//            tty.set(i, Math.atan2(target.y, 1));
+            ttx.add(Math.atan2(target.x, 1));
+            tty.add(Math.atan2(target.y, 1));
 
         }
         for(int i = 1; i < noSamples; i++) {
@@ -129,6 +155,8 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
             //bounding box
             Imgproc.rectangle(input, new Point(x, y), new Point(x + w, y + h), rectColor, 2);
         }
+        tx = ttx;
+        ty = tty;
         mask.release();
         tmp.release();
 
@@ -136,10 +164,10 @@ public class YellowSampleDetectionPipeline extends OpenCvPipeline {
     }
 
     public synchronized double getTx(int id){
-        return Math.toRadians(tx[id]);
+        return Math.toDegrees(tx.get(id));
     }
     public synchronized double getTy(int id){
-        return Math.toRadians(ty[id]);
+        return Math.toDegrees(ty.get(id));
     }
     public synchronized int getLargetDetectionId(){
         return biggestDetectionID;
